@@ -70,6 +70,36 @@ node <skill-path>/scripts/doctor.mjs
 
 Use `--json` when the result feeds automation. Treat findings as a review queue, not an automatic rewrite plan.
 
+### 1A. Bind database-backed development to the allocated App TiDB
+
+For a new Syfo Hosted App with `database.required: true`, initialize or select the
+Hosted App before app-specific schema, seed, or workflow development. App Init is
+the resource boundary: it provisions the App's physical TiDB database/account and
+records the canonical `prod` database binding used by both local development and
+deployment.
+
+- Record the App ID and work inside the initialized App repository.
+- Run App-specific migrations, seed commands, database contract tests, and local
+  servers through `syfo app dev -- <command>`. Do not substitute an unrelated
+  `.env`, another App's database, or a disposable TiDB database for this gate.
+- `syfo app dev` must receive `TIDB_HOST`, `TIDB_PORT`, `TIDB_DATABASE`,
+  `TIDB_USER`, `TIDB_PASSWORD`, `TIDB_SSL`, and `DATABASE_URL` from the canonical
+  platform binding. Fail closed if the binding is missing, incomplete, or uses
+  `tidb.stub.apps.syfo.test`.
+- Before the first App-data write, verify the connection without printing raw
+  hostnames, database names, usernames, passwords, or DSNs. Log only booleans,
+  table/count results, and one-way fingerprints when identity comparison is
+  necessary.
+- Run ordered migrations twice against the allocated App database, then verify
+  migration history and representative seed/contract counts on that same binding.
+- Treat disposable local or TiDB Cloud databases as compatibility test targets
+  only. They do not satisfy allocated-App database acceptance.
+
+If `syfo app dev` cannot retrieve the managed database environment, or the
+allocated database is unexpectedly empty after a claimed migration, stop and
+investigate the binding/provisioning lifecycle. Do not report database validation
+as passed from a different connection.
+
 ### 2. Pass the frontend capability gate
 
 Classify the user-visible scope as one of:
@@ -257,8 +287,11 @@ For TiDB work, additionally run migrations twice and database contract tests aga
 
 1. A disposable local TiDB environment when Docker is available.
 2. A disposable TiDB Cloud database over TLS when credentials are explicitly provided.
+3. The initialized Hosted App's allocated TiDB binding through
+   `syfo app dev -- <command>` when this is a Syfo App implementation or migration.
 
-A MySQL-only test is useful but does not replace TiDB validation.
+A MySQL-only test is useful but does not replace TiDB validation. Disposable TiDB
+validation does not replace the allocated-App binding gate in section 1A.
 
 For native dependencies or Mac/ARM development, build and smoke-test in a Linux AMD64 container matching the intended FC execution architecture.
 
@@ -282,6 +315,8 @@ Cloud acceptance should cover:
 - Health, home page, static assets, login redirects, and representative APIs.
 - At least one TiDB write/read transaction.
 - Repeated migration behavior.
+- Confirmation that local App validation and deployment use the same canonical
+  allocated database binding, compared without exposing connection values.
 - TLS and bounded connection pool behavior.
 - Logs free from secrets, Cookies, Authorization, and private keys.
 - A recorded artifact digest and rollback point.

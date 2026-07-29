@@ -7,6 +7,10 @@ import type { SyfoAuthSession } from './types';
 export function startLogin(returnTo = window.location.pathname + window.location.search): void {
   const url = new URL(syfoAuthPaths.login, window.location.origin);
   url.searchParams.set('returnTo', returnTo);
+  // The browser's address-bar origin is the only reliable public origin: behind the
+  // runtime edge the server sees an internal bind host (e.g. 0.0.0.0:9000), so the
+  // login route must derive the OAuth redirect_uri from this value, never from req.host.
+  url.searchParams.set('origin', window.location.origin);
   window.location.assign(url);
 }
 

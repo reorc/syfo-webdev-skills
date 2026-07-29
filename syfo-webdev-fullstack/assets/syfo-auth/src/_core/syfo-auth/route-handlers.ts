@@ -13,12 +13,27 @@ import {
   verifyIdToken,
 } from './protocol';
 import { readSyfoSession } from './server';
+import {
+  appOriginFromRedirectUri,
+  isLogoutAuthorized,
+  resolveAppOrigin,
+} from './origin';
 import type { OAuthTransaction } from './types';
 
 export async function loginRoute(request: NextRequest): Promise<NextResponse> {
+  let appOrigin: string;
+  try {
+    appOrigin = resolveAppOrigin({
+      provided: request.nextUrl.searchParams.get('origin'),
+      requestOrigin: request.nextUrl.origin,
+      isProduction: process.env.NODE_ENV === 'production',
+    });
+  } catch {
+    return NextResponse.json({ error: 'oauth_origin_invalid' }, { status: 400 });
+  }
   const config = syfoAuthConfig();
   const discovery = await discoverOpenId(config.issuer);
-  const redirectUri = new URL(syfoAuthPaths.callback, request.nextUrl.origin).toString();
+  const redirectUri = new URL(syfoAuthPaths.callback, appOrigin).toString();
   const { verifier, challenge } = await createPkcePair();
   const transaction = createOAuthTransaction({
     verifier,
@@ -87,11 +102,16 @@ async function completeCallback(request: NextRequest): Promise<NextResponse> {
     name: claims.name,
     picture: claims.picture,
   });
+  // The app origin captured at login is sealed into the transaction's redirect_uri. Reuse it
+  // for both the post-login redirect and the session binding, never request.nextUrl.origin —
+  // behind the runtime edge the latter is the internal bind host.
+  const appOrigin = appOriginFromRedirectUri(transaction.redirectUri);
   const session = sessionFromClaims({
     claims,
     appUser,
+    origin: appOrigin,
   });
-  const response = NextResponse.redirect(new URL(transaction.returnTo, request.nextUrl.origin));
+  const response = NextResponse.redirect(new URL(transaction.returnTo, appOrigin));
   response.cookies.delete(syfoAuthCookies.transaction);
   response.cookies.set(syfoAuthCookies.session, await sealCookie(session, config.sessionSecret), {
     ...syfoAuthCookieOptions,
@@ -123,7 +143,18 @@ export async function sessionRoute(request: NextRequest): Promise<NextResponse> 
 }
 
 export async function logoutRoute(request: NextRequest): Promise<NextResponse> {
-  if (request.headers.get('origin') !== request.nextUrl.origin) {
+  const session = await readSyfoSession(request);
+  // No active session: nothing to protect, idempotent success.
+  if (!session) return new NextResponse(null, { status: 204 });
+  // CSRF: compare the browser Origin against the origin sealed into the session at login
+  // (legacy sessions without a sealed origin fall back to Sec-Fetch-Site). Never trust
+  // request.nextUrl.origin — behind the runtime edge it is the internal bind host.
+  const authorized = isLogoutAuthorized({
+    browserOrigin: request.headers.get('origin'),
+    sessionOrigin: session.origin ?? null,
+    secFetchSite: request.headers.get('sec-fetch-site'),
+  });
+  if (!authorized) {
     return NextResponse.json({ error: 'csrf_origin_invalid' }, { status: 403 });
   }
   const response = new NextResponse(null, { status: 204 });

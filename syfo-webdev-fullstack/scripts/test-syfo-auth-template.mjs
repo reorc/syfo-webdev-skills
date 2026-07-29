@@ -36,6 +36,7 @@ async function bundleServerEntries() {
     'paths.ts',
     'config.ts',
     'oidc.ts',
+    'origin.ts',
     'server.ts',
     'route-handlers.ts',
   ];

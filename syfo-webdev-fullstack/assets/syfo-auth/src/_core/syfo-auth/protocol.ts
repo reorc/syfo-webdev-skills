@@ -180,6 +180,7 @@ export async function verifyIdToken(input: {
 export function sessionFromClaims(input: {
   claims: IdTokenClaims & { sub: string; exp: number };
   appUser: AppUser;
+  origin: string;
 }): StoredSyfoAuthSession {
   const user: SyfoAuthUser = {
     sub: input.claims.sub,
@@ -192,6 +193,7 @@ export function sessionFromClaims(input: {
     appUser: input.appUser,
     hostedApp: input.claims[syfoHostedAppClaimName] as SyfoHostedAppClaim,
     expiresAt: input.claims.exp * 1000,
+    origin: input.origin,
   };
 }
 

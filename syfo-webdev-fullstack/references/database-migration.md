@@ -20,7 +20,10 @@ Before editing schema or migrations, identify:
 5. Add repository contract tests.
 6. Run against disposable local TiDB.
 7. Run against disposable TiDB Cloud over TLS when available.
-8. Remove obsolete runtime dependencies only after behavior matches.
+8. For a Syfo Hosted App, run migrations twice and contract/seed checks through
+   `syfo app dev -- <command>` against the App's allocated canonical database
+   binding. Reject missing or stub bindings and do not print connection values.
+9. Remove obsolete runtime dependencies only after behavior matches.
 
 ## Safety
 
@@ -29,6 +32,8 @@ Before editing schema or migrations, identify:
 - Avoid implicit migration execution during ordinary application startup.
 - Return non-zero on migration failure.
 - Record migration version and outcome without logging credentials.
+- Do not use another App's database or a disposable compatibility database as
+  evidence that the allocated App database was migrated.
 
 ## Contract tests
 

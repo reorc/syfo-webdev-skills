@@ -32,7 +32,10 @@ export type SyfoAuthSession = {
   expiresAt: number;
 };
 
-export type StoredSyfoAuthSession = SyfoAuthSession;
+// The origin the user authenticated from, sealed into the session cookie and used for the
+// logout CSRF check. Optional so sessions issued before this field existed still decode
+// (those legacy sessions fall back to a Sec-Fetch-Site same-origin check on logout).
+export type StoredSyfoAuthSession = SyfoAuthSession & { origin?: string };
 
 export type OAuthTransaction = {
   state: string;
