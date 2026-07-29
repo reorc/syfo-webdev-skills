@@ -1,0 +1,42 @@
+version: 1
+
+app:
+  name: replace-with-app-slug
+  type: nextjs
+
+runtime:
+  family: nodejs
+  version: "20"
+
+build:
+  install: pnpm install --frozen-lockfile
+  command: pnpm build && node scripts/assemble-static.mjs
+  output: .fc/artifact
+
+run:
+  command: node server.mjs
+  port: 9000
+  healthCheck:
+    method: GET
+    path: /healthz
+    timeoutSeconds: 5
+
+resources:
+  memoryMB: 512
+  timeoutSeconds: 30
+  concurrency: 20
+
+database:
+  required: false
+
+env:
+  required: []
+  optional: []
+
+routing:
+  public: true
+  methods:
+    - GET
+    - HEAD
+    - OPTIONS
+  spaFallback: false

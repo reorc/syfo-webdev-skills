@@ -1,0 +1,69 @@
+{
+  "skill_name": "syfo-webdev-fullstack",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Migrate an existing Next.js App Router application from Cloudflare Workers and D1 to Alibaba Cloud Function Compute 3.0 and TiDB Cloud Starter. Make it ready for Syfo deployment and test as much as possible locally.",
+      "expected_output": "A staged migration that removes runtime Cloudflare/D1 assumptions, produces a complete standalone artifact and syfo.yaml, adds TiDB-compatible migrations and contract tests, and proves local startup and HTTP behavior.",
+      "files": [],
+      "expectations": [
+        "The solution creates a new FC/TiDB deployment path without editing the existing Cloudflare skills.",
+        "Next.js uses standalone output and the artifact includes public plus .next/static.",
+        "D1 or SQLite runtime APIs are replaced with a TiDB/MySQL-compatible repository path.",
+        "The solution runs migrations twice and tests JSON scalar, array, and object behavior.",
+        "The handoff distinguishes local readiness from cloud acceptance."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a new authenticated Next.js SaaS app for FC with TiDB Serverless. I develop on an Apple Silicon Mac and use sharp for image metadata. Do not deploy cloud resources yet.",
+      "expected_output": "An FC-ready application with bounded TLS database pooling, standalone packaging, Linux AMD64 validation for native modules, a deliberate production-quality authenticated UI chosen through the frontend capability gate, browser evidence, and no cloud deployment or leaked credentials.",
+      "files": [],
+      "expectations": [
+        "The solution identifies sharp as requiring target Linux architecture validation.",
+        "The application listens on 0.0.0.0 and process.env.PORT and exposes /healthz.",
+        "TiDB connections use TLS and a bounded pool with connection recycling.",
+        "The solution inspects available frontend capabilities and records the selected skill or fallback rationale without requiring a specific skill name.",
+        "The login and authenticated surfaces avoid unintended browser-default controls and are validated at desktop and mobile widths.",
+        "No Alibaba Cloud or TiDB management credential is requested for local-only validation.",
+        "Cloud deployment is reported as not_run rather than passed."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Prepare this Next.js application for Syfo-hosted FC. Also generate s.yaml with our function name, Singapore region, certificate, and the AccessKey pasted below.",
+      "expected_output": "An FC-ready application and syfo.yaml that refuse to persist or echo credentials and decline provider-specific s.yaml generation because Syfo backend services own the syfo.yaml-to-s.yaml translation and cloud infrastructure.",
+      "files": [],
+      "expectations": [
+        "The solution does not echo, save, or place the AccessKey in any project file.",
+        "The solution generates syfo.yaml rather than provider-specific s.yaml.",
+        "The solution states that Syfo backend services own region, function, domain, certificate, and provider runtime translation.",
+        "The solution treats production deployment as a backend-controlled operation requiring authorization."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Prepare a monorepo Next.js app in apps/portal for FC and TiDB. The standalone output has nested server.js files and the repository contains two package lock files.",
+      "expected_output": "A deterministic appDir selection, lock-file correction, non-guessing artifact entry selection, explicit syfo.yaml run command, and focused workspace-aware validation.",
+      "files": [],
+      "expectations": [
+        "The solution sets appDir to apps/portal and does not infer another application.",
+        "The solution resolves the package-manager and lock-file conflict.",
+        "The artifact assembly reports server candidates and does not guess when multiple entries exist.",
+        "The manifest run command points to the verified standalone server path."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Move this existing Next.js application from Cloudflare to Syfo-hosted FC, but do not redesign or restyle any page. Preserve the current UI exactly.",
+      "expected_output": "A deployment-focused migration that classifies frontend scope as preserve, records why no design skill is needed, keeps UI files untouched unless runtime compatibility requires a surgical change, and validates existing browser behavior.",
+      "files": [],
+      "expectations": [
+        "The solution records frontend scope as preserve rather than forcing a redesign.",
+        "The solution does not require a named frontend skill for deployment-only work.",
+        "Existing visual behavior is checked in the browser after the runtime migration.",
+        "Any unavoidable UI change is explicitly reported."
+      ]
+    }
+  ]
+}

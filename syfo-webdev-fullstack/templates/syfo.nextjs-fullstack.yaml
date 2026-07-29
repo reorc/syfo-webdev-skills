@@ -1,0 +1,52 @@
+version: 1
+
+app:
+  name: replace-with-app-slug
+  type: nextjs
+
+runtime:
+  family: nodejs
+  version: "20"
+
+build:
+  install: pnpm install --frozen-lockfile
+  command: pnpm build
+  output: .next/standalone
+
+run:
+  command: node server.js
+  port: 9000
+  healthCheck:
+    method: GET
+    path: /healthz
+    timeoutSeconds: 5
+
+resources:
+  memoryMB: 1024
+  timeoutSeconds: 60
+  concurrency: 10
+
+database:
+  engine: tidb
+  required: true
+  migrations:
+    command: pnpm db:migrate
+
+env:
+  required:
+    - SESSION_SECRET
+  optional:
+    - LOG_LEVEL
+    - APP_PUBLIC_ORIGIN
+
+routing:
+  public: true
+  methods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - HEAD
+    - OPTIONS
+  spaFallback: false

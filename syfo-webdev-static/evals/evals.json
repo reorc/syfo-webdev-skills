@@ -1,0 +1,67 @@
+{
+  "skill_name": "syfo-webdev-static",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a polished multi-page Next.js marketing site for Syfo deployment. It has no login, API, database, or server secrets.",
+      "expected_output": "A polished Next.js App Router static export with frontend capability selection, a deliberate design direction, deterministic FC artifact assembly, static adapter, health endpoint, syfo.yaml, desktop/mobile browser validation, and no s.yaml or database configuration.",
+      "files": [],
+      "expectations": [
+        "The solution uses output: export and generates every route at build time.",
+        "The solution creates syfo.yaml and does not create provider-specific s.yaml.",
+        "The solution selects appropriate available frontend capabilities without requiring a specific skill name.",
+        "The finished pages avoid unintended browser-default controls and obvious scaffold placeholders.",
+        "Desktop and mobile browser evidence is recorded.",
+        "The artifact contains exported files plus a foreground static server entry.",
+        "The handoff distinguishes local readiness from cloud acceptance."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Migrate a self-contained HTML audio showcase with hundreds of local MP3 files into a Next.js static site for Syfo-hosted FC. Preserve playback and seeking.",
+      "expected_output": "A static Next.js migration that inventories the media artifact, preserves local assets when within budget, serves correct MIME types and byte ranges, and validates playback without adding TiDB or business APIs.",
+      "files": [],
+      "expectations": [
+        "The solution does not blindly reject all local media or copy Manus-specific upload instructions.",
+        "The solution records asset size and file count.",
+        "The static adapter supports Range requests and the validation includes a 206 check.",
+        "No database or server-side application behavior is introduced."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Build a static Next.js customer portal that reads a private API key on the server, authenticates users with cookies, and updates data without redeploying.",
+      "expected_output": "A clear static-eligibility rejection that routes the request to syfo-webdev-fullstack instead of exposing secrets or weakening authentication.",
+      "files": [],
+      "expectations": [
+        "The solution identifies cookies, private credentials, and runtime mutations as fullstack blockers.",
+        "The solution does not move the private key into NEXT_PUBLIC variables.",
+        "The solution recommends syfo-webdev-fullstack with the smallest viable architecture change."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Prepare a Next.js documentation site with dynamic [slug] routes for Syfo FC. The complete document list is available during build, and unknown slugs must return 404.",
+      "expected_output": "A static export using generateStaticParams, real route-specific HTML and 404 behavior, deterministic artifact assembly, syfo.yaml, and direct-navigation smoke checks.",
+      "files": [],
+      "expectations": [
+        "The solution enumerates dynamic routes at build time.",
+        "The solution does not enable SPA fallback by default.",
+        "Direct navigation and unknown-route status are validated.",
+        "The provider-specific deployment configuration is left to the Syfo backend."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Convert this existing Next.js static site from Cloudflare hosting to Syfo FC packaging. Do not change its visual design or component styling.",
+      "expected_output": "A packaging-focused migration that classifies frontend scope as preserve, keeps the existing interface intact, avoids unnecessary design-skill work, and validates that browser behavior remains unchanged.",
+      "files": [],
+      "expectations": [
+        "The solution records frontend scope as preserve.",
+        "The solution does not force a redesign or require a named frontend skill.",
+        "Existing routes and responsive behavior are rechecked in the browser.",
+        "Any unavoidable UI-impacting change is reported."
+      ]
+    }
+  ]
+}

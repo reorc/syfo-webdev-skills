@@ -1,0 +1,12 @@
+{
+  "name": "syfo-webdev-skills",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/validate.mjs && node --test test-runtime-env-templates.mjs test-static-server-basic-auth.mjs syfo-webdev-fullstack/scripts/test-syfo-auth-template.mjs",
+    "package:release": "bash scripts/package-release.sh"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}
