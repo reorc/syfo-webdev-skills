@@ -7,7 +7,7 @@ description: "Build, migrate, validate, and package static Next.js App Router si
 
 Produce a static Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
 
-The site is static at the product layer. A small Node.js HTTP adapter exists only because FC requires a foreground HTTP process; it serves exported files, health checks, correct 404 responses, cache headers, and byte ranges for media. It must not contain business APIs, authentication, secrets, persistence, or request-time rendering.
+The site is static at the product layer. A small Node.js HTTP adapter exists only because FC requires a foreground HTTP process; it serves exported files, health checks, correct 404 responses, cache headers, byte ranges for media, and delegates platform Basic Auth policy checks. It must not contain business APIs, application-owned authentication, user credentials, persistence, or request-time rendering.
 
 ## Boundaries
 
@@ -31,7 +31,7 @@ Stay static when every required behavior is available at build time or in the br
 
 Stop and use `syfo-webdev-fullstack` when the request needs:
 
-- Cookies, server-side sessions, authentication, authorization, or private user data.
+- Cookies, server-side sessions, application-owned authentication or authorization, or private user data. Platform-managed Hosted App Basic Auth remains an infrastructure access policy and is supported by the adapter.
 - Server Actions or request-dependent Route Handlers.
 - Server-only secrets or private upstream credentials.
 - A database, upload backend, webhook, queue, scheduled job, or durable write.
@@ -197,6 +197,8 @@ The server adapter must:
 - Run in the foreground and exit non-zero on startup failure.
 - Serve exported files without writes or application state.
 - Provide unauthenticated `GET /healthz`.
+- Delegate non-health visitor access checks to the Syfo Basic Auth verifier, fail closed when the verifier is unavailable, and never embed visitor passwords.
+- Resolve the public root and served files through `realpath`, rejecting symlink escapes.
 - Preserve generated HTML routing and real 404 behavior.
 - Support `GET`, `HEAD`, and single byte ranges for media.
 - Add immutable caching for `/_next/static/` and conservative caching elsewhere.
@@ -212,8 +214,8 @@ The baseline declares:
 
 - `app.type: nextjs`.
 - Node.js runtime intent without provider runtime identifiers.
-- Frozen dependency installation.
-- `next build` followed by project-local artifact assembly.
+- `package-lock.json` with `npm ci` for new official-template Apps. Preserve another package manager only when its single lock file and every manifest command remain consistent.
+- `npm run build`, whose project-owned build script performs `next build` and artifact assembly; do not put compound shell commands in `syfo.yaml`.
 - `.fc/artifact` as the build output.
 - `node server.mjs` as the foreground command inside the artifact.
 - Port 9000 and `/healthz`.
@@ -260,12 +262,30 @@ Omit `--range-path` when the site has no audio or video.
 
 For Apple Silicon development or architecture-specific dependencies, validate the assembled artifact in Linux AMD64 even though the application itself is static.
 
+After an authorized deployment, run the access-aware cloud smoke. Pass Basic Auth credentials only
+through environment variables so they do not appear in shell history or the JSON report:
+
+```bash
+node <skill-path>/scripts/smoke-cloud-access.mjs \
+  --url https://APP_DOMAIN \
+  --mode public \
+  --path /
+
+SYFO_BASIC_AUTH_USERNAME=... SYFO_BASIC_AUTH_PASSWORD=... \
+node <skill-path>/scripts/smoke-cloud-access.mjs \
+  --url https://APP_DOMAIN \
+  --mode basic_auth \
+  --path /
+```
+
 ### 10. Prepare Syfo handoff
 
 - Record the verified artifact entry, source revision or ZIP digest, artifact digest, asset budget, public environment-variable names, and validation results.
 - Hand `syfo.yaml` plus immutable source/artifact identity to the Syfo backend deployment service.
 - Do not generate `s.yaml` or perform cloud resource creation from this skill.
 - Distinguish local readiness from backend/cloud acceptance.
+- After deployment, run access-aware smoke for the configured policy: public anonymous success;
+  Basic Auth anonymous challenge; and Basic Auth success with an authorized test credential.
 
 ## Required handoff
 
@@ -313,6 +333,9 @@ Return a human-readable summary followed by exactly one JSON object:
     "rangeRequests": "not_applicable",
     "browser": "passed",
     "linuxAmd64": "not_applicable",
+    "cloudPublicAnonymous": "not_run",
+    "cloudBasicAuthChallenge": "not_run",
+    "cloudBasicAuthAuthorized": "not_run",
     "cloudAcceptance": "not_run"
   },
   "notes": []

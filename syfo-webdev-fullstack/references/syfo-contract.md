@@ -15,8 +15,10 @@ The accepted application contract is `syfo.yaml` version 1 unless the repository
 
 - `app.type`: `nextjs`.
 - `runtime.family`: `nodejs`.
-- `build.output`: `.next/standalone`.
-- `run.command`: an explicit built standalone server path.
+- `build.install`: `npm ci` for the official `package-lock.json` template.
+- `build.command`: `npm run build`; the project build script assembles the artifact.
+- `build.output`: `.fc/artifact`.
+- `run.command`: `node server.js` inside the declared artifact.
 - `run.port`: `9000`.
 - `run.healthCheck.path`: `/healthz`.
 - `database.engine`: `tidb`.
@@ -27,6 +29,8 @@ The accepted application contract is `syfo.yaml` version 1 unless the repository
 
 - Unknown or unsupported manifest version.
 - Missing lock file or mismatch with the install command.
+- Multiple dependency lock files.
+- Package manager mismatch across lock file, install, build, and migration commands.
 - Absolute path or path escape.
 - Missing build output after the declared build.
 - Health endpoint failure.

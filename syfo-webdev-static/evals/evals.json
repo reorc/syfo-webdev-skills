@@ -13,7 +13,9 @@
         "The finished pages avoid unintended browser-default controls and obvious scaffold placeholders.",
         "Desktop and mobile browser evidence is recorded.",
         "The artifact contains exported files plus a foreground static server entry.",
-        "The handoff distinguishes local readiness from cloud acceptance."
+        "The official-template default uses package-lock.json, npm ci, and one npm run build command whose project script owns assembly.",
+        "The static adapter delegates platform Basic Auth, fails closed, preserves unauthenticated health, and blocks symlink escapes.",
+        "The handoff distinguishes local readiness from cloud acceptance and records access-aware public or Basic Auth cloud smoke as not_run until executed."
       ]
     },
     {

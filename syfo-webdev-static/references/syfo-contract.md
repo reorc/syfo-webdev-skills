@@ -7,6 +7,8 @@ The baseline contract is `syfo.yaml` version 1 unless the repository contains a 
 - Place `syfo.yaml` at the selected `appDir` root.
 - Keep every path relative to `appDir` and contained within it.
 - Use one matching dependency lock file and a frozen install command.
+- Use `package-lock.json`, `npm ci`, and `npm run build` for the official template; keep any
+  migrated package manager internally consistent instead of switching it implicitly.
 - Declare deterministic install, build, artifact, run, health, environment-name, and routing behavior.
 - Use `app.type: nextjs`, static artifact output `.fc/artifact`, and `node server.mjs` inside that artifact.
 - Declare `database.required: false`; do not declare TiDB variables.
@@ -17,6 +19,8 @@ The baseline contract is `syfo.yaml` version 1 unless the repository contains a 
 
 - Unknown manifest version.
 - Missing or mismatched lock file and frozen install command.
+- Multiple dependency lock files.
+- Compound manifest build commands instead of a project-owned build script.
 - Missing `output: "export"` or missing exported `out/` after build.
 - Missing artifact assembly or static server entry.
 - Health endpoint failure.
@@ -27,4 +31,4 @@ The baseline contract is `syfo.yaml` version 1 unless the repository contains a 
 
 ## Static baseline
 
-The application remains a static Next.js product even though FC needs a small HTTP process to serve its exported files. The adapter does not authorize users, mutate data, access secrets, call TiDB, or render application pages per request.
+The application remains a static Next.js product even though FC needs a small HTTP process to serve its exported files. The adapter does not own application users or credentials, mutate data, call TiDB, or render application pages per request. It may delegate platform access-policy verification to Syfo using platform-injected runtime credentials.

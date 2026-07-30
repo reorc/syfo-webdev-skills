@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev-fullstack
-description: Build, migrate, validate, and package fullstack Next.js App Router applications for Syfo-hosted Alibaba Cloud Function Compute 3.0, normally with TiDB Cloud Starter or Essential. Use for SSR, Route Handlers, Server Actions, cookies, authentication, server secrets, database-backed workflows, or migrations from Cloudflare Workers, D1, SQLite, Vercel, and ordinary Node.js hosting. Produces a Next.js standalone artifact and syfo.yaml; Syfo backend services generate provider-specific s.yaml and FC infrastructure. Use syfo-webdev-static for fully build-time sites without application backend behavior.
+description: Build, migrate, validate, and package fullstack Next.js App Router applications for Syfo-hosted Alibaba Cloud Function Compute 3.0, normally with TiDB Cloud Starter or Essential. Use for SSR, Route Handlers, Server Actions, cookies, authentication, server secrets, database-backed workflows, or migrations from Cloudflare Workers, D1, SQLite, Vercel, and ordinary Node.js hosting. Produces an assembled .fc/artifact from Next.js standalone output plus syfo.yaml; Syfo backend services generate provider-specific s.yaml and FC infrastructure. Use syfo-webdev-static for fully build-time sites without application backend behavior.
 ---
 
 # Syfo WebDev Fullstack for FC and TiDB
@@ -169,7 +169,7 @@ The production server must:
 - Stop accepting new work and close resources on termination when the runtime allows it.
 - Use trusted proxy and public-origin configuration for redirects rather than the FC probe URL.
 
-For Next.js, set `output: "standalone"`. Assemble `.next/standalone`, `.next/static`, and `public` into one immutable artifact.
+For Next.js, set `output: "standalone"`. Assemble `.next/standalone`, `.next/static`, and `public` into the immutable `.fc/artifact` accepted by Syfo.
 
 Read `references/fc-runtime.md` and `references/nextjs-standalone.md` before changing runtime or build configuration.
 
@@ -240,9 +240,9 @@ For a normal Next.js + TiDB application, declare:
 
 - `app.type: nextjs`.
 - Node.js runtime version supported by the platform.
-- Frozen dependency installation.
-- `next build` and `.next/standalone` output.
-- Foreground standalone start command.
+- `package-lock.json` with `npm ci` for new official-template Apps. Preserve another package manager only when its single lock file and every manifest command remain consistent.
+- `npm run build`, whose project script runs `next build` and assembles `.fc/artifact`.
+- `.fc/artifact` as `build.output` and `node server.js` as the foreground command inside it.
 - Port 9000 and `/healthz`.
 - TiDB requirement and migration command.
 - Only application-owned required and optional environment-variable names.
@@ -312,6 +312,22 @@ validation does not replace the allocated-App binding gate in section 1A.
 
 For native dependencies or Mac/ARM development, build and smoke-test in a Linux AMD64 container matching the intended FC execution architecture.
 
+After an authorized deployment, run the access-aware cloud smoke. Pass Basic Auth credentials only
+through environment variables so they do not appear in shell history or the JSON report:
+
+```bash
+node <skill-path>/scripts/smoke-cloud-access.mjs \
+  --url https://APP_DOMAIN \
+  --mode public \
+  --path /
+
+SYFO_BASIC_AUTH_USERNAME=... SYFO_BASIC_AUTH_PASSWORD=... \
+node <skill-path>/scripts/smoke-cloud-access.mjs \
+  --url https://APP_DOMAIN \
+  --mode basic_auth \
+  --path /
+```
+
 ### 10. Prepare Syfo handoff
 
 - Validate `syfo.yaml` as application intent rather than cloud infrastructure.
@@ -337,6 +353,8 @@ Cloud acceptance should cover:
 - TLS and bounded connection pool behavior.
 - Logs free from secrets, Cookies, Authorization, and private keys.
 - A recorded artifact digest and rollback point.
+- Access-aware smoke for every configured policy: public anonymous success; Basic Auth anonymous
+  challenge; and Basic Auth success with an authorized test credential.
 
 ## Required handoff
 
@@ -384,6 +402,9 @@ Return a human-readable summary followed by exactly one JSON object:
     "databaseContract": "passed",
     "browser": "passed",
     "linuxAmd64": "not_applicable",
+    "cloudPublicAnonymous": "not_run",
+    "cloudBasicAuthChallenge": "not_run",
+    "cloudBasicAuthAuthorized": "not_run",
     "cloudAcceptance": "not_run"
   },
   "notes": []
