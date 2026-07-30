@@ -76,10 +76,11 @@ Choose the init path before writing substantial application code:
 
 - For a brand-new Syfo Hosted App, use the platform-created GitLab template repository. The
   platform creates the app repository from `syfo_hosted_app/app-templates/web-fullstack`
-  (`nextjs` is a compatibility alias for `fullstack`). Work in that initialized repository;
-  do not recreate the scaffold from a checked-in docs copy.
+  (`nextjs` is a compatibility alias for `fullstack`). In the daemon CLI, run
+  `syfo app init <name> --template fullstack --from-template --clone <dir>` and then work
+  in `<dir>`. Do not recreate the scaffold from a checked-in docs copy.
 - For an existing local Git project, commit a clean first version, then run `syfo app init
-  <name> --template fullstack` from that repository. The daemon sends `sourceMode=local`,
+  <name> --template fullstack` from that repository without `--from-template`. The daemon sends `sourceMode=local`,
   so the platform creates an empty GitLab repository and the daemon pushes the local branch
   into it.
 - Do not push an existing local repository into a template-initialized remote. That creates

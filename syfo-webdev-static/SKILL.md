@@ -77,9 +77,10 @@ Choose the init path before writing substantial site code:
 
 - For a brand-new Syfo Hosted App, use the platform-created GitLab template repository. The
   platform creates the app repository from `syfo_hosted_app/app-templates/web-static`.
-  Work in that initialized repository; do not recreate the scaffold from a checked-in docs copy.
+  In the daemon CLI, run `syfo app init <name> --template static --from-template --clone <dir>`
+  and then work in `<dir>`. Do not recreate the scaffold from a checked-in docs copy.
 - For an existing local Git project, commit a clean first version, then run `syfo app init
-  <name> --template static` from that repository. The daemon sends `sourceMode=local`, so
+  <name> --template static` from that repository without `--from-template`. The daemon sends `sourceMode=local`, so
   the platform creates an empty GitLab repository and the daemon pushes the local branch into it.
 - Do not push an existing local repository into a template-initialized remote. That creates
   unrelated-history or non-fast-forward conflicts. If this has already happened, stop and
