@@ -9,9 +9,9 @@ runtime:
   version: "20"
 
 build:
-  install: pnpm install --frozen-lockfile
-  command: pnpm build
-  output: .next/standalone
+  install: npm ci
+  command: npm run build
+  output: .fc/artifact
 
 run:
   command: node server.js
@@ -30,14 +30,12 @@ database:
   engine: tidb
   required: true
   migrations:
-    command: pnpm db:migrate
+    command: npm run db:migrate
 
 env:
-  required:
-    - SESSION_SECRET
+  required: []
   optional:
     - LOG_LEVEL
-    - APP_PUBLIC_ORIGIN
 
 routing:
   public: true

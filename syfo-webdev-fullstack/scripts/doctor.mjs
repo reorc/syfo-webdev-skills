@@ -16,6 +16,29 @@ function findFirst(names) {
   return names.map((name) => join(root, name)).find(existsSync);
 }
 
+function section(source, name) {
+  const lines = source.split(/\r?\n/);
+  const start = lines.findIndex((line) => line === `${name}:`);
+  if (start < 0) return "";
+  const result = [];
+  for (const line of lines.slice(start + 1)) {
+    if (line && !/^\s/.test(line)) break;
+    result.push(line);
+  }
+  return result.join("\n");
+}
+
+function scalar(block, name, indent = 2) {
+  const match = block.match(new RegExp(`^\\s{${indent}}${name}:\\s*(.+?)\\s*$`, "m"));
+  return match?.[1]?.trim() || "";
+}
+
+const packageManagers = {
+  "package-lock.json": { install: "npm ci", build: "npm run build", migration: "npm run db:migrate" },
+  "pnpm-lock.yaml": { install: "pnpm install --frozen-lockfile", build: "pnpm build", migration: "pnpm db:migrate" },
+  "yarn.lock": { install: "yarn install --immutable", build: "yarn build", migration: "yarn db:migrate" },
+};
+
 function walk(directory, files = []) {
   if (!existsSync(directory) || files.length >= 2500) return files;
   for (const entry of readdirSync(directory)) {
@@ -53,7 +76,7 @@ if (!existsSync(packagePath)) {
 
 const lockFiles = ["pnpm-lock.yaml", "package-lock.json", "yarn.lock", "bun.lock", "bun.lockb"].filter((name) => existsSync(join(root, name)));
 if (lockFiles.length === 0) add("error", "missing-lockfile", ".", "Commit one dependency lock file.");
-if (lockFiles.length > 1) add("warning", "multiple-lockfiles", ".", `Multiple lock files found: ${lockFiles.join(", ")}.`);
+if (lockFiles.length > 1) add("error", "multiple-lockfiles", ".", `Multiple lock files found: ${lockFiles.join(", ")}. Keep exactly one.`);
 
 const nextConfig = findFirst(["next.config.ts", "next.config.mjs", "next.config.js", "next.config.cjs"]);
 if (!nextConfig) {
@@ -71,11 +94,15 @@ if (!existsSync(manifestPath)) {
   add("error", "missing-manifest", "syfo.yaml", "Create the Syfo application manifest at appDir root.");
 } else {
   manifest = read(manifestPath);
+  const build = section(manifest, "build");
+  const run = section(manifest, "run");
+  const database = section(manifest, "database");
   const checks = [
     ["manifest-version", /^version:\s*1\s*$/m, "Set syfo.yaml version to integer 1."],
     ["manifest-app-type", /^\s*type:\s*nextjs\s*$/m, "Declare app.type as nextjs."],
     ["manifest-runtime", /^\s*family:\s*nodejs\s*$/m, "Declare the Node.js runtime family."],
-    ["manifest-output", /^\s*output:\s*\.next\/standalone\s*$/m, "Declare .next/standalone as build output."],
+    ["manifest-output", /^\s*output:\s*\.fc\/artifact\s*$/m, "Declare .fc/artifact as build output."],
+    ["manifest-run", /^\s*command:\s*node server\.js\s*$/m, "Run node server.js inside the assembled artifact."],
     ["manifest-port", /^\s*port:\s*9000\s*$/m, "Use the Syfo FC port contract."],
     ["manifest-health", /^\s*path:\s*\/healthz\s*$/m, "Declare the /healthz check."],
     ["manifest-database", /^\s*engine:\s*tidb\s*$/m, "Declare TiDB when the application requires a database."],
@@ -83,6 +110,23 @@ if (!existsSync(manifestPath)) {
   for (const [code, pattern, detail] of checks) {
     if (!pattern.test(manifest)) add("error", code, "syfo.yaml", detail);
   }
+  if (lockFiles.length === 1) {
+    const expected = packageManagers[lockFiles[0]];
+    if (!expected) {
+      add("error", "unsupported-lockfile", lockFiles[0], "The Syfo build service supports package-lock.json, pnpm-lock.yaml, or yarn.lock.");
+    } else {
+      const actualInstall = scalar(build, "install");
+      const actualBuild = scalar(build, "command");
+      const actualMigration = scalar(database, "command", 4);
+      if (actualInstall !== expected.install) add("error", "manifest-install-lock-mismatch", "syfo.yaml", `${lockFiles[0]} requires build.install: ${expected.install}.`);
+      if (actualBuild !== expected.build) add("error", "manifest-build-lock-mismatch", "syfo.yaml", `${lockFiles[0]} requires build.command: ${expected.build}. Put assembly in the package build script.`);
+      if (actualMigration !== expected.migration) add("error", "manifest-migration-lock-mismatch", "syfo.yaml", `${lockFiles[0]} requires database.migrations.command: ${expected.migration}.`);
+    }
+  }
+  if (scalar(build, "output") !== ".fc/artifact") add("error", "manifest-output-contract", "syfo.yaml", "build.output must be .fc/artifact.");
+  if (scalar(run, "command") !== "node server.js") add("error", "manifest-run-contract", "syfo.yaml", "run.command must be node server.js inside .fc/artifact.");
+  if (!packageJson?.scripts?.build?.includes("assemble-next-standalone.mjs")) add("error", "build-missing-assembly", "package.json", "The build script must assemble .fc/artifact with assemble-next-standalone.mjs.");
+  if (!packageJson?.scripts?.["db:migrate"]) add("error", "migration-script-missing", "package.json", "The manifest migration command requires a db:migrate package script.");
   if (/^\s*(?:accessKey|password|secret|token|privateKey|connectionString)\s*:\s*\S+/im.test(manifest)) {
     add("error", "manifest-secret", "syfo.yaml", "The manifest appears to contain a secret value.");
   }
@@ -132,10 +176,10 @@ if (/required:\s*true/.test(manifest)) {
   }
 }
 
-if (existsSync(join(root, ".next", "standalone"))) {
-  if (!existsSync(join(root, ".next", "static"))) add("warning", "missing-next-static", ".next/static", "The production build has no static directory to assemble.");
+if (existsSync(join(root, ".fc", "artifact", "server.js"))) {
+  add("info", "artifact-present", ".fc/artifact", "Run the server smoke harness against the assembled artifact.");
 } else {
-  add("info", "build-not-run", ".next/standalone", "Run the production build before artifact validation.");
+  add("info", "build-not-run", ".fc/artifact", "Run the production build and artifact assembly before runtime validation.");
 }
 
 for (const config of ["wrangler.json", "wrangler.jsonc", "wrangler.toml", "open-next.config.ts", "open-next.config.mjs"]) {

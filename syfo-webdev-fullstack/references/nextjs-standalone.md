@@ -1,4 +1,4 @@
-# Next.js standalone artifact
+# Next.js standalone source and Syfo artifact
 
 ## Build configuration
 
@@ -14,14 +14,15 @@ Preserve unrelated configuration. In a monorepo, review output-file tracing root
 
 ## Required artifact content
 
-The deployable artifact needs:
+The project build script assembles `.fc/artifact`. Its source inputs are:
 
 - The complete `.next/standalone` tree.
 - `.next/static` copied under the standalone tree at `.next/static`.
 - `public` copied into the standalone tree when present.
 - The generated standalone server entry and traced runtime dependencies.
 
-Do not deploy only `.next/standalone` when static and public assets exist.
+Do not declare or deploy `.next/standalone` directly. Copy it into `.fc/artifact`, add static and
+public assets, and declare `build.output: .fc/artifact` with `run.command: node server.js`.
 
 ## Start validation
 

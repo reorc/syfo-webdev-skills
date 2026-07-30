@@ -6,6 +6,7 @@ Run the highest available tier. Report unavailable tiers as `not_run`, never `pa
 
 - Repository instructions and write set reviewed.
 - Lock file matches the package manager.
+- Install, build, migration, output, and run commands match that single lock file and the assembled artifact contract.
 - No secret values in source, manifests, artifacts, or logs.
 - No runtime D1, SQLite, Cloudflare binding, or Edge Runtime dependency remains.
 - `syfo.yaml` paths and commands match repository files.
@@ -58,4 +59,6 @@ Only with deployment authorization:
 - Probe the FC URL internally.
 - Validate the custom HTTPS domain externally.
 - Check health, assets, redirects, API, database write/read, logs, and rollback metadata.
+- Verify the configured access policy from the public domain: anonymous 2xx for public mode;
+  anonymous 401 plus `WWW-Authenticate: Basic` for Basic Auth; and 2xx with an authorized test credential.
 - Scan output for leaked secrets before sharing logs.

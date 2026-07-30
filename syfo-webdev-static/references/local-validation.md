@@ -6,6 +6,7 @@ Run the highest available tier. Report unavailable tiers as `not_run`, never `pa
 
 - Repository instructions and appDir reviewed.
 - One lock file matches the package manager.
+- Install and build commands match that lock file; build output and run command match `.fc/artifact` and `node server.mjs`.
 - No server-only API, database runtime, provider binding, or secret value remains.
 - `syfo.yaml` commands and paths match repository files.
 - Asset bytes, file count, and largest files are recorded.
@@ -44,5 +45,7 @@ Only through the authorized backend deployment path:
 - Syfo accepts `syfo.yaml` and generates provider deployment configuration.
 - FC starts the artifact on the configured port.
 - Custom HTTPS domain serves health, pages, static chunks, media, and 404 responses.
+- Public mode serves an anonymous representative page with 2xx.
+- Basic Auth mode returns anonymous 401 with `WWW-Authenticate: Basic` and serves the same page with an authorized test credential.
 - Logs contain no secrets or full environment dumps.
 - Artifact digest and rollback identity are recorded.

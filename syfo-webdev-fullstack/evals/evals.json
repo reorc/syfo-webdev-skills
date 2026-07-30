@@ -4,14 +4,15 @@
     {
       "id": 1,
       "prompt": "Migrate an existing Next.js App Router application from Cloudflare Workers and D1 to Alibaba Cloud Function Compute 3.0 and TiDB Cloud Starter. Make it ready for Syfo deployment and test as much as possible locally.",
-      "expected_output": "A staged migration that removes runtime Cloudflare/D1 assumptions, produces a complete standalone artifact and syfo.yaml, adds TiDB-compatible migrations and contract tests, and proves local startup and HTTP behavior.",
+      "expected_output": "A staged migration that removes runtime Cloudflare/D1 assumptions, assembles .fc/artifact from Next.js standalone output, produces a contract-aligned syfo.yaml, adds TiDB-compatible migrations and contract tests, and proves local startup and HTTP behavior.",
       "files": [],
       "expectations": [
         "The solution creates a new FC/TiDB deployment path without editing the existing Cloudflare skills.",
-        "Next.js uses standalone output and the artifact includes public plus .next/static.",
+        "Next.js uses standalone source output, while syfo.yaml declares .fc/artifact and node server.js after project-owned assembly includes public plus .next/static.",
+        "A new official-template App keeps package-lock.json, npm ci, npm run build, and npm run db:migrate aligned.",
         "D1 or SQLite runtime APIs are replaced with a TiDB/MySQL-compatible repository path.",
         "The solution runs migrations twice and tests JSON scalar, array, and object behavior.",
-        "The handoff distinguishes local readiness from cloud acceptance."
+        "The handoff distinguishes local readiness from cloud acceptance and records access-aware public or Basic Auth cloud smoke as not_run until executed."
       ]
     },
     {
@@ -48,7 +49,7 @@
       "files": [],
       "expectations": [
         "The solution sets appDir to apps/portal and does not infer another application.",
-        "The solution resolves the package-manager and lock-file conflict.",
+        "The solution treats multiple lock files as a hard error and aligns install, build, and migration commands to the retained lock file.",
         "The artifact assembly reports server candidates and does not guess when multiple entries exist.",
         "The manifest run command points to the verified standalone server path."
       ]

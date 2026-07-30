@@ -1,10 +1,10 @@
 import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
+import { realpath, stat } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const root = resolve(fileURLToPath(new URL("./public/", import.meta.url)));
+const root = await realpath(resolve(fileURLToPath(new URL("./public/", import.meta.url))));
 const hostname = process.env.HOSTNAME || "0.0.0.0";
 const port = Number(process.env.PORT || "9000");
 const forgeApiUrl = process.env.BUILT_IN_FORGE_API_URL || "";
@@ -38,8 +38,10 @@ function safePath(pathname) {
 
 async function fileInfo(path) {
   try {
-    const info = await stat(path);
-    return info.isFile() ? info : null;
+    const actualPath = await realpath(path);
+    if (actualPath !== root && !actualPath.startsWith(`${root}${sep}`)) return null;
+    const info = await stat(actualPath);
+    return info.isFile() ? { path: actualPath, info } : null;
   } catch {
     return null;
   }
@@ -52,12 +54,12 @@ async function resolveRequest(pathname) {
     ? [resolve(base, "index.html")]
     : [base, `${base}.html`, resolve(base, "index.html")];
   for (const candidate of candidates) {
-    const info = await fileInfo(candidate);
-    if (info) return { path: candidate, info, status: 200 };
+    const file = await fileInfo(candidate);
+    if (file) return { ...file, status: 200 };
   }
   const notFound = resolve(root, "404.html");
-  const info = await fileInfo(notFound);
-  return info ? { path: notFound, info, status: 404 } : null;
+  const file = await fileInfo(notFound);
+  return file ? { ...file, status: 404 } : null;
 }
 
 function parseRange(value, size) {
@@ -164,8 +166,11 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  const range = request.headers.range ? parseRange(request.headers.range, resolved.info.size) : null;
-  if (request.headers.range && !range) {
+  const range =
+    resolved.status === 200 && request.headers.range
+      ? parseRange(request.headers.range, resolved.info.size)
+      : null;
+  if (resolved.status === 200 && request.headers.range && !range) {
     response.writeHead(416, { "Content-Range": `bytes */${resolved.info.size}` });
     response.end();
     return;
