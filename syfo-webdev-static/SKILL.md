@@ -71,7 +71,21 @@ node <skill-path>/scripts/doctor.mjs --json
 
 Treat findings as a review queue, not an automatic rewrite plan.
 
-### 2. Pass the frontend capability gate
+### 2. Initialize the Hosted App repository correctly
+
+Choose the init path before writing substantial site code:
+
+- For a brand-new Syfo Hosted App, use the platform-created GitLab template repository. The
+  platform creates the app repository from `syfo_hosted_app/app-templates/web-static`.
+  Work in that initialized repository; do not recreate the scaffold from a checked-in docs copy.
+- For an existing local Git project, commit a clean first version, then run `syfo app init
+  <name> --template static` from that repository. The daemon sends `sourceMode=local`, so
+  the platform creates an empty GitLab repository and the daemon pushes the local branch into it.
+- Do not push an existing local repository into a template-initialized remote. That creates
+  unrelated-history or non-fast-forward conflicts. If this has already happened, stop and
+  resolve the Git history intentionally rather than force-pushing over the template baseline.
+
+### 3. Pass the frontend capability gate
 
 Classify the user-visible scope as `none`, `preserve`, `new_ui`, or `material_change`.
 
@@ -87,7 +101,7 @@ For `none` or `preserve`, record why no design workflow is required. Do not rede
 
 Read `references/frontend-capability.md` before creating or materially changing pages, navigation, forms, onboarding, empty states, or other user-visible UI.
 
-### 3. Prove static eligibility
+### 4. Prove static eligibility
 
 Search for request-time or server-only behavior, including:
 
@@ -115,7 +129,7 @@ Classify each finding as:
 
 Read `references/static-export.md` before deciding that a route is exportable.
 
-### 4. Configure Next.js static export
+### 5. Configure Next.js static export
 
 Preserve unrelated configuration and add the minimum static settings:
 
@@ -136,7 +150,7 @@ Only add `images.unoptimized` when the project uses `next/image` without an appr
 
 For dynamic segments, generate every deployable route with `generateStaticParams()`. Unknown paths must keep real 404 behavior unless the product explicitly requires SPA fallback.
 
-### 5. Implement the static experience
+### 6. Implement the static experience
 
 - Establish global layout and navigation before isolated pages.
 - Reuse the existing design system, components, and semantic tokens.
@@ -147,7 +161,7 @@ For dynamic segments, generate every deployable route with `generateStaticParams
 
 Read `references/frontend-quality.md` for the completion checklist.
 
-### 6. Handle assets and media deliberately
+### 7. Handle assets and media deliberately
 
 - Keep normal source-controlled assets in `public/` when their size, licensing, and deployment budget are acceptable.
 - Do not copy the reference skill's Manus-specific upload commands or storage paths.
@@ -159,7 +173,7 @@ The example repository's static audio showcase is about 23 MB with hundreds of M
 
 Read `references/assets-and-media.md` before moving or externalizing assets.
 
-### 7. Add the FC static adapter
+### 8. Add the FC static adapter
 
 Copy the bundled project templates into the application:
 
@@ -189,7 +203,7 @@ The server adapter must:
 
 Read `references/fc-static-runtime.md` before replacing the adapter.
 
-### 8. Create `syfo.yaml`
+### 9. Create `syfo.yaml`
 
 Start from `templates/syfo.nextjs-static.yaml` and keep all paths relative to `appDir`.
 
@@ -210,7 +224,7 @@ Never include region, function name, account ID, domain, certificate, AccessKey,
 
 Read `references/syfo-contract.md` for rejection conditions.
 
-### 9. Validate locally in layers
+### 10. Validate locally in layers
 
 Run the highest available tier from `references/local-validation.md`.
 

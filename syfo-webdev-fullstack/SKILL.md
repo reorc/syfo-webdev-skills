@@ -70,7 +70,23 @@ node <skill-path>/scripts/doctor.mjs
 
 Use `--json` when the result feeds automation. Treat findings as a review queue, not an automatic rewrite plan.
 
-### 1A. Bind database-backed development to the allocated App TiDB
+### 1A. Initialize the Hosted App repository correctly
+
+Choose the init path before writing substantial application code:
+
+- For a brand-new Syfo Hosted App, use the platform-created GitLab template repository. The
+  platform creates the app repository from `syfo_hosted_app/app-templates/web-fullstack`
+  (`nextjs` is a compatibility alias for `fullstack`). Work in that initialized repository;
+  do not recreate the scaffold from a checked-in docs copy.
+- For an existing local Git project, commit a clean first version, then run `syfo app init
+  <name> --template fullstack` from that repository. The daemon sends `sourceMode=local`,
+  so the platform creates an empty GitLab repository and the daemon pushes the local branch
+  into it.
+- Do not push an existing local repository into a template-initialized remote. That creates
+  unrelated-history or non-fast-forward conflicts. If this has already happened, stop and
+  resolve the Git history intentionally rather than force-pushing over the template baseline.
+
+### 1B. Bind database-backed development to the allocated App TiDB
 
 For a new Syfo Hosted App with `database.required: true`, initialize or select the
 Hosted App before app-specific schema, seed, or workflow development. App Init is
