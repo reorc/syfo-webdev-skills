@@ -1,0 +1,26 @@
+[
+  {
+    "query": "当前是 Syfo Hosted App，继续做完登录和用户数据保存然后上线。",
+    "should_trigger": true
+  },
+  {
+    "query": "syfo app deploy 前帮我修好 Route Handler 和 TiDB migration。",
+    "should_trigger": true
+  },
+  {
+    "query": "这个带 syfo.yaml 的 Next.js App 登录后 500，修复并部署给测试人员。",
+    "should_trigger": true
+  },
+  {
+    "query": "做一个没有登录、API、secret 或数据库的静态 Syfo 宣传网站。",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我开发一个部署到 AWS ECS 的 Express API，不使用 Syfo。",
+    "should_trigger": false
+  },
+  {
+    "query": "写一个本地运行的数据清洗 Python 脚本。",
+    "should_trigger": false
+  }
+]

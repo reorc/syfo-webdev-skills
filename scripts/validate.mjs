@@ -15,6 +15,36 @@ for (const skill of skills) {
   if (!source.startsWith('---\n') || !source.includes(`\nname: ${skill}\n`)) {
     throw new Error(`${skill}/SKILL.md has an invalid frontmatter name`);
   }
+
+  const frontmatter = source.match(/^---\n([\s\S]*?)\n---/u)?.[1];
+  const rawDescription = frontmatter
+    ?.split('\n')
+    .find((line) => line.startsWith('description:'))
+    ?.slice('description:'.length)
+    .trim();
+  if (!rawDescription) {
+    throw new Error(`${skill}/SKILL.md is missing a single-line description`);
+  }
+  const description = rawDescription.startsWith('"')
+    ? JSON.parse(rawDescription)
+    : rawDescription;
+  if (description.length > 1024) {
+    throw new Error(`${skill}/SKILL.md description exceeds 1024 characters`);
+  }
+
+  const taskEvals = JSON.parse(await readFile(join(root, 'evals', 'evals.json'), 'utf8'));
+  if (taskEvals.skill_name !== skill || !Array.isArray(taskEvals.evals) || taskEvals.evals.length === 0) {
+    throw new Error(`${skill}/evals/evals.json has an invalid task eval set`);
+  }
+
+  const triggerEvals = JSON.parse(await readFile(join(root, 'evals', 'trigger-evals.json'), 'utf8'));
+  if (
+    !Array.isArray(triggerEvals)
+    || !triggerEvals.some((entry) => entry.should_trigger === true)
+    || !triggerEvals.some((entry) => entry.should_trigger === false)
+  ) {
+    throw new Error(`${skill}/evals/trigger-evals.json must include positive and negative cases`);
+  }
 }
 
 async function collectMjs(root) {

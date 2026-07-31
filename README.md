@@ -17,6 +17,19 @@ ln -s "$PWD/syfo-webdev-fullstack" ~/.codex/skills/syfo-webdev-fullstack
 
 Claude Code 使用对应的 `~/.claude/skills/` 目录。
 
+如果目标目录包含 `.syfo-managed.json`，它是 daemon 从某个正式 Release 安装的实体副本，
+不会随本仓库工作树自动更新。开发调试时应先备份该目录，再改用指向当前仓库的软链；不要把
+未发布的源码直接伪装成 daemon 管理版本。
+
+## 生效链路
+
+- 本地源码修改只影响当前仓库，不会自动影响 `~/.codex/skills/`、`~/.claude/skills/` 或测试机器。
+- 本地开发可通过仓库软链验证新描述；重新启动 Agent 会话后才会重新发现 frontmatter。
+- 测试人员使用的 daemon 内嵌版本必须先发布新的 `syfo-webdev-skills` tag/Release，再由
+  `syfo-daemon` 流水线下载、校验并嵌入，最后安装或升级测试机 daemon。
+- 验收时检查每个 skill 的 `.syfo-managed.json`，确认 `version` 和 `commit` 对应预期 Release；
+  否则即使源码仓库已修改，模型仍会读取旧描述。
+
 ## 验证
 
 ```bash
@@ -38,4 +51,3 @@ checksum 匹配且目录结构完整的 Release。
 git tag v0.1.0
 git push origin v0.1.0
 ```
-

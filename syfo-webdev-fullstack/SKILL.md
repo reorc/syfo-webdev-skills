@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev-fullstack
-description: Build, migrate, validate, and package fullstack Next.js App Router applications for Syfo-hosted Alibaba Cloud Function Compute 3.0, normally with TiDB Cloud Starter or Essential. Use for SSR, Route Handlers, Server Actions, cookies, authentication, server secrets, database-backed workflows, or migrations from Cloudflare Workers, D1, SQLite, Vercel, and ordinary Node.js hosting. Produces an assembled .fc/artifact from Next.js standalone output plus syfo.yaml; Syfo backend services generate provider-specific s.yaml and FC infrastructure. Use syfo-webdev-static for fully build-time sites without application backend behavior.
+description: "Use whenever a user asks to create, build, continue, fix, migrate, validate, package, publish, deploy, or take live a fullstack Syfo App or Syfo Hosted App. Trigger without being named when the request or repository indicates Syfo hosting, including app, Hosted App, 上线, 部署, syfo.yaml, syfo app init, syfo app validate, or syfo app deploy. Use for SSR, Route Handlers, Server Actions, cookies, application auth, server secrets, request-time behavior, durable writes, TiDB/database workflows, or migration from Cloudflare Workers, D1, SQLite, Vercel, or Node hosting. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate through the allocated App database when needed, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run production acceptance when authorized. Produces standalone .fc/artifact plus syfo.yaml; never s.yaml. Use syfo-webdev-static only when all behavior is build-time or browser-only."
 ---
 
 # Syfo WebDev Fullstack for FC and TiDB
@@ -8,6 +8,28 @@ description: Build, migrate, validate, and package fullstack Next.js App Router 
 Produce a Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 and connect to TiDB Cloud Starter or Essential.
 
 The output is not ready merely because `next build` passes. Prove that the assembled standalone artifact starts on `0.0.0.0:$PORT`, passes health and representative HTTP checks, uses TiDB-compatible migrations, avoids secret leakage, and satisfies the `syfo.yaml` contract.
+
+## Completion contract
+
+This skill owns the Syfo Hosted App lifecycle, not only source generation, database migration, or FC packaging. A successful `next build`, artifact assembly, or local smoke test is not task completion when the user asked to publish, deploy, go live, 上线, or provide a working Hosted App URL.
+
+At the start, classify the requested scope and keep it visible in the handoff:
+
+- `build_only`: implement or repair the App and run relevant local checks; the user did not ask for Syfo deployment preparation.
+- `deploy_ready`: complete local validation and immutable source preparation, but do not invoke paid/cloud mutation because deployment was not authorized.
+- `deploy_authorized`: the user explicitly asked to deploy, publish, go live, 上线, or otherwise make the Syfo App accessible. Continue through the deployment workflow below.
+
+For `deploy_authorized`, do not stop after coding or local validation:
+
+1. Run `syfo app validate --json` in the bound App repository and resolve failures. For database Apps, also prove required migrations and contracts through `syfo app dev -- <command>` against the allocated App binding.
+2. Require a clean immutable commit, then push it with `syfo app push` or the repository-approved Git path. Never deploy an uncommitted working tree.
+3. Run `syfo app deploy --json` from the bound repository; pass an App ID only when no binding is available. This prepares a billing/human-confirmed deployment rather than completing it immediately.
+4. Report the returned deploy/confirmation identifiers and clearly state that the human confirmation card is pending when it has not been approved. A prepared card is progress, not a successful deployment.
+5. After confirmation, poll `syfo app status --json` and `syfo app versions --json` until a terminal state is available. Do not claim success while state is queued, pending confirmation, building, or deploying.
+6. Run `syfo app open --json` to obtain the deployed URL, then run the access-aware cloud smoke for the configured policy plus representative application and database acceptance checks.
+7. Mark deployment complete only when the deployed version matches the intended commit and required cloud acceptance passes.
+
+For `build_only` or `deploy_ready`, do not silently deploy. State the exact remaining `syfo app validate`, source push, `syfo app deploy`, confirmation, status/version, and smoke steps; cloud acceptance stays `not_run`.
 
 ## Boundaries
 
@@ -328,12 +350,14 @@ node <skill-path>/scripts/smoke-cloud-access.mjs \
   --path /
 ```
 
-### 10. Prepare Syfo handoff
+### 10. Complete deployment or prepare Syfo handoff
 
 - Validate `syfo.yaml` as application intent rather than cloud infrastructure.
 - Do not add region, function name, domain, certificate, account ID, AccessKey, provider runtime identifiers, or Serverless Devs access configuration.
 - Record the artifact entry, required application-owned environment-variable names, source revision, and validation results.
-- Hand the accepted manifest and immutable source/artifact identity to the Syfo backend deployment service.
+- Record `requestedScope` as `build_only`, `deploy_ready`, or `deploy_authorized`.
+- For `deploy_authorized`, execute the Completion contract through human confirmation, terminal deployment state, version verification, and cloud acceptance. Do not merely hand the artifact to the backend and stop.
+- For other scopes, hand the accepted manifest and immutable source/artifact identity to the Syfo backend deployment service and list the exact remaining deployment steps.
 
 Cloud resource creation, domain changes, certificate changes, destructive migrations, and production deployment remain backend-controlled operations requiring explicit human authorization.
 
@@ -363,6 +387,8 @@ Return a human-readable summary followed by exactly one JSON object:
 ```json
 {
   "skill": "syfo-webdev-fullstack",
+  "requestedScope": "deploy_ready",
+  "skillInvoked": true,
   "source": {
     "type": "git",
     "revision": "FULL_COMMIT_SHA",
@@ -378,6 +404,15 @@ Return a human-readable summary followed by exactly one JSON object:
     "database": "tidb-cloud"
   },
   "requiredEnv": ["SESSION_SECRET"],
+  "deployment": {
+    "validate": "passed",
+    "sourcePush": "passed",
+    "deployPrepared": "not_run",
+    "humanConfirmation": "not_run",
+    "deployState": "not_run",
+    "version": null,
+    "url": null
+  },
   "frontend": {
     "scope": "new_ui",
     "selectedSkills": ["agent-selected-skill"],

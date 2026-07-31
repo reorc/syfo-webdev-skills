@@ -1,0 +1,26 @@
+[
+  {
+    "query": "当前仓库是 Syfo Hosted App，帮我把官网剩下的页面做完并上线。",
+    "should_trigger": true
+  },
+  {
+    "query": "syfo app validate 报静态产物不完整，帮我修好然后 deploy。",
+    "should_trigger": true
+  },
+  {
+    "query": "这个仓库有 syfo.yaml，没有后端和数据库，修一下手机端并发布。",
+    "should_trigger": true
+  },
+  {
+    "query": "做一个带登录、cookie 和 TiDB 用户数据的 Syfo Hosted App。",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我做一个普通 Vite 官网，部署到 GitHub Pages，不使用 Syfo。",
+    "should_trigger": false
+  },
+  {
+    "query": "优化一个 iOS 原生 App 的启动速度。",
+    "should_trigger": false
+  }
+]
