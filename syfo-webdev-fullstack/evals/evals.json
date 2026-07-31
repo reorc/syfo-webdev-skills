@@ -65,6 +65,43 @@
         "Existing visual behavior is checked in the browser after the runtime migration.",
         "Any unavoidable UI change is explicitly reported."
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "继续完成当前 Syfo Hosted App 的登录、用户数据保存和错误页，然后直接上线给测试人员使用。",
+      "expected_output": "The fullstack skill is invoked without being named, completes authentication and persistence against the allocated App binding, validates locally and through syfo app dev, pushes immutable source, prepares the human-confirmed deployment, waits for the deployed version, and performs access-aware application and database acceptance.",
+      "files": [],
+      "expectations": [
+        "The solution identifies authentication and durable user data as fullstack and records requestedScope as deploy_authorized.",
+        "Allocated-App migrations and contracts run through syfo app dev before deployment.",
+        "The solution does not stop after next build, standalone smoke, or migration success.",
+        "The deployment sequence includes syfo app validate --json, immutable push, syfo app deploy --json, human confirmation, status/version polling, and production acceptance.",
+        "The deployed version must match the intended commit before success is claimed."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "把这个带 TiDB 的 Syfo App 修到可以随时部署，但不要创建本次线上部署。",
+      "expected_output": "A deploy-ready fullstack App validated against the allocated TiDB binding with no deployment mutation, explicit not_run deployment/cloud fields, and exact remaining deployment steps.",
+      "files": [],
+      "expectations": [
+        "The solution records requestedScope as deploy_ready.",
+        "Migrations and database contracts run through syfo app dev against the allocated App binding.",
+        "The solution runs syfo app validate --json but does not invoke syfo app deploy.",
+        "The handoff lists the remaining immutable push, deploy, confirmation, status/version, and cloud acceptance steps."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "部署确认已经通过，但这个全栈 Hosted App 仍然是旧版本，登录后接口也报错。接着查到上线可用。",
+      "expected_output": "A deployment-continuation investigation that reuses the existing binding, checks App status and versions, compares the deployed commit, inspects application/database acceptance, and only reports success after the intended version and authenticated workflow pass.",
+      "files": [],
+      "expectations": [
+        "The solution does not reinitialize the App or overwrite its allocated database binding.",
+        "The solution checks syfo app status --json and syfo app versions --json before deciding whether to redeploy.",
+        "The deployed source version, login flow, representative API, and TiDB write/read behavior are verified.",
+        "Pending or failed deployment state is reported accurately rather than called deployed."
+      ]
     }
   ]
 }

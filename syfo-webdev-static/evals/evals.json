@@ -64,6 +64,43 @@
         "Existing routes and responsive behavior are rechecked in the browser.",
         "Any unavoidable UI-impacting change is reported."
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "这个 Syfo Hosted App 官网还差两个页面和移动端适配。帮我做完并上线，最后给我可访问地址。",
+      "expected_output": "The static skill is invoked without being named, completes the missing UI, validates locally, validates the bound Syfo App, pushes an immutable commit, prepares the human-confirmed deployment, waits for deployment state/version, then verifies the deployed URL with access-aware cloud smoke.",
+      "files": [],
+      "expectations": [
+        "The solution recognizes the repository as a static Syfo Hosted App and records requestedScope as deploy_authorized.",
+        "The solution does not stop after next build or local browser validation.",
+        "The deployment sequence includes syfo app validate --json, an immutable commit and push, syfo app deploy --json, human confirmation, status/version polling, and production smoke.",
+        "A prepared human confirmation card is not reported as a completed deployment.",
+        "The final URL is only reported successful after the deployed version and cloud access behavior are verified."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "把当前静态 Syfo App 修到 deploy-ready，但今天不要真的部署云资源。",
+      "expected_output": "A deploy-ready static App with local and syfo app validation, immutable source preparation, no deployment mutation, explicit not_run cloud fields, and exact remaining deployment steps.",
+      "files": [],
+      "expectations": [
+        "The solution records requestedScope as deploy_ready.",
+        "The solution runs local checks and syfo app validate --json but does not invoke syfo app deploy.",
+        "The handoff leaves deploy preparation, confirmation, deployment state, and cloud acceptance as not_run.",
+        "The exact push, deploy, confirmation, status/version, and smoke steps are listed for the next operator."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "这个静态 Hosted App 已经点过部署确认了，但一直看不到新版本。继续处理到能访问，不要重新初始化项目。",
+      "expected_output": "A deployment-continuation diagnosis that reuses the existing Hosted App binding, checks status and versions, verifies the intended commit, diagnoses a failed or pending deploy, and runs cloud smoke when a version becomes live.",
+      "files": [],
+      "expectations": [
+        "The solution does not run syfo app init or rebuild from scratch without evidence.",
+        "The solution uses syfo app status --json and syfo app versions --json to inspect deployment state.",
+        "The intended commit is compared with the deployed version before success is claimed.",
+        "Cloud smoke is run only after a live URL/version exists."
+      ]
     }
   ]
 }
