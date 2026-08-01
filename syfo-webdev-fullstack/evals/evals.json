@@ -102,6 +102,19 @@
         "The deployed source version, login flow, representative API, and TiDB write/read behavior are verified.",
         "Pending or failed deployment state is reported accurately rather than called deployed."
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "新建一个带登录和 TiDB 的 Syfo Hosted App。app init 超时后返回 commandId 和 resumeCommand，本地 clone 目录可能只完成了一部分。继续开发。",
+      "expected_output": "The fullstack skill initializes from the official template through the daemon-owned clone, resumes the same idempotent app init after an ambiguous timeout, refuses a second init or manual clone, and begins development only after the exact clone and binding are complete.",
+      "files": [],
+      "expectations": [
+        "The solution uses syfo app init with --template fullstack --from-template --clone for the new App.",
+        "The solution runs the exact emitted syfo app init --resume <commandId> after the ambiguous timeout.",
+        "The solution does not rerun the original init, generate a new idempotency key, manually clone, or overwrite the partial clone.",
+        "Development starts only after app initialized, cloneDir, and the local binding are confirmed.",
+        "The solution changes into the daemon-created clone and inspects the official template before editing."
+      ]
     }
   ]
 }

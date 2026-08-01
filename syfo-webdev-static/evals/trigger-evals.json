@@ -12,6 +12,10 @@
     "should_trigger": true
   },
   {
+    "query": "从官方模板新建一个静态 Syfo 网站，app init 超时后继续恢复。",
+    "should_trigger": true
+  },
+  {
     "query": "做一个带登录、cookie 和 TiDB 用户数据的 Syfo Hosted App。",
     "should_trigger": false
   },

@@ -12,6 +12,10 @@
     "should_trigger": true
   },
   {
+    "query": "从官方模板新建一个带登录和 TiDB 的 Syfo App，app init 超时后继续恢复。",
+    "should_trigger": true
+  },
+  {
     "query": "做一个没有登录、API、secret 或数据库的静态 Syfo 宣传网站。",
     "should_trigger": false
   },

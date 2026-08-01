@@ -101,6 +101,19 @@
         "The intended commit is compared with the deployed version before success is claimed.",
         "Cloud smoke is run only after a live URL/version exists."
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "从官方模板创建一个新的静态 Syfo 网站。app init 请求超时并给出 commandId 和 resumeCommand，目标目录可能已有未完成 clone。继续完成网站。",
+      "expected_output": "The static skill initializes through the daemon-owned official template clone, resumes the same idempotent app init after an ambiguous timeout, refuses a second init or manual clone, and begins site work only after the exact clone and binding are complete.",
+      "files": [],
+      "expectations": [
+        "The solution uses syfo app init with --template static --from-template --clone for the new App.",
+        "The solution runs the exact emitted syfo app init --resume <commandId> after the ambiguous timeout.",
+        "The solution does not rerun the original init, generate a new idempotency key, manually clone, or overwrite the partial clone.",
+        "Site work starts only after app initialized, cloneDir, and the local binding are confirmed.",
+        "The solution changes into the daemon-created clone and inspects the official template before editing."
+      ]
     }
   ]
 }

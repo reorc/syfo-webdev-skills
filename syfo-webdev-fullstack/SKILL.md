@@ -101,6 +101,16 @@ Choose the init path before writing substantial application code:
   (`nextjs` is a compatibility alias for `fullstack`). In the daemon CLI, run
   `syfo app init <name> --template fullstack --from-template --clone <dir>` and then work
   in `<dir>`. Do not recreate the scaffold from a checked-in docs copy.
+- The daemon CLI owns the authenticated Git clone for `--from-template`. Do not run a separate
+  `git clone`, reconstruct the repository URL, or copy a template by hand. Treat initialization
+  as complete only after the command reports `app initialized` and returns a non-empty `cloneDir`
+  plus the local binding path. Then `cd <cloneDir>` and inspect the template before changing it.
+- If initialization reports that the outcome is not yet known and returns a `commandId` or
+  `resumeCommand`, run the exact `syfo app init --resume <commandId>` command. Do not rerun the
+  original init command with a new idempotency key, choose another clone directory, manually
+  clone the repository, or overwrite a partial clone. Resume replays the original request and
+  either completes or reuses the exact clone; it fails closed if backend identity, local source,
+  or clone state drifted. Keep the recovery state until both the API and local Git sync succeed.
 - For an existing local Git project, commit a clean first version, then run `syfo app init
   <name> --template fullstack` from that repository without `--from-template`. The daemon sends `sourceMode=local`,
   so the platform creates an empty GitLab repository and the daemon pushes the local branch
