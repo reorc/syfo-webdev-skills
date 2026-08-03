@@ -114,6 +114,20 @@
         "Site work starts only after app initialized, cloneDir, and the local binding are confirmed.",
         "The solution changes into the daemon-created clone and inspects the official template before editing."
       ]
+    },
+    {
+      "id": 10,
+      "prompt": "Create a new static Syfo Hosted App called Trail Notes, described as a lightweight hiking journal and route scrapbook, and prepare it for its first deployment.",
+      "expected_output": "A first-deploy-ready static App whose source includes a safe, App-specific SVG icon family derived from the Trail Notes name and description, wired into Next metadata and validated before syfo app validate or deployment preparation.",
+      "files": [],
+      "expectations": [
+        "The solution creates public/syfo-app-icon.svg as the canonical 512×512 source-controlled App icon before the first syfo app validate or deploy command.",
+        "The icon concept is specific to Trail Notes and is not a generic letter tile, framework logo, Syfo logo, or copied third-party icon.",
+        "The solution creates the required 16, 32, 180, and canonical 512 SVG variants with viewBox 0 0 512 512 and checks legibility at each target size.",
+        "The root app directory contains valid Next native icon1.png through icon4.png rendered at 16, 32, 180, and 512 pixels from the SVG sources, with no competing icon metadata files.",
+        "Every SVG is a regular self-contained file, at most 64 KiB, with an unprefixed SVG root in the SVG namespace and no entity/escape, style, DTD, script, event handler, foreignObject, SMIL mutation, external reference, command, or secret.",
+        "The enforced order is create icons, run the final project doctor with zero icon errors, run syfo app validate, then prepare deployment."
+      ]
     }
   ]
 }

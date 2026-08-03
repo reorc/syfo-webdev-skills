@@ -1,11 +1,49 @@
 import assert from 'node:assert/strict';
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import test from 'node:test';
+import { deflateSync } from 'node:zlib';
 
 const repositoryRoot = process.cwd();
+
+function crc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function pngChunk(type, data) {
+  const typeBytes = Buffer.from(type, 'ascii');
+  const output = Buffer.alloc(12 + data.length);
+  output.writeUInt32BE(data.length, 0);
+  typeBytes.copy(output, 4);
+  data.copy(output, 8);
+  output.writeUInt32BE(crc32(Buffer.concat([typeBytes, data])), 8 + data.length);
+  return output;
+}
+
+function createPng(size, { colorType = 6, imageData, chunks } = {}) {
+  const header = Buffer.alloc(13);
+  header.writeUInt32BE(size, 0);
+  header.writeUInt32BE(size, 4);
+  header[8] = 8;
+  header[9] = colorType;
+  const channels = colorType === 2 ? 3 : 4;
+  const rowLength = size * channels + 1;
+  const pixels = Buffer.alloc(rowLength * size);
+  const pngChunks = chunks ?? [pngChunk('IDAT', imageData ?? deflateSync(pixels))];
+  return Buffer.concat([
+    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    pngChunk('IHDR', header),
+    ...pngChunks,
+    pngChunk('IEND', Buffer.alloc(0)),
+  ]);
+}
 
 function runDoctor(skill, project) {
   const result = spawnSync(
@@ -24,6 +62,28 @@ function errorCodes(run) {
   return run.result.findings
     .filter((finding) => finding.level === 'error')
     .map((finding) => finding.code);
+}
+
+async function createAppIcons(project) {
+  await mkdir(join(project, 'public'), { recursive: true });
+  await mkdir(join(project, 'app'), { recursive: true });
+  for (const [file, size] of [
+    ['syfo-app-icon.svg', 512],
+    ['favicon-16.svg', 16],
+    ['favicon-32.svg', 32],
+    ['app-icon-180.svg', 180],
+  ]) {
+    await writeFile(
+      join(project, 'public', file),
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 512 512"><path fill="#123456" d="M64 64h384v384H64z"/></svg>\n`,
+    );
+  }
+  for (const [file, size] of [
+    ['icon1.png', 16],
+    ['icon2.png', 32],
+    ['icon3.png', 180],
+    ['icon4.png', 512],
+  ]) await writeFile(join(project, 'app', file), createPng(size));
 }
 
 async function createStaticFixture() {
@@ -51,6 +111,7 @@ async function createStaticFixture() {
     join(repositoryRoot, 'syfo-webdev-static', 'templates', 'syfo.nextjs-static.yaml'),
     join(project, 'syfo.yaml'),
   );
+  await createAppIcons(project);
   return project;
 }
 
@@ -82,6 +143,7 @@ async function createFullstackFixture() {
     join(repositoryRoot, 'syfo-webdev-fullstack', 'templates', 'syfo.nextjs-fullstack.yaml'),
     join(project, 'syfo.yaml'),
   );
+  await createAppIcons(project);
   return project;
 }
 
@@ -109,6 +171,100 @@ test('multiple lockfiles are hard errors', async () => {
     }
   } finally {
     await Promise.all(projects.map((project) => rm(project, { recursive: true, force: true })));
+  }
+});
+
+test('doctor blocks malformed, externally-referencing, and non-regular App icons', async () => {
+  const project = await createStaticFixture();
+  const outsideIcon = join(tmpdir(), `syfo-outside-icon-${Date.now()}.svg`);
+  try {
+    await writeFile(
+      join(project, 'public', 'favicon-16.svg'),
+      '<svg width="16" height="16" viewBox="0 0 512 512"><style>@import "https://attacker.example/icon.css"</style></svg>\n',
+    );
+    await writeFile(
+      join(project, 'public', 'favicon-32.svg'),
+      '<svg width="32" height="32" viewBox="0 0 512 512"><image href="/tracking.svg"/></svg>\n',
+    );
+    await writeFile(
+      join(project, 'public', 'app-icon-180.svg'),
+      '<html><svg width="180" height="180" viewBox="0 0 512 512"/></html>\n',
+    );
+    await writeFile(outsideIcon, '<svg width="512" height="512" viewBox="0 0 512 512"/>\n');
+    await rm(join(project, 'public', 'syfo-app-icon.svg'));
+    await symlink(outsideIcon, join(project, 'public', 'syfo-app-icon.svg'));
+    const codes = errorCodes(runDoctor('syfo-webdev-static', project));
+    assert.equal(codes.filter((code) => code === 'app-icon-unsafe-svg').length, 3);
+    assert.ok(codes.includes('app-icon-not-regular'));
+  } finally {
+    await rm(project, { recursive: true, force: true });
+    await rm(outsideIcon, { force: true });
+  }
+});
+
+test('doctor rejects encoded CSS, namespaces, entities, and SMIL mutation', async () => {
+  const cases = [
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><style>@im&#x70;ort "https://attacker.example/x.css"</style></svg>\n',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><style>@\\69mport "https://attacker.example/x.css"</style></svg>\n',
+    '<html:svg xmlns:html="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"/>\n',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><text>&bogus;</text></svg>\n',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><image href="#safe"><set attributeName="href" to="https://attacker.example/tracker.svg"/></image></svg>\n',
+    '<?xml-stylesheet href="https://attacker.example/x.css" type="text/css"?><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"/>\n',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><animateColor attributeName="fill" values="red;blue"/></svg>\n',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><discard begin="1s"/></svg>\n',
+  ];
+  for (const source of cases) {
+    const project = await createStaticFixture();
+    try {
+      await writeFile(join(project, 'public', 'favicon-16.svg'), source);
+      assert.ok(errorCodes(runDoctor('syfo-webdev-static', project)).includes('app-icon-unsafe-svg'));
+    } finally {
+      await rm(project, { recursive: true, force: true });
+    }
+  }
+});
+
+test('doctor requires real per-size PNG browser metadata', async () => {
+  const project = await createFullstackFixture();
+  try {
+    await writeFile(join(project, 'app', 'icon2.png'), createPng(16));
+    assert.ok(errorCodes(runDoctor('syfo-webdev-fullstack', project)).includes('app-icon-metadata-invalid'));
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
+test('doctor rejects unsupported, empty, and undecodable PNG pixel data', async () => {
+  const pixels = deflateSync(Buffer.alloc(16 * (1 + 16 * 4)));
+  const cases = [
+    createPng(16, { colorType: 1 }),
+    createPng(16, { imageData: Buffer.alloc(0) }),
+    createPng(16, { imageData: Buffer.from('not-zlib') }),
+    createPng(16, { chunks: [pngChunk('PLTE', Buffer.alloc(1)), pngChunk('IDAT', pixels)] }),
+    createPng(16, {
+      chunks: [pngChunk('IDAT', Buffer.alloc(0)), pngChunk('PLTE', Buffer.from([0, 0, 0])), pngChunk('IDAT', pixels)],
+    }),
+  ];
+  for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
+    for (const png of cases) {
+      const project = skill === 'syfo-webdev-static' ? await createStaticFixture() : await createFullstackFixture();
+      try {
+        await writeFile(join(project, 'app', 'icon1.png'), png);
+        assert.ok(errorCodes(runDoctor(skill, project)).includes('app-icon-metadata-invalid'));
+      } finally {
+        await rm(project, { recursive: true, force: true });
+      }
+    }
+  }
+});
+
+test('skill completion contract locks icon creation before final doctor, validation, and deploy', async () => {
+  for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
+    const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
+    assert.match(
+      source,
+      /Create or update the App-specific SVG icon family[\s\S]*Run the skill doctor again[\s\S]*syfo app validate --json[\s\S]*syfo app deploy --json/,
+    );
   }
 });
 

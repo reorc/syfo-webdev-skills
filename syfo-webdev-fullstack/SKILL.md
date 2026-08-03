@@ -21,13 +21,15 @@ At the start, classify the requested scope and keep it visible in the handoff:
 
 For `deploy_authorized`, do not stop after coding or local validation:
 
-1. Run `syfo app validate --json` in the bound App repository and resolve failures. For database Apps, also prove required migrations and contracts through `syfo app dev -- <command>` against the allocated App binding.
-2. Require a clean immutable commit, then push it with `syfo app push` or the repository-approved Git path. Never deploy an uncommitted working tree.
-3. Run `syfo app deploy --json` from the bound repository; pass an App ID only when no binding is available. This prepares a billing/human-confirmed deployment rather than completing it immediately.
-4. Report the returned deploy/confirmation identifiers and clearly state that the human confirmation card is pending when it has not been approved. A prepared card is progress, not a successful deployment.
-5. After confirmation, poll `syfo app status --json` and `syfo app versions --json` until a terminal state is available. Do not claim success while state is queued, pending confirmation, building, or deploying.
-6. Run `syfo app open --json` to obtain the deployed URL, then run the access-aware cloud smoke for the configured policy plus representative application and database acceptance checks.
-7. Mark deployment complete only when the deployed version matches the intended commit and required cloud acceptance passes.
+1. Create or update the App-specific SVG icon family from the current App name and description, render matching PNG browser assets, and place them in the root Next file-convention metadata paths.
+2. Run the skill doctor again as the final pre-deploy gate. Continue only when it reports zero icon errors; an earlier repository-audit run does not satisfy this step.
+3. Run `syfo app validate --json` in the bound App repository and resolve failures. For database Apps, also prove required migrations and contracts through `syfo app dev -- <command>` against the allocated App binding.
+4. Require a clean immutable commit, then push it with `syfo app push` or the repository-approved Git path. Never deploy an uncommitted working tree.
+5. Run `syfo app deploy --json` from the bound repository; pass an App ID only when no binding is available. This prepares a billing/human-confirmed deployment rather than completing it immediately.
+6. Report the returned deploy/confirmation identifiers and clearly state that the human confirmation card is pending when it has not been approved. A prepared card is progress, not a successful deployment.
+7. After confirmation, poll `syfo app status --json` and `syfo app versions --json` until a terminal state is available. Do not claim success while state is queued, pending confirmation, building, or deploying.
+8. Run `syfo app open --json` to obtain the deployed URL, then run the access-aware cloud smoke for the configured policy plus representative application and database acceptance checks.
+9. Mark deployment complete only when the deployed version matches the intended commit and required cloud acceptance passes.
 
 For `build_only` or `deploy_ready`, do not silently deploy. State the exact remaining `syfo app validate`, source push, `syfo app deploy`, confirmation, status/version, and smoke steps; cloud acceptance stays `not_run`.
 
@@ -169,6 +171,19 @@ For `new_ui` or `material_change`:
 For `none` or `preserve`, record why the gate does not require a design workflow. Do not redesign an existing interface during a deployment-only migration.
 
 Read `references/frontend-capability.md` before creating authentication pages, forms, dashboards, app shells, error states, or other user-visible UI.
+
+### 2A. Create the App icon before first deployment
+
+Treat the favicon as product identity, not template residue. Before the first `syfo app validate` or deployment preparation:
+
+1. Use the current App name and description to choose a distinctive, simple visual metaphor. Do not reuse a generic letter tile, framework logo, Syfo logo, or another App's icon.
+2. Draw the icon as source-controlled SVG with a shared `viewBox="0 0 512 512"`, a strong silhouette, and enough contrast to remain legible at 16×16.
+3. Create `public/syfo-app-icon.svg` as the canonical 512×512 source consumed by Syfo App cards before deployment, plus `public/favicon-16.svg`, `public/favicon-32.svg`, and `public/app-icon-180.svg`.
+4. Render those SVG sources to valid RGBA/RGB PNGs in the root `app/` or `src/app/` directory using Next's native file convention: `icon1.png` = 16, `icon2.png` = 32, `icon3.png` = 180, and `icon4.png` = 512. Remove competing `favicon.ico`, SVG file-convention icons, unnumbered `icon.*`, extra numbered icons, and `apple-icon.*`; Next emits real per-size browser metadata from the PNG dimensions without parsing application TypeScript.
+5. Keep every SVG a regular source-controlled file, self-contained, valid UTF-8, and at most 64 KiB. Require an unprefixed root `<svg xmlns="http://www.w3.org/2000/svg">`; forbid all entities/escapes, `<style>`/`style=`, DTD, scripts, event handlers, `foreignObject`, SMIL mutation elements (`set`/`animate*`), external CSS/resources, secrets, user-uploaded markup, and unlicensed logos. `href`, `src`, and `xlink:href` may reference only a local `#fragment`.
+6. Render or inspect the design at 16, 32, 180, and 512 pixels. Simplify small variants instead of merely scaling details that disappear.
+
+The skill doctor treats missing, unsafe, non-regular, incorrectly sized, conflicting, invalid-PNG, or unwired App icons as errors. After icon creation, run the doctor again and record zero icon errors before `syfo app validate` or deployment preparation.
 
 ### 3. Audit the current runtime
 
