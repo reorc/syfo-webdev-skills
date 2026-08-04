@@ -333,6 +333,14 @@ const lockFiles = ["pnpm-lock.yaml", "package-lock.json", "yarn.lock", "bun.lock
 validateAppIcons();
 if (lockFiles.length === 0) add("error", "missing-lockfile", ".", "Commit one dependency lock file.");
 if (lockFiles.length > 1) add("error", "multiple-lockfiles", ".", `Multiple lock files found: ${lockFiles.join(", ")}. Keep exactly one.`);
+if (lockFiles.length === 1 && lockFiles[0] === "package-lock.json" && packageJson) {
+  const packageManager = String(packageJson.packageManager || "").trim();
+  if (!packageManager) {
+    add("error", "npm-builder-version-required", "package.json", "Pin packageManager to the exact npm 10 version used to generate and validate package-lock.json.");
+  } else if (!/^npm@10\.\d+\.\d+(?:\+sha\d+\.[a-f0-9]+)?$/.test(packageManager)) {
+    add("error", "npm-builder-version-mismatch", "package.json", `Syfo's Node 20 builder uses npm 10; found ${packageManager}. Regenerate package-lock.json with an exact npm 10 version.`);
+  }
+}
 
 const nextConfig = findFirst(["next.config.ts", "next.config.mjs", "next.config.js", "next.config.cjs"]);
 if (!nextConfig) {

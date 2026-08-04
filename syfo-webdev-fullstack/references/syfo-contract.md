@@ -7,6 +7,8 @@ The accepted application contract is `syfo.yaml` version 1 unless the repository
 - Place `syfo.yaml` at the selected `appDir` root.
 - Keep every path relative to `appDir` and contained within it.
 - Use one matching dependency lock file and a frozen install command.
+- For npm Apps, pin an exact `packageManager: npm@10.x.y`, generate `package-lock.json` with that
+  version, and pass a no-script dry-run `npm ci` with the same version before validation or deploy.
 - Declare deterministic install, build, run, health, migration, environment-name, and routing behavior.
 - Keep provider resource IDs, actual domains, credentials, secret values, and certificate material out of the manifest.
 - Syfo backend services translate the accepted manifest into provider-specific `s.yaml` and FC infrastructure. Application-building agents must not generate or maintain that provider file.
@@ -31,6 +33,7 @@ The accepted application contract is `syfo.yaml` version 1 unless the repository
 - Missing lock file or mismatch with the install command.
 - Multiple dependency lock files.
 - Package manager mismatch across lock file, install, build, and migration commands.
+- Missing npm version pin, npm 11 lock generation, or a failed npm 10 frozen-install dry run.
 - Absolute path or path escape.
 - Missing build output after the declared build.
 - Health endpoint failure.
