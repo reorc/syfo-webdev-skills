@@ -94,6 +94,7 @@ async function createStaticFixture() {
     join(project, 'package.json'),
     `${JSON.stringify({
       private: true,
+      packageManager: 'npm@10.9.2',
       scripts: {
         build: 'next build && node scripts/assemble-static.mjs',
         typecheck: 'tsc --noEmit',
@@ -124,6 +125,7 @@ async function createFullstackFixture() {
     join(project, 'package.json'),
     `${JSON.stringify({
       private: true,
+      packageManager: 'npm@10.9.2',
       scripts: {
         build: 'next build && node scripts/assemble-next-standalone.mjs',
         typecheck: 'tsc --noEmit',
@@ -171,6 +173,31 @@ test('multiple lockfiles are hard errors', async () => {
     }
   } finally {
     await Promise.all(projects.map((project) => rm(project, { recursive: true, force: true })));
+  }
+});
+
+test('npm apps pin the builder-compatible npm 10 version', async () => {
+  for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
+    const project = skill === 'syfo-webdev-static'
+      ? await createStaticFixture()
+      : await createFullstackFixture();
+    try {
+      const packagePath = join(project, 'package.json');
+      const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));
+      delete packageJson.packageManager;
+      await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+      assert.ok(errorCodes(runDoctor(skill, project)).includes('npm-builder-version-required'));
+
+      packageJson.packageManager = 'npm@11.4.2';
+      await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+      assert.ok(errorCodes(runDoctor(skill, project)).includes('npm-builder-version-mismatch'));
+
+      packageJson.packageManager = 'npm@10.9.2';
+      await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+      assert.equal(errorCodes(runDoctor(skill, project)).includes('npm-builder-version-mismatch'), false);
+    } finally {
+      await rm(project, { recursive: true, force: true });
+    }
   }
 });
 
@@ -264,6 +291,16 @@ test('skill completion contract locks icon creation before final doctor, validat
     assert.match(
       source,
       /Create or update the App-specific SVG icon family[\s\S]*Run the skill doctor again[\s\S]*syfo app validate --json[\s\S]*syfo app deploy --json/,
+    );
+  }
+});
+
+test('skill completion contract locks npm 10 dry-run before validation, push, and deploy', async () => {
+  for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
+    const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
+    assert.match(
+      source,
+      /packageManager: npm@10\.x\.y[\s\S]*npx --yes npm@<package\.json packageManager version> ci --ignore-scripts --dry-run[\s\S]*syfo app validate --json[\s\S]*syfo app push[\s\S]*syfo app deploy --json/,
     );
   }
 });

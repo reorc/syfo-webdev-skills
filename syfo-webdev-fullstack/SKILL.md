@@ -23,13 +23,14 @@ For `deploy_authorized`, do not stop after coding or local validation:
 
 1. Create or update the App-specific SVG icon family from the current App name and description, render matching PNG browser assets, and place them in the root Next file-convention metadata paths.
 2. Run the skill doctor again as the final pre-deploy gate. Continue only when it reports zero icon errors; an earlier repository-audit run does not satisfy this step.
-3. Run `syfo app validate --json` in the bound App repository and resolve failures. For database Apps, also prove required migrations and contracts through `syfo app dev -- <command>` against the allocated App binding.
-4. Require a clean immutable commit, then push it with `syfo app push` or the repository-approved Git path. Never deploy an uncommitted working tree.
-5. Run `syfo app deploy --json` from the bound repository; pass an App ID only when no binding is available. This prepares a billing/human-confirmed deployment rather than completing it immediately.
-6. Report the returned deploy/confirmation identifiers and clearly state that the human confirmation card is pending when it has not been approved. A prepared card is progress, not a successful deployment.
-7. After confirmation, poll `syfo app status --json` and `syfo app versions --json` until a terminal state is available. Do not claim success while state is queued, pending confirmation, building, or deploying.
-8. Run `syfo app open --json` to obtain the deployed URL, then run the access-aware cloud smoke for the configured policy plus representative application and database acceptance checks.
-9. Mark deployment complete only when the deployed version matches the intended commit and required cloud acceptance passes.
+3. For npm Apps, require an exact `packageManager: npm@10.x.y`, then run `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`. If it fails, regenerate `package-lock.json` with that same npm 10 version and rerun the frozen-install gate. Never validate or deploy a lock generated only with npm 11.
+4. Run `syfo app validate --json` in the bound App repository and resolve failures. For database Apps, also prove required migrations and contracts through `syfo app dev -- <command>` against the allocated App binding.
+5. Require a clean immutable commit, then push it with `syfo app push` or the repository-approved Git path. Never deploy an uncommitted working tree.
+6. Run `syfo app deploy --json` from the bound repository; pass an App ID only when no binding is available. This prepares a billing/human-confirmed deployment rather than completing it immediately.
+7. Report the returned deploy/confirmation identifiers and clearly state that the human confirmation card is pending when it has not been approved. A prepared card is progress, not a successful deployment.
+8. After confirmation, poll `syfo app status --json` and `syfo app versions --json` until a terminal state is available. Do not claim success while state is queued, pending confirmation, building, or deploying.
+9. Run `syfo app open --json` to obtain the deployed URL, then run the access-aware cloud smoke for the configured policy plus representative application and database acceptance checks.
+10. Mark deployment complete only when the deployed version matches the intended commit and required cloud acceptance passes.
 
 For `build_only` or `deploy_ready`, do not silently deploy. State the exact remaining `syfo app validate`, source push, `syfo app deploy`, confirmation, status/version, and smoke steps; cloud acceptance stays `not_run`.
 
@@ -287,7 +288,7 @@ For a normal Next.js + TiDB application, declare:
 
 - `app.type: nextjs`.
 - Node.js runtime version supported by the platform.
-- `package-lock.json` with `npm ci` for new official-template Apps. Preserve another package manager only when its single lock file and every manifest command remain consistent.
+- `package-lock.json` with `npm ci` and an exact `packageManager: npm@10.x.y` for new official-template Apps. Generate and validate the lock with that npm 10 version because the Node 20 Builder does not accept npm 11-only lock resolution. Preserve another package manager only when its single lock file and every manifest command remain consistent.
 - `npm run build`, whose project script runs `next build` and assembles `.fc/artifact`.
 - `.fc/artifact` as `build.output` and `node server.js` as the foreground command inside it.
 - Port 9000 and `/healthz`.
@@ -318,7 +319,7 @@ Read `references/local-validation.md` and execute the highest available tier.
 
 Mandatory without cloud credentials:
 
-1. Frozen clean dependency install.
+1. Frozen clean dependency install. For npm, first pass `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`, then run the real clean install with that same exact npm 10 version.
 2. Project-provided lint, typecheck, unit, and integration tests for the touched surface.
 3. Production Next.js build.
 4. Standalone artifact assembly and content verification.
