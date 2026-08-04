@@ -15,6 +15,12 @@ for (const skill of skills) {
   if (!source.startsWith('---\n') || !source.includes(`\nname: ${skill}\n`)) {
     throw new Error(`${skill}/SKILL.md has an invalid frontmatter name`);
   }
+  if (!source.includes('Do not append raw CLI JSON or an internal audit object by default.')) {
+    throw new Error(`${skill}/SKILL.md must keep deployment handoffs human-readable by default`);
+  }
+  if (source.includes(`"skill": "${skill}"`)) {
+    throw new Error(`${skill}/SKILL.md must not embed the legacy raw handoff JSON template`);
+  }
 
   const frontmatter = source.match(/^---\n([\s\S]*?)\n---/u)?.[1];
   const rawDescription = frontmatter
@@ -35,6 +41,13 @@ for (const skill of skills) {
   const taskEvals = JSON.parse(await readFile(join(root, 'evals', 'evals.json'), 'utf8'));
   if (taskEvals.skill_name !== skill || !Array.isArray(taskEvals.evals) || taskEvals.evals.length === 0) {
     throw new Error(`${skill}/evals/evals.json has an invalid task eval set`);
+  }
+  if (
+    !taskEvals.evals.some((entry) =>
+      entry.expectations?.some((expectation) => expectation.includes('does not append the raw skill handoff JSON')),
+    )
+  ) {
+    throw new Error(`${skill}/evals/evals.json must guard the human-readable deployment handoff`);
   }
 
   const triggerEvals = JSON.parse(await readFile(join(root, 'evals', 'trigger-evals.json'), 'utf8'));

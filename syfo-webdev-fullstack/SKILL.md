@@ -13,7 +13,7 @@ The output is not ready merely because `next build` passes. Prove that the assem
 
 This skill owns the Syfo Hosted App lifecycle, not only source generation, database migration, or FC packaging. A successful `next build`, artifact assembly, or local smoke test is not task completion when the user asked to publish, deploy, go live, 上线, or provide a working Hosted App URL.
 
-At the start, classify the requested scope and keep it visible in the handoff:
+At the start, classify the requested scope so the workflow applies the correct deployment boundary:
 
 - `build_only`: implement or repair the App and run relevant local checks; the user did not ask for Syfo deployment preparation.
 - `deploy_ready`: complete local validation and immutable source preparation, but do not invoke paid/cloud mutation because deployment was not authorized.
@@ -407,71 +407,22 @@ Cloud acceptance should cover:
 
 ## Required handoff
 
-Return a human-readable summary followed by exactly one JSON object:
+Return a concise human-readable result in the user's language. Do not append raw CLI JSON or an internal audit object by default. Fields such as `skill`, `skillInvoked`, `requestedScope`, and a full `passed`/`not_run` matrix are implementation evidence, not user-facing deployment output.
 
-```json
-{
-  "skill": "syfo-webdev-fullstack",
-  "requestedScope": "deploy_ready",
-  "skillInvoked": true,
-  "source": {
-    "type": "git",
-    "revision": "FULL_COMMIT_SHA",
-    "sha256": null
-  },
-  "appDir": ".",
-  "manifest": "syfo.yaml",
-  "artifact": ".fc/artifact",
-  "serverEntry": ".fc/artifact/server.js",
-  "target": {
-    "platform": "aliyun-fc3",
-    "region": null,
-    "database": "tidb-cloud"
-  },
-  "requiredEnv": ["SESSION_SECRET"],
-  "deployment": {
-    "validate": "passed",
-    "sourcePush": "passed",
-    "deployPrepared": "not_run",
-    "humanConfirmation": "not_run",
-    "deployState": "not_run",
-    "version": null,
-    "url": null
-  },
-  "frontend": {
-    "scope": "new_ui",
-    "selectedSkills": ["agent-selected-skill"],
-    "designDirection": "SHORT_DESCRIPTION",
-    "desktopValidation": "passed",
-    "mobileValidation": "passed",
-    "accessibility": "passed",
-    "knownGaps": []
-  },
-  "validation": {
-    "install": "passed",
-    "typecheck": "passed",
-    "lint": "passed",
-    "test": "passed",
-    "build": "passed",
-    "artifact": "passed",
-    "start": "passed",
-    "health": "passed",
-    "httpSmoke": "passed",
-    "migration": "passed",
-    "migrationRepeat": "passed",
-    "databaseContract": "passed",
-    "browser": "passed",
-    "linuxAmd64": "not_applicable",
-    "cloudPublicAnonymous": "not_run",
-    "cloudBasicAuthChallenge": "not_run",
-    "cloudBasicAuthAuthorized": "not_run",
-    "cloudAcceptance": "not_run"
-  },
-  "notes": []
-}
-```
+For a completed authorized deployment, report:
 
-Use only `passed`, `failed`, `not_applicable`, or `not_run`. Never report `passed` for a command or scenario that was not executed.
+- The live URL first.
+- The deployed version and immutable source revision, confirming whether they match.
+- The important cloud, authentication, and database checks that actually ran, summarized in one sentence.
+- Known gaps or follow-up work only when they exist.
+
+For a deployment waiting on human confirmation or still building, state the current stage and the concrete next action. Do not describe a prepared confirmation card as deployed.
+
+For `build_only` or `deploy_ready`, state clearly that no cloud deployment was performed, record the immutable source identity and local validation outcome, and list the exact remaining deployment steps.
+
+Keep command JSON and the detailed validation matrix as working evidence. If the user or an automation consumer explicitly requests structured output, write a secret-free `deployment-report.json` artifact or provide a compact JSON object on request instead of placing it in every chat response.
+
+Never report a check as passed unless it was executed. Always distinguish local readiness from backend/cloud acceptance, and report pending or failed deployment state accurately.
 
 ## Stop conditions
 
