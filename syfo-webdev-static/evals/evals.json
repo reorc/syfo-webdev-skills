@@ -15,7 +15,7 @@
         "The artifact contains exported files plus a foreground static server entry.",
         "The official-template default uses package-lock.json, npm ci, and one npm run build command whose project script owns assembly.",
         "The static adapter delegates platform Basic Auth, fails closed, preserves unauthenticated health, and blocks symlink escapes.",
-        "The handoff distinguishes local readiness from cloud acceptance and records access-aware public or Basic Auth cloud smoke as not_run until executed."
+        "The handoff distinguishes local readiness from cloud acceptance without dumping the internal audit JSON into the user-facing response."
       ]
     },
     {
@@ -71,23 +71,25 @@
       "expected_output": "The static skill is invoked without being named, completes the missing UI, validates locally, validates the bound Syfo App, pushes an immutable commit, prepares the human-confirmed deployment, waits for deployment state/version, then verifies the deployed URL with access-aware cloud smoke.",
       "files": [],
       "expectations": [
-        "The solution recognizes the repository as a static Syfo Hosted App and records requestedScope as deploy_authorized.",
+        "The solution recognizes the repository as a static Syfo Hosted App and internally classifies the request as deploy_authorized.",
         "The solution does not stop after next build or local browser validation.",
         "The deployment sequence includes syfo app validate --json, an immutable commit and push, syfo app deploy --json, human confirmation, status/version polling, and production smoke.",
         "A prepared human confirmation card is not reported as a completed deployment.",
-        "The final URL is only reported successful after the deployed version and cloud access behavior are verified."
+        "The final URL is only reported successful after the deployed version and cloud access behavior are verified.",
+        "The final response is a concise human-readable deployment summary and does not append the raw skill handoff JSON."
       ]
     },
     {
       "id": 7,
       "prompt": "把当前静态 Syfo App 修到 deploy-ready，但今天不要真的部署云资源。",
-      "expected_output": "A deploy-ready static App with local and syfo app validation, immutable source preparation, no deployment mutation, explicit not_run cloud fields, and exact remaining deployment steps.",
+      "expected_output": "A deploy-ready static App with local and syfo app validation, immutable source preparation, no deployment mutation, a clear statement that cloud acceptance was not run, and exact remaining deployment steps.",
       "files": [],
       "expectations": [
-        "The solution records requestedScope as deploy_ready.",
+        "The solution internally classifies the request as deploy_ready.",
         "The solution runs local checks and syfo app validate --json but does not invoke syfo app deploy.",
-        "The handoff leaves deploy preparation, confirmation, deployment state, and cloud acceptance as not_run.",
-        "The exact push, deploy, confirmation, status/version, and smoke steps are listed for the next operator."
+        "The handoff clearly states that deployment preparation, confirmation, deployment state, and cloud acceptance were not run.",
+        "The exact push, deploy, confirmation, status/version, and smoke steps are listed for the next operator.",
+        "The user-facing handoff does not expose the raw internal validation matrix."
       ]
     },
     {

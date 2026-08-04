@@ -12,7 +12,7 @@
         "A new official-template App keeps package-lock.json, npm ci, npm run build, and npm run db:migrate aligned.",
         "D1 or SQLite runtime APIs are replaced with a TiDB/MySQL-compatible repository path.",
         "The solution runs migrations twice and tests JSON scalar, array, and object behavior.",
-        "The handoff distinguishes local readiness from cloud acceptance and records access-aware public or Basic Auth cloud smoke as not_run until executed."
+        "The handoff distinguishes local readiness from cloud acceptance without dumping the internal audit JSON into the user-facing response."
       ]
     },
     {
@@ -72,23 +72,25 @@
       "expected_output": "The fullstack skill is invoked without being named, completes authentication and persistence against the allocated App binding, validates locally and through syfo app dev, pushes immutable source, prepares the human-confirmed deployment, waits for the deployed version, and performs access-aware application and database acceptance.",
       "files": [],
       "expectations": [
-        "The solution identifies authentication and durable user data as fullstack and records requestedScope as deploy_authorized.",
+        "The solution identifies authentication and durable user data as fullstack and internally classifies the request as deploy_authorized.",
         "Allocated-App migrations and contracts run through syfo app dev before deployment.",
         "The solution does not stop after next build, standalone smoke, or migration success.",
         "The deployment sequence includes syfo app validate --json, immutable push, syfo app deploy --json, human confirmation, status/version polling, and production acceptance.",
-        "The deployed version must match the intended commit before success is claimed."
+        "The deployed version must match the intended commit before success is claimed.",
+        "The final response is a concise human-readable deployment summary and does not append the raw skill handoff JSON."
       ]
     },
     {
       "id": 7,
       "prompt": "把这个带 TiDB 的 Syfo App 修到可以随时部署，但不要创建本次线上部署。",
-      "expected_output": "A deploy-ready fullstack App validated against the allocated TiDB binding with no deployment mutation, explicit not_run deployment/cloud fields, and exact remaining deployment steps.",
+      "expected_output": "A deploy-ready fullstack App validated against the allocated TiDB binding with no deployment mutation, a clear statement that deployment and cloud acceptance were not run, and exact remaining deployment steps.",
       "files": [],
       "expectations": [
-        "The solution records requestedScope as deploy_ready.",
+        "The solution internally classifies the request as deploy_ready.",
         "Migrations and database contracts run through syfo app dev against the allocated App binding.",
         "The solution runs syfo app validate --json but does not invoke syfo app deploy.",
-        "The handoff lists the remaining immutable push, deploy, confirmation, status/version, and cloud acceptance steps."
+        "The handoff lists the remaining immutable push, deploy, confirmation, status/version, and cloud acceptance steps.",
+        "The user-facing handoff does not expose the raw internal validation matrix."
       ]
     },
     {
