@@ -128,6 +128,20 @@
         "Every SVG is a regular self-contained file, at most 64 KiB, with an unprefixed SVG root in the SVG namespace and no entity/escape, style, DTD, script, event handler, foreignObject, SMIL mutation, external reference, command, or secret.",
         "The enforced order is create icons, run the final project doctor with zero icon errors, run syfo app validate, then prepare deployment."
       ]
+    },
+    {
+      "id": 11,
+      "prompt": "我本机 ~/Downloads/专题解析.html 是一个自包含单页面，帮我尽量原样部署成公开 Syfo 网站。没有登录、API、secret、数据库，也没要求改成 React。",
+      "expected_output": "The static skill selects single_html_preserve, keeps the existing page structure and design, uses the thinnest official-template integration, applies the fast validation lane once, and completes the authorized static deployment lifecycle without inventing a backend or redesign.",
+      "files": [],
+      "expectations": [
+        "The request routes to syfo-webdev-static rather than syfo-webdev-fullstack despite the words website, App, or deploy.",
+        "The solution classifies the source as single_html_preserve and frontend scope as preserve.",
+        "The solution does not introduce a parser/extractor library, component hierarchy, database, API route, or new test framework without a source requirement.",
+        "The original DOM structure, classes, IDs, anchors, copy, styles, scripts, and local assets are preserved except for focused deployment compatibility fixes.",
+        "Validation runs doctor, one production build and artifact assembly, root/health/404 smoke, desktop and about-390px browser checks, one representative interaction when present, and syfo app validate without duplicate broad gates.",
+        "Authorized deployment continues through immutable commit and push, human confirmation, version verification, and public cloud smoke."
+      ]
     }
   ]
 }

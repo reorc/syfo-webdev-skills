@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev-fullstack
-description: "Use whenever a user asks to create, build, continue, fix, migrate, validate, package, publish, deploy, or take live a fullstack Syfo App or Syfo Hosted App. Trigger without being named when the request or repository indicates Syfo hosting, including app, Hosted App, 上线, 部署, syfo.yaml, syfo app init, syfo app validate, or syfo app deploy. Use for SSR, Route Handlers, Server Actions, cookies, application auth, server secrets, request-time behavior, durable writes, TiDB/database workflows, or migration from Cloudflare Workers, D1, SQLite, Vercel, or Node hosting. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate through the allocated App database when needed, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run production acceptance when authorized. Produces standalone .fc/artifact plus syfo.yaml; never s.yaml. Use syfo-webdev-static only when all behavior is build-time or browser-only."
+description: "Use only for Syfo Apps and Hosted Apps that concretely require server-side behavior: SSR or request-time rendering, Route Handlers, Server Actions, cookies or sessions, application auth, server-only secrets, private upstream credentials, ISR, durable writes, uploads, webhooks, queues, scheduled work, or TiDB/database workflows. Trigger only when the request or repository proves at least one such requirement. Do not trigger merely because the prompt says app, website, Hosted App, Syfo, 上线, 部署, syfo.yaml, validate, or deploy. Standalone HTML, static single-page sites, marketing/content sites, and browser-only Next.js belong to syfo-webdev-static. When unclear, inspect first and prefer static; escalate only after finding a concrete server blocker. Own the lifecycle through allocated-resource validation, immutable push, human-confirmed deploy, version checks, and production acceptance. Produces standalone .fc/artifact plus syfo.yaml; never s.yaml."
 ---
 
 # Syfo WebDev Fullstack for FC and TiDB
@@ -44,6 +44,12 @@ For `build_only` or `deploy_ready`, do not silently deploy. State the exact rema
 - Verify region-sensitive FC runtime availability and version-sensitive TiDB behavior against current official documentation.
 
 ## Supported target
+
+Routing gate:
+
+- Require positive evidence of server-side behavior before selecting this skill. Source framework, repository size, and deployment wording are not sufficient.
+- A plain or self-contained HTML file stays with `syfo-webdev-static` unless it contains a concrete dependency on private server credentials, request-time identity, persistence, or another backend capability.
+- If inspection finds no server blocker, stop using this skill and continue with `syfo-webdev-static`; do not add a backend to justify the route.
 
 Default target:
 

@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev-static
-description: "Use whenever a user asks to create, build, continue, fix, migrate, validate, package, publish, deploy, or take live a static Syfo App or Syfo Hosted App. Trigger without being named when the request or repository indicates Syfo hosting, including website, Hosted App, 上线, 部署, syfo.yaml, syfo app init, syfo app validate, or syfo app deploy. Covers landing pages, marketing sites, docs, portfolios, blogs, showcases, and browser-only Next.js App Router experiences fully generated at build time. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run access-aware production smoke when authorized. Produces output: export, .fc/artifact with static adapter, /healthz, and syfo.yaml; never s.yaml. Route cookies, application auth, server routes/actions, secrets, ISR, writes, and database requirements to syfo-webdev-fullstack."
+description: "Use for Syfo Apps and Hosted Apps whose behavior is fully build-time or browser-only, including standalone or self-contained .html files, single-page sites, landing pages, marketing sites, docs, portfolios, blogs, showcases, and statically generated Next.js routes. Trigger for Syfo create, migrate, validate, publish, or deploy requests when no concrete server requirement is present. Prefer this skill for ambiguous website or App deployment until inspection proves a backend is required; words such as app, website, Hosted App, Syfo, 上线, 部署, syfo.yaml, or deploy do not imply fullstack. Own the lifecycle through immutable push, human-confirmed deploy, version checks, and production smoke. Produces export, .fc/artifact, /healthz, and syfo.yaml; never s.yaml. Route only concrete cookies, application auth, server routes/actions, secrets, request-time behavior, ISR, durable writes, or database requirements to syfo-webdev-fullstack."
 ---
 
 # Syfo WebDev Static for FC
@@ -45,6 +45,12 @@ For `build_only` or `deploy_ready`, do not silently deploy. State the exact rema
 
 ## Eligibility gate
 
+Routing precedence:
+
+- Source format does not make an App fullstack. Plain HTML, CSS, JavaScript, React, Vite, and Next.js can all remain static when behavior is build-time or browser-only.
+- Generic deployment language such as "app", "website", "Hosted App", "Syfo", "deploy", "上线", or "部署" is not evidence of a backend.
+- When the request is ambiguous, start with this skill, inspect the source, and escalate to `syfo-webdev-fullstack` only after finding a concrete server-side blocker below.
+
 Stay static when every required behavior is available at build time or in the browser:
 
 - Marketing, product, documentation, portfolio, campaign, showcase, and content sites.
@@ -84,8 +90,12 @@ Deliver all applicable items:
 
 - Inspect the repository, package manager, workspace layout, Next.js version, router mode, design system, test commands, and current deployment configuration.
 - Select one explicit `appDir`; do not guess between multiple plausible applications.
-- For an existing plain HTML or React/Vite site, preserve information architecture and assets while migrating it to a Next.js App Router static export only when the user requested Next.js.
+- Classify the source as `single_html_preserve`, `existing_static_app`, or `new_static_ui` before choosing implementation and validation depth.
+- For `single_html_preserve`, keep the original DOM structure, classes, IDs, copy, styles, scripts, and local assets unless a deployment incompatibility requires a focused change. The official template still exports through Next.js, but that does not justify a React redesign, content model, parser/extractor library, component hierarchy, or new test framework.
+- For an existing plain HTML or React/Vite site, preserve information architecture and assets. Use the thinnest integration needed to produce the official Next.js static artifact; do not semantically rewrite the site merely because the deployment template uses Next.js.
 - Inventory source-controlled media by total bytes, file count, largest files, and required HTTP Range behavior.
+
+Read `references/single-html-fast-path.md` for `single_html_preserve` before changing source files.
 
 Run the bundled audit from the selected application root:
 
@@ -278,18 +288,27 @@ Read `references/syfo-contract.md` for rejection conditions.
 
 Run the highest available tier from `references/local-validation.md`.
 
-Mandatory without cloud credentials:
+For `single_html_preserve` with no application backend, dependency change, custom runtime code, or large media, use the fast validation lane and execute each expensive gate once:
 
-1. Frozen clean dependency install.
-2. Project-provided lint, typecheck, and tests.
-3. Production static export build.
-4. Artifact assembly and content verification.
-5. Artifact start on `0.0.0.0:9000`.
-6. `/healthz`, home, representative nested paths, static assets, and 404 checks.
-7. Audio/video Range checks when media exists.
-8. Browser checks for direct navigation, hydration, console errors, responsive layout, accessibility basics, and media playback.
-9. Secret, server-only API, database dependency, and forbidden provider-reference scans.
-10. `syfo.yaml` consistency review.
+1. Run the skill doctor and resolve relevant errors.
+2. Run the frozen install when dependencies are not already proven from the matching lock file.
+3. Run one production build that also assembles `.fc/artifact`.
+4. Run static smoke for `/`, `/healthz`, and an unknown route returning the real 404.
+5. Run one desktop and one narrow-mobile browser check plus one representative anchor or interaction when present.
+6. Run `syfo app validate --json`, then continue directly to immutable commit, push, and authorized deploy.
+
+Do not add or run broad lint, typecheck, or test suites solely because the official scaffold exposes them when the touched surface is preserved HTML/CSS and the production build already checks the unchanged wrapper. Run repository-required checks and focused tests whenever application JavaScript/TypeScript, dependencies, build/runtime code, forms, media behavior, or other logic changed. Do not repeat builds, artifact smoke, or browser scenarios without a new change that could affect them.
+
+For other static work, validate according to the touched surface:
+
+1. Frozen clean dependency install when dependencies or lock state are not already proven.
+2. Project-provided lint, typecheck, unit, and integration tests relevant to changed code or required by repository instructions.
+3. Production static export build, artifact assembly, and content verification.
+4. Artifact start on `0.0.0.0:9000`.
+5. `/healthz`, home, representative changed paths, relevant static assets, and 404 checks.
+6. Audio/video Range checks when media exists.
+7. Browser checks for changed or risk-bearing direct navigation, interactions, responsive layout, accessibility basics, and media playback.
+8. Secret, server-only API, database dependency, forbidden provider-reference, and `syfo.yaml` consistency scans.
 
 When frontend scope is `new_ui` or `material_change`, browser validation must also prove the selected design direction, desktop and mobile layouts, keyboard operation, interactive states, and absence of unintended default controls or scaffold placeholders.
 

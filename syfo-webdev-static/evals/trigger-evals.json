@@ -16,6 +16,14 @@
     "should_trigger": true
   },
   {
+    "query": "我本机 Downloads 里有一个自包含 HTML 文件，帮我原样部署成公开 Syfo 网站，不需要登录、API 或数据库。",
+    "should_trigger": true
+  },
+  {
+    "query": "把这个单页面 html 上线成 Hosted App。",
+    "should_trigger": true
+  },
+  {
     "query": "做一个带登录、cookie 和 TiDB 用户数据的 Syfo Hosted App。",
     "should_trigger": false
   },
