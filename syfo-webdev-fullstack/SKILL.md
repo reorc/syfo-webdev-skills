@@ -317,7 +317,7 @@ Exclude development caches, source `.env*`, credentials, test databases, certifi
 
 Read `references/local-validation.md` and execute the highest available tier.
 
-Mandatory without cloud credentials:
+Required local attempts without cloud credentials follow the resource-constrained retry and `not_run` rules in `references/local-validation.md`:
 
 1. Frozen clean dependency install. For npm, first pass `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`, then run the real clean install with that same exact npm 10 version.
 2. Project-provided lint, typecheck, unit, and integration tests for the touched surface.

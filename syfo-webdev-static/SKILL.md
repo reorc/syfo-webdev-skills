@@ -279,7 +279,7 @@ Read `references/syfo-contract.md` for rejection conditions.
 
 Run the highest available tier from `references/local-validation.md`.
 
-Mandatory without cloud credentials:
+Required local attempts without cloud credentials follow the resource-constrained retry and `not_run` rules in `references/local-validation.md`:
 
 1. Frozen clean dependency install. For npm, first pass `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`, then run the real clean install with that same exact npm 10 version.
 2. Project-provided lint, typecheck, and tests.

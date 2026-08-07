@@ -2,6 +2,26 @@
 
 Run the highest available tier. Report unavailable tiers as `not_run`, never `passed`.
 
+## Resource-constrained hosts
+
+Do not treat low memory or process limits as permission to skip the build immediately. When a Node.js install, test, build, export, or artifact assembly fails with resource evidence such as `SIGABRT`, `pthread_create: Resource temporarily unavailable`, `Cannot fork`, worker termination, or an out-of-memory error:
+
+1. Record the original command, exit status, and resource error.
+2. If a configured package mirror rejects the frozen install, retry the npm command with `--registry=https://registry.npmjs.org` without changing the lock file or persisting a global registry override.
+3. Retry the affected command once with constrained Node resources:
+
+   ```bash
+   UV_THREADPOOL_SIZE=1 \
+   NODE_OPTIONS='--v8-pool-size=1 --max-old-space-size=768' \
+   <original-command>
+   ```
+
+   Also set any repository-supported test or build worker limit to `1`; do not invent unsupported framework flags.
+4. If the constrained retry succeeds, continue the normal build, artifact assembly, `syfo app validate`, and smoke workflow.
+5. If it still fails for resource reasons, mark only the blocked local build, runtime, test, or browser checks as `not_run`. Continue Tier 0 checks and any independent manifest, asset, route, secret, and artifact-input validation that can still execute safely.
+
+Never report the App as locally verified, deployed, or live while required build/runtime checks are `not_run`. For an authorized deployment, the Syfo clean build environment must rebuild from the immutable source, reach a terminal successful version, and pass `/healthz` plus required access-aware cloud smoke before completion can be claimed.
+
 ## Tier 0: static audit
 
 - Repository instructions and appDir reviewed.
