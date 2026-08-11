@@ -11,6 +11,8 @@ The baseline contract is `syfo.yaml` version 1 unless the repository contains a 
   for the official template. Generate the lock and pass a no-script dry-run `npm ci` with that
   exact npm 10 version before validation or deployment; keep any migrated package manager
   internally consistent instead of switching it implicitly.
+- For Next.js 16, declare `engines.node: ">=20.9.0"` or a newer compatible minimum and verify the
+  local and Syfo Builder Node versions satisfy it.
 - Declare deterministic install, build, artifact, run, health, environment-name, and routing behavior.
 - Use `app.type: nextjs`, static artifact output `.fc/artifact`, and `node server.mjs` inside that artifact.
 - Declare `database.required: false`; do not declare TiDB variables.

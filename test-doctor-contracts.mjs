@@ -201,6 +201,40 @@ test('npm apps pin the builder-compatible npm 10 version', async () => {
   }
 });
 
+test('static doctor requires the Next.js 16 Node engine contract', async () => {
+  const project = await createStaticFixture();
+  try {
+    const packagePath = join(project, 'package.json');
+    const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));
+    packageJson.dependencies.next = '16.3.0';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    assert.ok(errorCodes(runDoctor('syfo-webdev-static', project)).includes('next16-node-engine'));
+
+    packageJson.engines = { node: '>=20.9.0' };
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    assert.ok(!errorCodes(runDoctor('syfo-webdev-static', project)).includes('next16-node-engine'));
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
+test('fullstack doctor requires the Next.js 16 Node engine contract', async () => {
+  const project = await createFullstackFixture();
+  try {
+    const packagePath = join(project, 'package.json');
+    const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));
+    packageJson.dependencies.next = '16.3.0';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    assert.ok(errorCodes(runDoctor('syfo-webdev-fullstack', project)).includes('next16-node-engine'));
+
+    packageJson.engines = { node: '>=20.9.0' };
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    assert.ok(!errorCodes(runDoctor('syfo-webdev-fullstack', project)).includes('next16-node-engine'));
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
 test('doctor blocks malformed, externally-referencing, and non-regular App icons', async () => {
   const project = await createStaticFixture();
   const outsideIcon = join(tmpdir(), `syfo-outside-icon-${Date.now()}.svg`);

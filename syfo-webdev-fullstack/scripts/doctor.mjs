@@ -316,6 +316,18 @@ if (!existsSync(packagePath)) {
   packageJson = JSON.parse(read(packagePath));
   dependencies = { ...packageJson.dependencies, ...packageJson.devDependencies };
   if (!dependencies.next) add("error", "missing-next", "package.json", "The application does not declare Next.js.");
+  const nextMajor = Number(String(dependencies.next || "").match(/\d+/)?.[0]);
+  if (nextMajor >= 16) {
+    const engine = String(packageJson.engines?.node || "").trim();
+    const minimum = engine.match(/^>=(\d+)\.(\d+)\.(\d+)$/)?.slice(1).map(Number);
+    if (!minimum || minimum[0] < 20 || (minimum[0] === 20 && minimum[1] < 9)) {
+      add("error", "next16-node-engine", "package.json", "Next.js 16 requires an explicit engines.node minimum of >=20.9.0 or newer so local and Builder environments cannot silently use an incompatible Node 20 patch.");
+    }
+    const local = process.versions.node.split(".").map(Number);
+    if (local[0] < 20 || (local[0] === 20 && local[1] < 9)) {
+      add("error", "next16-local-node", "package.json", `Next.js 16 requires Node >=20.9.0; current Node is ${process.versions.node}.`);
+    }
+  }
   for (const script of ["build", "typecheck", "test", "db:migrate"]) {
     if (!packageJson.scripts?.[script]) add("warning", `missing-${script}-script`, "package.json", `No ${script} script was found.`);
   }
