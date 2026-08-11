@@ -9,6 +9,8 @@ The accepted application contract is `syfo.yaml` version 1 unless the repository
 - Use one matching dependency lock file and a frozen install command.
 - For npm Apps, pin an exact `packageManager: npm@10.x.y`, generate `package-lock.json` with that
   version, and pass a no-script dry-run `npm ci` with the same version before validation or deploy.
+- For Next.js 16, declare `engines.node: ">=20.9.0"` or a newer compatible minimum and verify the
+  local and Syfo Builder Node versions satisfy it.
 - Declare deterministic install, build, run, health, migration, environment-name, and routing behavior.
 - Keep provider resource IDs, actual domains, credentials, secret values, and certificate material out of the manifest.
 - Syfo backend services translate the accepted manifest into provider-specific `s.yaml` and FC infrastructure. Application-building agents must not generate or maintain that provider file.
