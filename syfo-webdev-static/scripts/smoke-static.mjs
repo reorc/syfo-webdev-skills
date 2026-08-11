@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
+import { createServer } from "node:http";
 import { resolve } from "node:path";
 
 const args = process.argv.slice(2);
@@ -17,10 +18,39 @@ const root = resolve(artifact);
 const entry = resolve(root, "server.mjs");
 if (!existsSync(entry)) throw new Error(`Missing static server entry: ${entry}`);
 
+const verifierToken = `local-smoke-${process.pid}-${Date.now()}`;
+const verifier = createServer((request, response) => {
+  if (
+    request.url !== "/api/v1/hosted-app-auth/basic/verify" ||
+    request.method !== "POST" ||
+    request.headers["x-syfo-hosted-app-token"] !== verifierToken
+  ) {
+    response.writeHead(403).end();
+    return;
+  }
+  response.writeHead(204).end();
+});
+await new Promise((resolveListen, reject) => {
+  verifier.once("error", reject);
+  verifier.listen(0, "127.0.0.1", resolveListen);
+});
+const verifierAddress = verifier.address();
+if (!verifierAddress || typeof verifierAddress === "string") {
+  verifier.close();
+  throw new Error("Local verifier did not expose a TCP port.");
+}
+
 const port = 9000 + Math.floor(Math.random() * 500);
 const child = spawn(process.execPath, [entry], {
   cwd: root,
-  env: { ...process.env, HOSTNAME: "0.0.0.0", PORT: String(port), NODE_ENV: "production" },
+  env: {
+    ...process.env,
+    HOSTNAME: "0.0.0.0",
+    PORT: String(port),
+    NODE_ENV: "production",
+    BUILT_IN_FORGE_API_URL: `http://127.0.0.1:${verifierAddress.port}`,
+    BUILT_IN_FORGE_API_KEY: verifierToken,
+  },
   stdio: ["ignore", "pipe", "pipe"],
 });
 let output = "";
@@ -60,11 +90,12 @@ try {
     if (range.status !== 206) throw new Error(`${rangePath} returned ${range.status}, expected 206 for a byte range.`);
     results.push({ path: rangePath, status: range.status, contentRange: range.headers.get("content-range") });
   }
-  process.stdout.write(`${JSON.stringify({ artifact: root, results }, null, 2)}\n`);
+  process.stdout.write(`${JSON.stringify({ artifact: root, accessMode: "local-public-verifier", results }, null, 2)}\n`);
 } finally {
   child.kill("SIGTERM");
   await new Promise((resolveExit) => {
     const timer = setTimeout(() => { child.kill("SIGKILL"); resolveExit(); }, 5000);
     child.once("exit", () => { clearTimeout(timer); resolveExit(); });
   });
+  await new Promise((resolveClose) => verifier.close(resolveClose));
 }

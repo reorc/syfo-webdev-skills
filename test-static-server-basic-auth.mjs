@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
 
 const source = await readFile(
   new URL('syfo-webdev-static/templates/project-static-server.mjs', import.meta.url),
@@ -122,6 +125,41 @@ test('static runtime blocks symlink escapes after delegated access succeeds', as
     child.kill('SIGTERM');
     await new Promise((resolve) => child.once('exit', resolve));
     await new Promise((resolve) => verifier.close(resolve));
+    await rm(artifact, { recursive: true, force: true });
+  }
+});
+
+test('static smoke harness injects a local public verifier', async () => {
+  const artifact = await mkdtemp(join(tmpdir(), 'syfo-static-smoke-runtime-'));
+  const publicRoot = join(artifact, 'public');
+  await mkdir(publicRoot, { recursive: true });
+  await writeFile(join(artifact, 'server.mjs'), source);
+  await writeFile(join(publicRoot, 'index.html'), '<h1>ok</h1>');
+  await writeFile(join(publicRoot, '404.html'), '<h1>missing</h1>');
+
+  try {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      [
+        new URL('syfo-webdev-static/scripts/smoke-static.mjs', import.meta.url).pathname,
+        '--artifact',
+        artifact,
+        '--path',
+        '/',
+      ],
+      { timeout: 20_000 },
+    );
+    const report = JSON.parse(stdout);
+    assert.equal(report.accessMode, 'local-public-verifier');
+    assert.deepEqual(
+      report.results.map((result) => [result.path, result.status]),
+      [
+        ['/healthz', 200],
+        ['/', 200],
+        ['missing-route', 404],
+      ],
+    );
+  } finally {
     await rm(artifact, { recursive: true, force: true });
   }
 });
