@@ -1,6 +1,7 @@
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { inflateSync } from "node:zlib";
+import { analyzeArtifactTree, formatBytes } from "./check-artifact-budget.mjs";
 
 const root = process.cwd();
 const findings = [];
@@ -441,7 +442,39 @@ if (/required:\s*true/.test(manifest)) {
 }
 
 if (existsSync(join(root, ".fc", "artifact", "server.js"))) {
-  add("info", "artifact-present", ".fc/artifact", "Run the server smoke harness against the assembled artifact.");
+  const artifactRoot = join(root, ".fc", "artifact");
+  try {
+    const report = analyzeArtifactTree(artifactRoot);
+    if (report.ok) {
+      add(
+        "info",
+        "artifact-budget-pass",
+        ".fc/artifact",
+        `Builder-size preflight passed: ${report.fileCount}/${report.limits.maxFileCount} files and ${formatBytes(report.totalBytes)}/${formatBytes(report.limits.maxTotalBytes)}. Run the server smoke harness next.`,
+      );
+    } else {
+      for (const violation of report.violations) {
+        const topDependencies = report.topN.runtimeDependenciesByBytes
+          .slice(0, 4)
+          .map((entry) => `${entry.path}=${formatBytes(entry.bytes)}`)
+          .join(", ");
+        add(
+          "error",
+          violation.code.replaceAll("_", "-"),
+          ".fc/artifact",
+          `${violation.metric} is ${violation.actual}, exceeding Builder limit ${violation.limit}${violation.path ? ` at ${violation.path}` : ""}. Prune build-time-only or non-target dependencies from the assembled runtime artifact.${topDependencies ? ` Largest runtime dependencies: ${topDependencies}.` : ""}`,
+        );
+      }
+    }
+    for (const hint of report.hints) add("warning", hint.code, ".fc/artifact", hint.detail);
+  } catch (error) {
+    add(
+      "error",
+      "artifact-budget-scan-failed",
+      ".fc/artifact",
+      `Make the assembled artifact a regular, readable file tree: ${error instanceof Error ? error.message : String(error)}.`,
+    );
+  }
 } else {
   add("info", "build-not-run", ".fc/artifact", "Run the production build and artifact assembly before runtime validation.");
 }

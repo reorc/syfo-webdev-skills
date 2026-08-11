@@ -37,6 +37,8 @@ Never report the App as locally verified, deployed, or live while required build
 - Focused lint, typecheck, unit, and integration tests.
 - Production build.
 - Standalone artifact assembly.
+- Run `node <skill-path>/scripts/check-artifact-budget.mjs --artifact .fc/artifact` and require zero Builder-compatible size/file violations.
+- Review its Top dependency and hint output. Remove build-only packages and non-target native variants from the assembled runtime tree; do not raise the 70 MiB limit to mask packaging drift.
 - Start on `0.0.0.0:9000`.
 - Health, home, representative page/API, static assets, and redirect smoke checks.
 - SIGTERM shutdown check where practical.
