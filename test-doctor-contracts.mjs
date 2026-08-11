@@ -293,9 +293,25 @@ test('skill lifecycle keeps icon validation and deploy state machine explicit', 
       'utf8',
     );
     assert.match(source, /After icon creation, run the doctor again[\s\S]*before `syfo app validate`/);
-    assert.match(lifecycle, /source_ready[\s\S]*syfo app deploy --json[\s\S]*awaiting_confirmation/);
+    assert.match(
+      lifecycle,
+      /source_ready[\s\S]*syfo app deploy --target "<reply-target>" --json[\s\S]*awaiting_confirmation/,
+    );
+    assert.doesNotMatch(lifecycle, /syfo app deploy --json/);
+    assert.match(lifecycle, /operationId[\s\S]*do not create a second deploy operation/);
     assert.match(lifecycle, /owner=null[\s\S]*Do not run `syfo app claim` as a routine prerequisite/);
   }
+});
+
+test('skill architecture choice rejects speculative fullstack upgrades', async () => {
+  const staticSkill = await readFile(join(repositoryRoot, 'syfo-webdev-static', 'SKILL.md'), 'utf8');
+  const fullstackSkill = await readFile(join(repositoryRoot, 'syfo-webdev-fullstack', 'SKILL.md'), 'utf8');
+
+  assert.match(staticSkill, /Use static by default/);
+  assert.match(staticSkill, /may need a backend later/i);
+  assert.match(staticSkill, /ask the user rather than[\s\S]*guessing/);
+  assert.match(fullstackSkill, /Do not choose fullstack only for possible future expansion/);
+  assert.match(fullstackSkill, /ask the user rather than guessing/);
 });
 
 test('skill keeps npm 10 gate and immutable deploy preparation explicit', async () => {
