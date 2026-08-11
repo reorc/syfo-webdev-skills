@@ -130,6 +130,30 @@
         "Every SVG is a regular self-contained file, at most 64 KiB, with an unprefixed SVG root in the SVG namespace and no entity/escape, style, DTD, script, event handler, foreignObject, SMIL mutation, external reference, command, or secret.",
         "The enforced order is create icons, run the final project doctor with zero icon errors, run syfo app validate, then prepare deployment."
       ]
+    },
+    {
+      "id": 11,
+      "prompt": "app init 成功但 owner=null。不要让我多走没必要的流程，继续准备第一次部署。",
+      "expected_output": "The Agent treats owner=null as a valid draft, does not run claim by default, prepares the deploy confirmation from the immutable commit, and explains that the confirming human may become owner on first deploy.",
+      "files": [],
+      "expectations": [
+        "The solution does not classify owner=null as initialization failure.",
+        "The solution does not run syfo app claim as a routine prerequisite.",
+        "The Agent prepares syfo app deploy after validation and immutable push.",
+        "Human confirmation remains the paid mutation boundary and may establish ownership."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "静态导出和 artifact 都通过，但本地 server.mjs 只有 /healthz 是 200，首页是 503。判断是不是应用坏了并完成 smoke。",
+      "expected_output": "The Agent recognizes the fail-closed verifier behavior, uses the bundled smoke harness with its loopback public verifier, and validates home, representative routes, assets, and 404 without cloud credentials.",
+      "files": [],
+      "expectations": [
+        "The solution does not diagnose the credential-less adapter 503 as an application build failure.",
+        "The solution uses smoke-static.mjs instead of weakening production authorization.",
+        "The local harness injects a loopback verifier and proves home plus 404 behavior.",
+        "Production fail-closed behavior remains intact."
+      ]
     }
   ]
 }

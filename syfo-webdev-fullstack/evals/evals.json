@@ -131,6 +131,18 @@
         "Every SVG is a regular self-contained file, at most 64 KiB, with an unprefixed SVG root in the SVG namespace and no entity/escape, style, DTD, script, event handler, foreignObject, SMIL mutation, external reference, command, or secret.",
         "The enforced order is create icons, run the final project doctor with zero icon errors, run syfo app validate, then prepare deployment."
       ]
+    },
+    {
+      "id": 11,
+      "prompt": "这个 App 已认领，但 Agent 发起部署返回 FORBIDDEN。不要把它说成构建失败，给出正确处理。",
+      "expected_output": "The Agent separates ownership from deploy preparation authority, reports the exact authorization failure, preserves the intended commit, and uses the owner/UI handoff only when the server says the actor cannot prepare the deploy.",
+      "files": [],
+      "expectations": [
+        "The solution does not retry claim after the App already has an owner.",
+        "The solution classifies the failure as authorization rather than Build Service failure.",
+        "The intended immutable commit and completed validation remain preserved.",
+        "The owner/UI handoff is used only as the explicit permission fallback."
+      ]
     }
   ]
 }

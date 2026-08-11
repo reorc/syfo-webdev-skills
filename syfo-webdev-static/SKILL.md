@@ -19,20 +19,14 @@ At the start, classify the requested scope so the workflow applies the correct d
 - `deploy_ready`: complete local validation and immutable source preparation, but do not invoke paid/cloud mutation because deployment was not authorized.
 - `deploy_authorized`: the user explicitly asked to deploy, publish, go live, 上线, or otherwise make the Syfo App accessible. Continue through the deployment workflow below.
 
-For `deploy_authorized`, do not stop after coding or local validation:
+For `deploy_ready` and `deploy_authorized`, read `references/deployment-lifecycle.md` and follow its
+ownership, confirmation, failure-stage, and completion state machine. In particular, `owner=null`
+is a valid draft and `syfo app claim` is not a routine pre-deploy step.
 
-1. Create or update the App-specific SVG icon family from the current App name and description, render matching PNG browser assets, and place them in the root Next file-convention metadata paths.
-2. Run the skill doctor again as the final pre-deploy gate. Continue only when it reports zero icon errors; an earlier repository-audit run does not satisfy this step.
-3. For npm Apps, require an exact `packageManager: npm@10.x.y`, then run `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`. If it fails, regenerate `package-lock.json` with that same npm 10 version and rerun the frozen-install gate. Never validate or deploy a lock generated only with npm 11.
-4. Run `syfo app validate --json` in the bound App repository and resolve failures.
-5. Require a clean immutable commit, then push it with `syfo app push` or the repository-approved Git path. Never deploy an uncommitted working tree.
-6. Run `syfo app deploy --json` from the bound repository; pass an App ID only when no binding is available. This prepares a billing/human-confirmed deployment rather than completing it immediately.
-7. Report the returned deploy/confirmation identifiers and clearly state that the human confirmation card is pending when it has not been approved. A prepared card is progress, not a successful deployment.
-8. After confirmation, poll `syfo app status --json` and `syfo app versions --json` until a terminal state is available. Do not claim success while state is queued, pending confirmation, building, or deploying.
-9. Run `syfo app open --json` to obtain the deployed URL, then run the access-aware cloud smoke for the configured policy.
-10. Mark deployment complete only when the deployed version matches the intended commit and required cloud smoke passes.
-
-For `build_only` or `deploy_ready`, do not silently deploy. State the exact remaining `syfo app validate`, source push, `syfo app deploy`, confirmation, status/version, and smoke steps; cloud acceptance stays `not_run`.
+For `deploy_authorized`, finish the icon/npm gates below, run `syfo app validate --json`, push a
+clean immutable commit, prepare the human-confirmed deploy, poll to a terminal version, and run
+access-aware cloud smoke. For `build_only` or `deploy_ready`, do not silently deploy; report the
+immutable source identity, local result, and exact remaining state-machine step.
 
 ## Boundaries
 
@@ -108,6 +102,9 @@ Choose the init path before writing substantial site code:
   `git clone`, reconstruct the repository URL, or copy a template by hand. Treat initialization
   as complete only after the command reports `app initialized` and returns a non-empty `cloneDir`
   plus the local binding path. Then `cd <cloneDir>` and inspect the template before changing it.
+- An initialized App may report `owner=null`. Continue implementation and validation; do not insert
+  `syfo app claim` unless the user explicitly wants ownership established before deployment or the
+  CLI returns a specific ownership-required result.
 - If initialization reports that the outcome is not yet known and returns a `commandId` or
   `resumeCommand`, run the exact `syfo app init --resume <commandId>` command. Do not rerun the
   original init command with a new idempotency key, choose another clone directory, manually
@@ -308,6 +305,16 @@ node <skill-path>/scripts/smoke-static.mjs \
 
 Omit `--range-path` when the site has no audio or video.
 
+The harness starts a loopback public verifier and injects temporary platform verifier variables, so
+home and 404 checks exercise the production fail-closed adapter without cloud credentials. Do not
+start `server.mjs` directly and interpret its expected credential-less 503 as an App failure.
+
+For responsive browser evidence, prefer browser automation with an explicit viewport instead of
+manually resizing Chrome. Capture at least one desktop viewport (for example 1440×900) and one
+mobile viewport (for example 390×844), plus direct navigation and console results. Use Computer Use
+when interaction requires the real desktop, but never mark mobile validation passed from source
+inspection alone.
+
 For Apple Silicon development or architecture-specific dependencies, validate the assembled artifact in Linux AMD64 even though the application itself is static.
 
 After an authorized deployment, run the access-aware cloud smoke. Pass Basic Auth credentials only
@@ -332,6 +339,9 @@ node <skill-path>/scripts/smoke-cloud-access.mjs \
 - Record `requestedScope` as `build_only`, `deploy_ready`, or `deploy_authorized`.
 - For `deploy_authorized`, execute the Completion contract through human confirmation, terminal deployment state, version verification, and cloud smoke. Do not merely hand the artifact to the backend and stop.
 - For other scopes, hand `syfo.yaml` plus immutable source/artifact identity to the Syfo backend deployment service and list the exact remaining deployment steps.
+- When the delivery Artifact source is a directory, archive it first (for example `.tar.gz`) and
+  declare/upload the regular archive file. A directory-upload rejection plus a local card is not a
+  successful remote delivery.
 - Do not generate `s.yaml` or perform cloud resource creation from this skill.
 - Distinguish local readiness from backend/cloud acceptance.
 - After deployment, run access-aware smoke for the configured policy: public anonymous success;
