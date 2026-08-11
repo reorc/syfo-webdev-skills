@@ -285,23 +285,31 @@ test('doctor rejects unsupported, empty, and undecodable PNG pixel data', async 
   }
 });
 
-test('skill completion contract locks icon creation before final doctor, validation, and deploy', async () => {
+test('skill lifecycle keeps icon validation and deploy state machine explicit', async () => {
   for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
     const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
-    assert.match(
-      source,
-      /Create or update the App-specific SVG icon family[\s\S]*Run the skill doctor again[\s\S]*syfo app validate --json[\s\S]*syfo app deploy --json/,
+    const lifecycle = await readFile(
+      join(repositoryRoot, skill, 'references', 'deployment-lifecycle.md'),
+      'utf8',
     );
+    assert.match(source, /After icon creation, run the doctor again[\s\S]*before `syfo app validate`/);
+    assert.match(lifecycle, /source_ready[\s\S]*syfo app deploy --json[\s\S]*awaiting_confirmation/);
+    assert.match(lifecycle, /owner=null[\s\S]*Do not run `syfo app claim` as a routine prerequisite/);
   }
 });
 
-test('skill completion contract locks npm 10 dry-run before validation, push, and deploy', async () => {
+test('skill keeps npm 10 gate and immutable deploy preparation explicit', async () => {
   for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
     const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
+    const lifecycle = await readFile(
+      join(repositoryRoot, skill, 'references', 'deployment-lifecycle.md'),
+      'utf8',
+    );
     assert.match(
       source,
-      /packageManager: npm@10\.x\.y[\s\S]*npx --yes npm@<package\.json packageManager version> ci --ignore-scripts --dry-run[\s\S]*syfo app validate --json[\s\S]*syfo app push[\s\S]*syfo app deploy --json/,
+      /packageManager: npm@10\.x\.y[\s\S]*npx --yes npm@<package\.json packageManager version> ci --ignore-scripts --dry-run/,
     );
+    assert.match(lifecycle, /validated[\s\S]*Commit and push immutable source[\s\S]*source_ready/);
   }
 });
 
