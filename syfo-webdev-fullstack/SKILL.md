@@ -23,11 +23,12 @@ For `deploy_ready` and `deploy_authorized`, read `references/deployment-lifecycl
 ownership, confirmation, failure-stage, and completion state machine. In particular, `owner=null`
 is a valid draft and `syfo app claim` is not a routine pre-deploy step.
 
-For `deploy_authorized`, finish the icon/npm gates below, run `syfo app validate --json`, prove
-required database migrations through `syfo app dev -- <command>` when applicable, push a clean
-immutable commit, prepare the human-confirmed deploy, poll to a terminal version, and run production
-acceptance. For `build_only` or `deploy_ready`, do not silently deploy; report the immutable source
-identity, local result, and exact remaining state-machine step.
+For `deploy_authorized`, finish the icon/npm gates below, pass the Builder-compatible artifact budget
+gate, run `syfo app validate --json`, prove required database migrations through
+`syfo app dev -- <command>` when applicable, push a clean immutable commit, prepare the
+human-confirmed deploy, poll to a terminal version, and run production acceptance. For `build_only`
+or `deploy_ready`, do not silently deploy; report the immutable source identity, local result, and
+exact remaining state-machine step.
 
 ## Boundaries
 
@@ -72,6 +73,7 @@ Deliver all applicable items:
 7. Frontend capability selection and browser-quality evidence when user-visible UI is created or materially changed.
 8. An immutable Git commit SHA or ZIP SHA-256 for final handoff.
 9. For Syfo-authenticated Apps, an App-local user schema and first-login persistence path.
+10. A passing Builder-compatible artifact budget report for the final `.fc/artifact`.
 
 ## Workflow
 
@@ -311,6 +313,19 @@ The script copies the standalone tree, `public`, and `.next/static`, then report
 
 Exclude development caches, source `.env*`, credentials, test databases, certificates, local logs, and unrelated workspace applications from the artifact.
 
+Immediately after assembly, enforce the same runtime-tree limits used by Builder:
+
+```bash
+node <skill-path>/scripts/check-artifact-budget.mjs --artifact .fc/artifact
+```
+
+The gate fails when the tree exceeds 70 MiB, a single file exceeds 70 MiB, the artifact has more
+than 100,000 files, or the tree contains unsupported file types. Its Top dependency report and
+hints identify common causes such as TypeScript/ESLint/Prettier in the runtime tree or simultaneous
+glibc and musl Sharp packages. Do not delete dependencies blindly or increase the limit: rebuild
+for the Linux FC target and prune only build-time or non-target packages from the assembled
+artifact. The final doctor run repeats this gate when `.fc/artifact/server.js` exists.
+
 ### 9. Validate locally in layers
 
 Read `references/local-validation.md` and execute the highest available tier.
@@ -321,10 +336,11 @@ Required local attempts without cloud credentials follow the resource-constraine
 2. Project-provided lint, typecheck, unit, and integration tests for the touched surface.
 3. Production Next.js build.
 4. Standalone artifact assembly and content verification.
-5. Artifact start with `HOSTNAME=0.0.0.0` and `PORT=9000`.
-6. `/healthz`, home page, representative public route, and key API smoke checks.
-7. Secret and forbidden-platform-reference scan.
-8. `syfo.yaml` consistency review.
+5. Builder-compatible artifact budget check with zero violations.
+6. Artifact start with `HOSTNAME=0.0.0.0` and `PORT=9000`.
+7. `/healthz`, home page, representative public route, and key API smoke checks.
+8. Secret and forbidden-platform-reference scan.
+9. `syfo.yaml` consistency review.
 
 When frontend scope is `new_ui` or `material_change`, also require:
 
