@@ -65,7 +65,9 @@ Only through the authorized backend deployment path:
 - Syfo accepts `syfo.yaml` and generates provider deployment configuration.
 - FC starts the artifact on the configured port.
 - Custom HTTPS domain serves health, pages, static chunks, media, and 404 responses.
+- Read the configured access policy from `syfo app status --json`; do not modify it.
 - Public mode serves an anonymous representative page with 2xx.
-- Basic Auth mode returns anonymous 401 with `WWW-Authenticate: Basic` and serves the same page with an authorized test credential.
+- Basic Auth mode returns anonymous 401 with `WWW-Authenticate: Basic`; verify authorized access only
+  when a human explicitly supplies a test credential.
 - Logs contain no secrets or full environment dumps.
 - Artifact digest and rollback identity are recorded.

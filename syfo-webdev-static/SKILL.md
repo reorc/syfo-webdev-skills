@@ -317,8 +317,12 @@ inspection alone.
 
 For Apple Silicon development or architecture-specific dependencies, validate the assembled artifact in Linux AMD64 even though the application itself is static.
 
-After an authorized deployment, run the access-aware cloud smoke. Pass Basic Auth credentials only
-through environment variables so they do not appear in shell history or the JSON report:
+After an authorized deployment, read `app.visibility` with `syfo app status --json`. Never modify
+the policy: App initialization supplies the default and only a human may change it in the Hosted App
+management UI. If it conflicts with the requested audience, stop for the human change, then re-read
+status. Run the matching cloud smoke only when the policy is `public` or when the human explicitly
+supplies Basic Auth test credentials. Pass credentials only through environment variables so they do
+not appear in shell history or the JSON report:
 
 ```bash
 node <skill-path>/scripts/smoke-cloud-access.mjs \
@@ -344,8 +348,10 @@ node <skill-path>/scripts/smoke-cloud-access.mjs \
   successful remote delivery.
 - Do not generate `s.yaml` or perform cloud resource creation from this skill.
 - Distinguish local readiness from backend/cloud acceptance.
-- After deployment, run access-aware smoke for the configured policy: public anonymous success;
-  Basic Auth anonymous challenge; and Basic Auth success with an authorized test credential.
+- Read and report the policy from `syfo app status --json`; never call `syfo app access set`.
+- For `public`, verify anonymous success. For Basic Auth, verify the anonymous challenge and
+  authorized success only when a human explicitly supplies a test credential. If the required
+  credential is unavailable, report the acceptance gap without weakening or changing the policy.
 
 ## Required handoff
 
