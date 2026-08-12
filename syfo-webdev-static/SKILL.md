@@ -40,6 +40,17 @@ immutable source identity, local result, and exact remaining state-machine step.
 
 ## Eligibility gate
 
+Before initialization, record a concise capability decision based on current requirements, not
+speculative future expansion:
+
+- Use static by default when no request-time server capability is required.
+- “We may need a backend later” is not sufficient reason to initialize fullstack now.
+- If the user names fullstack but the stated requirements are entirely build-time or browser-only,
+  point out the mismatch and ask whether there is an unstated server requirement before initializing.
+- If a requirement is ambiguous and the answer changes the template, ask the user rather than
+  guessing. Keep the question focused on the missing capability, such as authentication, secrets,
+  runtime APIs, request-time rendering, or durable writes.
+
 Stay static when every required behavior is available at build time or in the browser:
 
 - Marketing, product, documentation, portfolio, campaign, showcase, and content sites.

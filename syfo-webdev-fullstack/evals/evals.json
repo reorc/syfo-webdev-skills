@@ -75,7 +75,7 @@
         "The solution identifies authentication and durable user data as fullstack and internally classifies the request as deploy_authorized.",
         "Allocated-App migrations and contracts run through syfo app dev before deployment.",
         "The solution does not stop after next build, standalone smoke, or migration success.",
-        "The deployment sequence includes syfo app validate --json, immutable push, syfo app deploy --json, human confirmation, status/version polling, and production acceptance.",
+        "The deployment sequence includes syfo app validate --json, immutable push, syfo app deploy --target <complete-reply-target> --json, human confirmation, status/version polling, and production acceptance.",
         "The deployed version must match the intended commit before success is claimed.",
         "The final response is a concise human-readable deployment summary and does not append the raw skill handoff JSON."
       ]
@@ -142,6 +142,18 @@
         "The solution classifies the failure as authorization rather than Build Service failure.",
         "The intended immutable commit and completed validation remain preserved.",
         "The owner/UI handoff is used only as the explicit permission fallback."
+      ]
+    },
+    {
+      "id": 12,
+      "prompt": "请用 fullstack 模板做一个官网。现在只有静态页面和浏览器交互，没有登录、API、密钥、SSR 或数据库。",
+      "expected_output": "An architecture mismatch response that does not initialize fullstack without a current server capability, recommends static from the known facts, and asks whether an unstated server requirement exists.",
+      "files": [],
+      "expectations": [
+        "The solution identifies that the stated requirements are entirely static.",
+        "The solution explains that possible future needs do not justify fullstack now.",
+        "The solution asks a focused clarification question before choosing a fullstack template.",
+        "The solution routes to syfo-webdev-static if no current server requirement is provided."
       ]
     }
   ]

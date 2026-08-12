@@ -42,6 +42,16 @@ exact remaining state-machine step.
 
 ## Supported target
 
+Before initialization, establish at least one current request-time server capability that requires
+fullstack, such as SSR, server routes/actions, application authentication, server-only secrets,
+runtime personalization, or durable writes/database access.
+
+- Do not choose fullstack only for possible future expansion.
+- If the stated requirements are entirely build-time or browser-only, use `syfo-webdev-static`.
+- If the user names fullstack but provides no server requirement, point out the architecture cost
+  and ask whether an unstated server capability exists before initializing.
+- If the answer is ambiguous and changes the template, ask the user rather than guessing.
+
 Default target:
 
 ```text

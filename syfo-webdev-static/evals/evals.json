@@ -73,7 +73,7 @@
       "expectations": [
         "The solution recognizes the repository as a static Syfo Hosted App and internally classifies the request as deploy_authorized.",
         "The solution does not stop after next build or local browser validation.",
-        "The deployment sequence includes syfo app validate --json, an immutable commit and push, syfo app deploy --json, human confirmation, status/version polling, and production smoke.",
+        "The deployment sequence includes syfo app validate --json, an immutable commit and push, syfo app deploy --target <complete-reply-target> --json, human confirmation, status/version polling, and production smoke.",
         "A prepared human confirmation card is not reported as a completed deployment.",
         "The final URL is only reported successful after the deployed version and cloud access behavior are verified.",
         "The final response is a concise human-readable deployment summary and does not append the raw skill handoff JSON."
@@ -153,6 +153,18 @@
         "The solution uses smoke-static.mjs instead of weakening production authorization.",
         "The local harness injects a loopback verifier and proves home plus 404 behavior.",
         "Production fail-closed behavior remains intact."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "做一个纯展示型官网，没有登录、API、数据库或服务端写入。为了以后扩展，我觉得是不是直接 fullstack 更保险？",
+      "expected_output": "A static-first architecture decision that rejects speculative future expansion as a fullstack requirement and asks only if an unstated current server capability may exist.",
+      "files": [],
+      "expectations": [
+        "The solution selects static from the stated current requirements.",
+        "The solution does not treat possible future expansion as sufficient reason for fullstack.",
+        "If clarification is needed, the question is limited to current SSR, server API, authentication, secrets, runtime personalization, or durable-write requirements.",
+        "The solution does not initialize a fullstack template before resolving an architecture-changing ambiguity."
       ]
     }
   ]
