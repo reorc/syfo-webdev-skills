@@ -81,6 +81,8 @@ Only with deployment authorization:
 - Probe the FC URL internally.
 - Validate the custom HTTPS domain externally.
 - Check health, assets, redirects, API, database write/read, logs, and rollback metadata.
-- Verify the configured access policy from the public domain: anonymous 2xx for public mode;
-  anonymous 401 plus `WWW-Authenticate: Basic` for Basic Auth; and 2xx with an authorized test credential.
+- Read the configured access policy from `syfo app status --json`; do not modify it. Verify anonymous
+  2xx for public mode. For Basic Auth, verify anonymous 401 plus `WWW-Authenticate: Basic` and
+  authorized 2xx only when a human explicitly supplies a test credential. For login/org policies,
+  use an available authorized human session or report the acceptance gap.
 - Scan output for leaked secrets before sharing logs.

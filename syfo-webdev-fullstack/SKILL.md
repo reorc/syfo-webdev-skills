@@ -374,8 +374,12 @@ validation does not replace the allocated-App binding gate in section 1A.
 
 For native dependencies or Mac/ARM development, build and smoke-test in a Linux AMD64 container matching the intended FC execution architecture.
 
-After an authorized deployment, run the access-aware cloud smoke. Pass Basic Auth credentials only
-through environment variables so they do not appear in shell history or the JSON report:
+After an authorized deployment, read `app.visibility` with `syfo app status --json`. Never modify
+the policy: App initialization supplies the default and only a human may change it in the Hosted App
+management UI. If it conflicts with the requested audience, stop for the human change, then re-read
+status. Run the matching cloud smoke only when the policy is `public` or when the human explicitly
+supplies Basic Auth test credentials. Pass credentials only through environment variables so they do
+not appear in shell history or the JSON report:
 
 ```bash
 node <skill-path>/scripts/smoke-cloud-access.mjs \
@@ -420,8 +424,11 @@ Cloud acceptance should cover:
 - TLS and bounded connection pool behavior.
 - Logs free from secrets, Cookies, Authorization, and private keys.
 - A recorded artifact digest and rollback point.
-- Access-aware smoke for every configured policy: public anonymous success; Basic Auth anonymous
-  challenge; and Basic Auth success with an authorized test credential.
+- Record the read-only access policy from `syfo app status --json`; never call `syfo app access set`.
+- For `public`, verify anonymous success. For Basic Auth, verify the anonymous challenge and
+  authorized success only when a human explicitly supplies a test credential. For login/org policies,
+  run the authorized browser flow only when the required human session is available; otherwise report
+  the acceptance gap without weakening or changing the policy.
 
 ## Required handoff
 

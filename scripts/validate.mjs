@@ -21,6 +21,9 @@ for (const skill of skills) {
   if (source.includes(`"skill": "${skill}"`)) {
     throw new Error(`${skill}/SKILL.md must not embed the legacy raw handoff JSON template`);
   }
+  if (!source.includes('never call `syfo app access set`')) {
+    throw new Error(`${skill}/SKILL.md must keep Hosted App access policy human-owned`);
+  }
 
   const frontmatter = source.match(/^---\n([\s\S]*?)\n---/u)?.[1];
   const rawDescription = frontmatter
