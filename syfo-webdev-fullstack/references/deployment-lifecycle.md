@@ -12,7 +12,17 @@ from another.
 | `awaiting_confirmation` | Deploy/action-card identifiers and intended commit recorded | Wait for human confirmation |
 | `building` / `publishing` | Status or version reports a non-terminal state | Poll status and versions |
 | `failed` | Structured failure stage/code is available | Follow the failure branch below |
-| `active` | Intended commit is the live version | Run production acceptance |
+| `active` | Intended commit is the live version | Read access policy, then run production acceptance |
+
+## Access policy ownership
+
+- App initialization assigns the platform default access policy. The Agent must not change it.
+- Read the current policy from `syfo app status --json` at deployment acceptance time.
+- If the current policy does not match the user's requirement, stop and ask a human to update it in
+  the Hosted App management UI. Re-read status after the human change before continuing.
+- Never call or suggest `syfo app access set`; access policy is a human-owned security boundary.
+- Run only the acceptance checks possible with credentials explicitly supplied by the human. Do not
+  request, retrieve, rotate, print, or persist Basic Auth credentials.
 
 ## Ownership and deploy authority
 

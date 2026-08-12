@@ -36,6 +36,26 @@ Claude Code 使用对应的 `~/.claude/skills/` 目录。
 npm test
 ```
 
+官方 `web-static` 模板升级后，额外运行一次跨仓库 canary。该命令会复制模板到临时目录，
+使用模板声明的 npm 10 版本执行全新安装、lint、typecheck、test、Next.js build、artifact
+检查和静态 smoke，不会把这套流程加入普通 Agent 部署：
+
+```bash
+npm run test:static-template-canary -- \
+  --template /path/to/web-static-template
+```
+
+本地模板已经完成 frozen install 时，可用 `--reuse-install` 快速复验现有 checkout；正式 CI
+应省略该参数以验证干净安装。
+
+Fullstack 官方模板使用对应 runner；它额外检查 standalone artifact budget，并在不连接数据库
+的条件下验证生产 server 能启动和提供登录入口：
+
+```bash
+npm run test:fullstack-template-canary -- \
+  --template /path/to/web-fullstack-template
+```
+
 ## 发布
 
 推送 `v*` tag 后，GitHub Actions 会运行验证并发布三个资产：
