@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev-static
-description: "Use whenever a user asks to create, build, continue, fix, migrate, validate, package, publish, deploy, or take live a static Syfo App or Syfo Hosted App. Trigger without being named when the request or repository indicates Syfo hosting, including website, Hosted App, 上线, 部署, syfo.yaml, syfo app init, syfo app validate, or syfo app deploy. Covers landing pages, marketing sites, docs, portfolios, blogs, showcases, and browser-only Next.js App Router experiences fully generated at build time. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run access-aware production smoke when authorized. Produces output: export, .fc/artifact with static adapter, /healthz, and syfo.yaml; never s.yaml. Route cookies, application auth, server routes/actions, secrets, ISR, writes, and database requirements to syfo-webdev-fullstack."
+description: "Use when the user explicitly asks for a static Syfo App or Syfo Hosted App, or when the repository/request clearly identifies Syfo hosting through syfo.yaml, syfo app init, syfo app validate, syfo app deploy, or an existing Syfo Hosted App. Also use for a Syfo deployment request covering landing pages, marketing sites, docs, portfolios, blogs, showcases, or browser-only Next.js experiences that are fully generated at build time. Do not auto-trigger for generic website/webpage requests, a standalone HTML file, a local preview, or a deployment to another provider. If the user asks for a website but does not say whether they want a local HTML artifact or a Syfo Hosted App, ask before initializing or deploying Syfo. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run access-aware production smoke when authorized. Produces output: export, .fc/artifact with static adapter, /healthz, and syfo.yaml; never s.yaml. Route cookies, application auth, server routes/actions, secrets, ISR, writes, and database requirements to syfo-webdev-fullstack."
 ---
 
 # Syfo WebDev Static for FC
@@ -12,6 +12,14 @@ The site is static at the product layer. A small Node.js HTTP adapter exists onl
 ## Completion contract
 
 This skill owns the Syfo Hosted App lifecycle, not only source generation or FC packaging. A successful `next build`, artifact assembly, or local smoke test is not task completion when the user asked to publish, deploy, go live, 上线, or provide a working Hosted App URL.
+
+Before running any Syfo CLI command, resolve the delivery target explicitly:
+
+- `local_html`: the user wants an HTML file or local preview only. Do not initialize, validate, package, or deploy a Syfo App; provide the requested local artifact instead.
+- `syfo_hosted_app`: the user names Syfo, an existing Syfo App, `syfo.yaml`, or a Syfo CLI/deployment action. Continue with the scope classification below.
+- `unknown`: the user asks for a website/webpage but does not identify a hosting target. Ask whether they want a local HTML artifact or a Syfo Hosted App before choosing a template or running Syfo commands.
+
+“Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting or deployment.
 
 At the start, classify the requested scope so the workflow applies the correct deployment boundary:
 
