@@ -61,6 +61,16 @@ const matrix = [
     query: '我想做一个网站，可能部署 Syfo，也可能只要 HTML，还没决定。',
     expected: { unified: true, static: false, fullstack: false },
   },
+  {
+    name: 'generic website enters delivery routing',
+    query: '我想做一个网站。',
+    expected: { unified: true, static: false, fullstack: false },
+  },
+  {
+    name: 'generic website target unspecified',
+    query: '做一个普通网站，部署目标暂时不确定。',
+    expected: { unified: true, static: false, fullstack: false },
+  },
 ];
 
 test('trigger fixtures are mutually exclusive across unified and legacy Skills', () => {
@@ -78,10 +88,10 @@ test('trigger fixtures are mutually exclusive across unified and legacy Skills',
   }
 });
 
-test('generic unknown and local HTML prompts do not auto-trigger a Syfo Skill', () => {
+test('explicit non-Syfo delivery prompts do not auto-trigger a Syfo Skill', () => {
   for (const query of [
     '给我一个可以直接打开的单文件 HTML 页面，不需要部署。',
-    '做一个普通网站，部署目标暂时不确定。',
+    '在 syfo-web 产品仓库实现搜索功能，不涉及 Hosted App 托管。',
   ]) {
     for (const [skill, entries] of Object.entries(fixtures)) {
       const matches = entries.filter((entry) => entry.query === query);
