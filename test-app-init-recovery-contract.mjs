@@ -21,11 +21,24 @@ test('unified Skill owns new-App init and ambiguous recovery discipline', () => 
   assert.match(unified, /Never rerun init, generate a new idempotency key, or manually clone/);
 });
 
-test('legacy Skills require existing App bindings and never initialize', () => {
+test('all Skills recover existing App bindings without reinitializing or copying credentials', () => {
+  for (const source of [unified, ...legacy]) {
+    assert.match(source, /\.git\/syfo-hosted-app\.json/);
+    assert.match(source, /syfo app bind <app-id>/);
+    assert.match(source, /syfo app clone <app-id> --clone <dir>/);
+    assert.match(source, /must never be committed or copied|must never be committed, copied/);
+    assert.match(source, /\.syfo\/app\.json/);
+    assert.match(source, /Never (?:use|run) `syfo app init` to (?:repair|recover) a missing binding|Never run `syfo app init` to recover an existing App/);
+  }
+});
+
+test('legacy Skills require authoritative existing Apps and never initialize new ones', () => {
   for (const source of legacy) {
     assert.match(source, /Verify the existing historical App binding/);
-    assert.match(source, /Existing App identity or local binding evidence matches this repository/);
+    assert.match(source, /Existing App identity and canonical repository identity agree/);
     assert.match(source, /Route new creation to `syfo-webdev`/);
-    assert.doesNotMatch(source, /syfo app init/);
+    for (const line of source.split('\n').filter((value) => /syfo app init/i.test(value))) {
+      assert.match(line, /does not|do not|must not|never|refus|rather than/i);
+    }
   }
 });

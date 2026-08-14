@@ -58,6 +58,27 @@ Never pass `--confirm-tidb` for `preset=site` or without an informed explicit Ap
 
 After an ambiguous init timeout, run only the emitted `syfo app init --resume <commandId>` recovery command. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
 
+## Existing App machine-local binding recovery
+
+Hosted App source and Hosted App binding are different things. The binding is clone-local state at
+`.git/syfo-hosted-app.json`; it contains a short-lived Git credential, is created separately on each
+machine, and must never be committed, copied, uploaded, or reconstructed as legacy `.syfo/app.json`.
+A normal Git clone therefore does not carry the binding, and its absence does not mean GitLab source
+history is broken.
+
+- When the canonical App repository already exists on this machine, identify the authoritative App
+  ID, verify that a local Git remote points to the App's canonical repository without embedded
+  credentials, then run `syfo app bind <app-id>` from that worktree. This obtains a fresh
+  machine-local credential and writes the local binding; it is recovery, not initialization.
+- When this machine has no local clone, run `syfo app clone <app-id> --clone <dir>`. Do not manually
+  clone and then rerun init, and do not copy another Agent's `.git/syfo-hosted-app.json`.
+- Never use `syfo app init` to repair a missing binding for an existing App. If the App ID is unknown,
+  the remote does not match the canonical repository, or the destination is ambiguous, stop and get
+  authoritative App/repository identity rather than guessing or overwriting files.
+
+After bind or clone, re-run repository classification and continue only when the source markers and
+App identity agree.
+
 ## Upgrade and database consent
 
 An existing legacy App stays legacy by default. Before any upgrade proposal:

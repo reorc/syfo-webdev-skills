@@ -152,6 +152,18 @@
         "The legacy fullstack Skill routes the new App request to syfo-webdev rather than initializing anything.",
         "The unified Skill selects site+none if no current server requirement is provided."
       ]
+    },
+    {
+      "id": 13,
+      "prompt": "在新电脑接手现有 historical legacy fullstack App。这里没有本地 clone，但 App ID 已确认；必须保留原来的 TiDB，不能重新 init。",
+      "expected_output": "The legacy fullstack Skill uses syfo app clone with the authoritative App ID, verifies the cloned fullstack markers and machine-local binding, and preserves the existing App and allocated TiDB without copying credentials or initializing a replacement.",
+      "files": [],
+      "expectations": [
+        "The solution runs syfo app clone <app-id> --clone <dir> instead of a manual clone followed by init.",
+        "The solution never copies or commits .git/syfo-hosted-app.json and does not recreate legacy .syfo/app.json.",
+        "The solution preserves the allocated App and TiDB database and does not provision replacements.",
+        "Database work starts only after App identity, canonical repository identity, fullstack markers, and the local binding agree."
+      ]
     }
   ]
 }

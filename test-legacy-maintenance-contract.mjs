@@ -19,9 +19,14 @@ test('legacy Skill bodies are maintenance-only', () => {
   for (const [name, source] of skills) {
     assert.match(source, /existing historical App binding/);
     assert.match(source, /Never create a replacement App/);
+    assert.match(source, /syfo app bind <app-id>/);
+    assert.match(source, /syfo app clone <app-id> --clone <dir>/);
+    assert.match(source, /\.git\/syfo-hosted-app\.json/);
     assert.match(source, /Route new creation to `syfo-webdev`/);
     assert.doesNotMatch(source, new RegExp(`syfo app init[^\n]*--template ${name}`));
-    assert.doesNotMatch(source, /syfo app init/);
+    for (const line of source.split('\n').filter((value) => /syfo app init/i.test(value))) {
+      assert.match(line, /does not|do not|must not|never|refus|rather than/i);
+    }
     assert.doesNotMatch(source, /brand-new|new Syfo Hosted App|new official-template Apps/i);
     assert.doesNotMatch(source, /For an existing local Git project.*platform creates/s);
   }
@@ -36,7 +41,7 @@ test('legacy eval expectations never prescribe legacy App creation', () => {
     ]).join('\n');
 
     for (const line of expectations.split('\n').filter((value) => /syfo app init/i.test(value))) {
-      assert.match(line, /does not|do not|must not|never|refus/i);
+      assert.match(line, /does not|do not|must not|never|refus|rather than/i);
     }
     assert.doesNotMatch(expectations, new RegExp(`--template ${name}`));
     assert.doesNotMatch(expectations, /new official-template App|official-template default/i);
