@@ -18,6 +18,7 @@ const skills = [
 test('legacy Skill bodies are maintenance-only', () => {
   for (const [name, source] of skills) {
     assert.match(source, /existing historical App binding/);
+    assert.match(source, /Hard stop: this Skill must never run `syfo app init`/);
     assert.match(source, /Never create a replacement App/);
     assert.match(source, /syfo app bind <app-id>/);
     assert.match(source, /syfo app clone <app-id> --clone <dir>/);
@@ -28,6 +29,7 @@ test('legacy Skill bodies are maintenance-only', () => {
       assert.match(line, /does not|do not|must not|never|refus|rather than/i);
     }
     assert.doesNotMatch(source, /brand-new|new Syfo Hosted App|new official-template Apps/i);
+    assert.doesNotMatch(source, /Produce a .* application|Before initialization/i);
     assert.doesNotMatch(source, /For an existing local Git project.*platform creates/s);
   }
 });

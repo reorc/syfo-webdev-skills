@@ -5,9 +5,9 @@ description: "Legacy compatibility Skill only for maintaining an existing histor
 
 # Syfo WebDev Fullstack for FC and TiDB
 
-This is a legacy compatibility entry. Preserve the old fullstack repository and flow. Do not reinterpret it as unified or change its database/template because a newer capability exists; route an explicitly requested upgrade plan to `syfo-webdev` and require separate human consent.
+This is a legacy compatibility entry. Hard stop: this Skill must never run `syfo app init`, create a new App, or create a replacement App or database allocation. Preserve the old fullstack repository and flow. If no existing historical App and canonical repository can be verified, route the request to `syfo-webdev`. Do not reinterpret it as unified or change its database/template because a newer capability exists; route an explicitly requested upgrade plan to `syfo-webdev` and require separate human consent.
 
-Produce a Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 and connect to TiDB Cloud Starter or Essential.
+Maintain an existing historical Next.js application that Syfo deploys deterministically to Alibaba Cloud Function Compute 3.0 and connects to its already allocated TiDB Cloud Starter or Essential database.
 
 The output is not ready merely because `next build` passes. Prove that the assembled standalone artifact starts on `0.0.0.0:$PORT`, passes health and representative HTTP checks, uses TiDB-compatible migrations, avoids secret leakage, and satisfies the `syfo.yaml` contract.
 
@@ -52,14 +52,14 @@ exact remaining state-machine step.
 
 ## Supported target
 
-Before initialization, establish at least one current request-time server capability that requires
+Before continuing maintenance, verify that the existing historical App has at least one current request-time server capability that requires
 fullstack, such as SSR, server routes/actions, application authentication, server-only secrets,
 runtime personalization, or durable writes/database access.
 
 - Do not choose fullstack only for possible future expansion.
 - If the stated requirements are entirely build-time or browser-only, use `syfo-webdev-static`.
 - If the user names fullstack but provides no server requirement, point out the architecture cost
-  and ask whether an unstated server capability exists before initializing.
+  and ask whether an unstated server capability exists before proposing any architecture change.
 - If the answer is ambiguous and changes the template, ask the user rather than guessing.
 
 Default target:
@@ -390,7 +390,7 @@ validation does not replace the allocated-App binding gate in section 1A.
 For native dependencies or Mac/ARM development, build and smoke-test in a Linux AMD64 container matching the intended FC execution architecture.
 
 After an authorized deployment, read `app.visibility` with `syfo app status --json`. Never modify
-the policy: App initialization supplies the default and only a human may change it in the Hosted App
+the policy: the existing App already has a default and only a human may change it in the Hosted App
 management UI. If it conflicts with the requested audience, stop for the human change, then re-read
 status. Run the matching cloud smoke only when the policy is `public` or when the human explicitly
 supplies Basic Auth test credentials. Pass credentials only through environment variables so they do

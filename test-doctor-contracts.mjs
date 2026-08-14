@@ -356,7 +356,7 @@ test('skill architecture choice rejects speculative fullstack upgrades', async (
   const staticSkill = await readFile(join(repositoryRoot, 'syfo-webdev-static', 'SKILL.md'), 'utf8');
   const fullstackSkill = await readFile(join(repositoryRoot, 'syfo-webdev-fullstack', 'SKILL.md'), 'utf8');
 
-  assert.match(staticSkill, /Use static by default/);
+  assert.match(staticSkill, /Preserve static/);
   assert.match(staticSkill, /may need a backend later/i);
   assert.match(staticSkill, /ask the user rather than[\s\S]*guessing/);
   assert.match(fullstackSkill, /Do not choose fullstack only for possible future expansion/);
