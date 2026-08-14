@@ -5,9 +5,9 @@ description: "Legacy compatibility Skill only for maintaining an existing histor
 
 # Syfo WebDev Static for FC
 
-This is a legacy compatibility entry. Preserve the old static repository and flow. A request for APIs, login, or persistence is not consent to migrate or enable TiDB; route upgrade planning to `syfo-webdev` and require separate explicit human authorization.
+This is a legacy compatibility entry. Hard stop: this Skill must never run `syfo app init`, create a new App, or create a replacement App. Preserve the old static repository and flow. If no existing historical App and canonical repository can be verified, route the request to `syfo-webdev`. A request for APIs, login, or persistence is not consent to migrate or enable TiDB; route upgrade planning to `syfo-webdev` and require separate explicit human authorization.
 
-Produce a static Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
+Maintain an existing historical static Next.js application that Syfo deploys deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
 
 The site is static at the product layer. A small Node.js HTTP adapter exists only because FC requires a foreground HTTP process; it serves exported files, health checks, correct 404 responses, cache headers, byte ranges for media, and delegates platform Basic Auth policy checks. It must not contain business APIs, application-owned authentication, user credentials, persistence, or request-time rendering.
 
@@ -50,13 +50,13 @@ immutable source identity, local result, and exact remaining state-machine step.
 
 ## Eligibility gate
 
-Before initialization, record a concise capability decision based on current requirements, not
+Before continuing maintenance on the existing historical App, record a concise capability decision based on current requirements, not
 speculative future expansion:
 
-- Use static by default when no request-time server capability is required.
-- “We may need a backend later” is not sufficient reason to initialize fullstack now.
+- Preserve static when no current request-time server capability is required.
+- “We may need a backend later” is not sufficient reason to migrate the existing App to fullstack.
 - If the user names fullstack but the stated requirements are entirely build-time or browser-only,
-  point out the mismatch and ask whether there is an unstated server requirement before initializing.
+  point out the mismatch and ask whether there is an unstated server requirement before proposing any migration.
 - If a requirement is ambiguous and the answer changes the template, ask the user rather than
   guessing. Keep the question focused on the missing capability, such as authentication, secrets,
   runtime APIs, request-time rendering, or durable writes.
@@ -337,7 +337,7 @@ inspection alone.
 For Apple Silicon development or architecture-specific dependencies, validate the assembled artifact in Linux AMD64 even though the application itself is static.
 
 After an authorized deployment, read `app.visibility` with `syfo app status --json`. Never modify
-the policy: App initialization supplies the default and only a human may change it in the Hosted App
+the policy: the existing App already has a default and only a human may change it in the Hosted App
 management UI. If it conflicts with the requested audience, stop for the human change, then re-read
 status. Run the matching cloud smoke only when the policy is `public` or when the human explicitly
 supplies Basic Auth test credentials. Pass credentials only through environment variables so they do
