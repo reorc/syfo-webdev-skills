@@ -16,6 +16,18 @@
     "should_trigger": true
   },
   {
+    "query": "给我一个可以直接打开的单文件 HTML 页面，不需要部署。",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我做一个网页，先给我 html；是否部署还没决定。",
+    "should_trigger": false
+  },
+  {
+    "query": "做一个普通网站，部署目标暂时不确定。",
+    "should_trigger": false
+  },
+  {
     "query": "做一个带登录、cookie 和 TiDB 用户数据的 Syfo Hosted App。",
     "should_trigger": false
   },
