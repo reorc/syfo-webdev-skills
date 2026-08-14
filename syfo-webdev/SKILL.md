@@ -1,19 +1,36 @@
 ---
 name: syfo-webdev
-description: "The only Skill for creating any new Syfo website or Hosted App and maintaining template.id: web-unified Apps. New creation accepts only template=unified with preset=site or preset=app; the daemon maps site to the Core site/none pair and app to app/tidb. If an existing App's machine-local binding is missing, use syfo app bind <app-id> in its local repository, or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. If target, preset, repository type, or App identity is unclear, ask before Syfo CLI action. For preset=app, disclose TiDB; the human's informed App selection or explicit TiDB App request is the single confirmation, so pass --confirm-tidb without asking twice. Historical static/fullstack Apps stay on legacy Skills unless a human authorizes migration. Not for generic websites, local HTML/previews, or other providers. Never silently migrate, enable a database, deploy, or change access policy."
+description: "The only Skill for creating a website or App whose selected delivery target is Syfo Hosted App, maintaining web-unified Apps, recovering bindings, and classifying Hosted App contracts. In a Syfo runtime, also use as the routing gate for a new website, web app, landing page, or dashboard with an unspecified target; ask once whether the user wants local/source-only delivery or Syfo hosting before implementation. If an existing App's machine-local binding is missing, use syfo app bind <app-id> or syfo app clone <app-id> --clone <dir>; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Do not trigger merely because a repository, product, package, team, feature, or organization is named Syfo. Explicit local HTML, source-only, preview, or another provider does not use this Skill. Historical static/fullstack Apps route to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
 
 Build, repair, validate, package, and—only when explicitly authorized—deploy a Syfo Hosted App based on the `web-unified` template.
 
+## Activation boundary
+
+Selection is based on delivery intent and Hosted App contract evidence, not on the word “Syfo” alone.
+
+Use this Skill when at least one positive signal exists:
+
+1. The current application has a recognized Syfo Hosted App contract marker, including a valid `syfo.yaml`.
+2. The user explicitly asks to create, host, validate, package, publish, or deploy the application through Syfo Hosted App, or explicitly requests a `syfo app` workflow.
+3. The user explicitly names this Skill.
+4. The daemon-injected runtime context identifies the agent as running in Syfo and the user asks to create a new website, web app, landing page, dashboard, or interactive browser experience without specifying a delivery target. In this case, use the Skill only as a routing gate until the target is resolved.
+
+Do not activate merely because a repository, product, package, team, feature, organization, CLI, daemon, template, API, or infrastructure component is named Syfo or discusses Hosted App concepts. In an existing repository without a recognized Hosted App marker, requests such as “implement Syfo Web search” or “fix the Syfo website login” are ordinary product-development work unless the user separately selects Syfo Hosted App as the delivery target.
+
+Consulting this Skill is not authorization to initialize, provision TiDB, migrate, deploy, or change access policy.
+
 ## Delivery target and Skill relationship
 
-Before any Syfo CLI command, resolve the target:
+For new website creation, resolve the target before implementation. For existing repositories, inspect contract markers before any Syfo CLI command:
 
-- `local_html`: the user wants only an HTML file or local preview. Do not initialize, validate, package, or deploy Syfo.
+- `local_html`: the user explicitly wants HTML/source only, a local preview, or another hosting provider. Exit the Syfo workflow and use the appropriate general web-development workflow. Do not initialize, validate, package, or deploy Syfo.
 - `syfo_hosted_app`: all new Syfo websites and Apps use this unified Skill. Existing `template.id: web-unified` Apps also stay here. Positively identified historical static/fullstack Apps route to their matching legacy maintenance Skill without reinterpretation.
-- `unknown`: the user mentions Syfo but has not confirmed local HTML vs Hosted App, or a new Syfo App lacks a valid preset/database pair, or existing repository markers are missing/conflicting. Ask the minimum focused question and do not choose a template, initialize, migrate, enable a database, or deploy meanwhile.
+- `unknown`: a new website request does not specify local/source-only delivery, another provider, or Syfo hosting; a new Syfo App lacks a valid preset/database pair; or existing repository markers are missing/conflicting. Ask the minimum focused question and do not begin implementation, choose a template, initialize, migrate, enable a database, or deploy meanwhile.
+
+For an unspecified new website target, ask once in the user's language: “Do you want local/source-only delivery, or should I create and host it as a Syfo Hosted App?” A direct answer resolves this gate; do not repeatedly ask after the target is clear.
 
 `syfo-webdev-static` and `syfo-webdev-fullstack` are compatibility aliases for historical Apps only. They never create a new website or App. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
 
@@ -44,6 +61,8 @@ For a new App, require the human to choose exactly one user-facing preset:
 
 - Site: `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
 - App: `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
+
+The human's informed App selection or explicit TiDB App request is the single confirmation for TiDB provisioning.
 
 If the request says only “new Syfo website/App” without an informed preset choice, ask once whether they want a site with no database or an app that provisions TiDB. Do not infer from feature hints alone. A human selection of App after that disclosure is the required confirmation. An initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation, so do not ask again. Include `--confirm-tidb` only when one of those informed explicit choices exists; the flag records that consent for the daemon and never requires a second confirmation prompt.
 

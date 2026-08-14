@@ -15,7 +15,7 @@ test('unified create contract accepts only frozen pairs', () => {
   assert.match(unified, /daemon sends the complete Core pair `site\/none`/);
   assert.match(unified, /daemon sends the complete Core pair `app\/tidb`/);
   assert.match(unified, /Do not expose or pass `--database`, infer a preset from feature prose/);
-  assert.match(unified, /the human's informed App selection or explicit TiDB App request is the single confirmation/);
+  assert.match(unified, /[Tt]he human's informed App selection or explicit TiDB App request is the single confirmation/);
   assert.match(unified, /selection of App after that disclosure is the required confirmation/);
   assert.match(unified, /initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation/);
   assert.match(unified, /never requires a second confirmation prompt/);
@@ -31,7 +31,7 @@ test('legacy aliases preserve flow and require explicit upgrade consent', () => 
   }
   assert.match(unified, /Detection is read-only\. A classification result is not migration consent/);
   assert.match(unified, /Never infer `none -> tidb`/);
-  assert.match(unified, /only Skill for creating any new Syfo website or Hosted App/i);
+  assert.match(unified, /only Skill for creating a website or App whose selected delivery target is Syfo Hosted App/i);
   assert.match(unified, /compatibility aliases for historical Apps only/);
   assert.match(staticSkill, /Do not use for any new website or App/);
   assert.match(fullstackSkill, /Do not use for any new website or App/);
@@ -40,7 +40,16 @@ test('legacy aliases preserve flow and require explicit upgrade consent', () => 
 test('uncertain Syfo requests ask once before choosing a template or mutating', () => {
   assert.match(unified, /If the request says only “new Syfo website\/App”.*ask once/s);
   assert.match(unified, /`unknown`.*Ask the minimum focused question/s);
-  assert.match(unified, /do not choose a template, initialize, migrate, enable a database, or deploy meanwhile/);
+  assert.match(unified, /do not begin implementation, choose a template, initialize, migrate, enable a database, or deploy meanwhile/);
+});
+
+test('generic website creation enters routing without treating names as hosting intent', () => {
+  assert.match(unified, /daemon-injected runtime context identifies the agent as running in Syfo/i);
+  assert.match(unified, /new website, web app, landing page, dashboard, or interactive browser experience without specifying a delivery target/i);
+  assert.match(unified, /Do you want local\/source-only delivery, or should I create and host it as a Syfo Hosted App\?/);
+  assert.match(unified, /Do not activate merely because a repository, product, package, team, feature, organization/i);
+  assert.match(unified, /“implement Syfo Web search” or “fix the Syfo website login” are ordinary product-development work/);
+  assert.match(unified, /Consulting this Skill is not authorization to initialize, provision TiDB, migrate, deploy, or change access policy/);
 });
 
 test('evals distinguish informed App consent from an ambiguous new-App request', async () => {
@@ -64,6 +73,9 @@ test('trigger matrix covers unified, legacy, ambiguous, and no-consent database 
     [/旧 web-fullstack App/, false],
     [/markers 冲突/, true],
     [/还没授权迁移或启用 TiDB/, true],
+    [/^我想做一个网站。$/, true],
+    [/部署目标暂时不确定/, true],
+    [/syfo-web 产品仓库实现搜索功能/, false],
   ];
   for (const [pattern, expected] of cases) {
     assert.ok(
