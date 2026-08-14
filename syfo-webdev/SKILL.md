@@ -98,14 +98,35 @@ history is broken.
 After bind or clone, re-run repository classification and continue only when the source markers and
 App identity agree.
 
-## Upgrade and database consent
+## Existing unified Site database enable
+
+For an existing repository classified as unified, read current state with `syfo app status --json`. Only the exact `preset=site,database=none` state can use the database-enable flow. If the App identity is omitted, the daemon resolves the machine-local binding; if identity or state is ambiguous, stop before mutation.
+
+When the human explicitly asks to add TiDB, or chooses persistence after being told that TiDB will be provisioned, that is the single informed confirmation. Do not ask again. Record the consent in the daemon command:
+
+```bash
+syfo app database enable [app-id] --confirm-tidb
+```
+
+Never run this command from a generic feature hint alone, never pass a second consent field, and never rerun `syfo app init`. The command only asks Core to atomically enable the active database binding and change desired state from `site/none` to `app/tidb`; it does not modify source, validate, deploy, change the live version, domain, or access policy.
+
+After `state=enabled` or `state=already_enabled`:
+
+1. Re-read `syfo app status --json` and require the exact unified `app/tidb` state with an active TiDB binding.
+2. Modify the same original repository for App/TiDB usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Do not clone a replacement project or rewrite it as a legacy template.
+3. Run the App/TiDB validation workflow below, then commit and push the immutable source.
+4. Stop at local/deploy-ready handoff unless the human separately authorized deployment. Database consent is not deploy consent.
+
+If the enable command returns a stable state conflict or other backend error, do not edit the repository as though the transition succeeded. Re-read status and either resume from the observed exact state or report the blocker.
+
+## Legacy upgrade and database consent
 
 An existing legacy App stays legacy by default. Before any upgrade proposal:
 
 1. Report the detected legacy type and current database state.
 2. Explain that a unified upgrade can change template/runtime behavior and requires a separate explicit human decision.
 3. Keep database enablement separate from template migration and deployment consent.
-4. Accept database transition only from `none` to `tidb`, and only after explicit authorization through the supported operation.
+4. Do not use `syfo app database enable` for a legacy App; the supported operation is only for existing unified `site/none`.
 5. Never infer `none -> tidb` merely because requested features need persistence.
 
 Requests such as “add login,” “add an API,” or “store data” authorize product work, not migration, database enablement, or deployment. Ask for the missing decision.

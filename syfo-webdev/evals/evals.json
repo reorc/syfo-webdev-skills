@@ -65,6 +65,28 @@
         "The solution never reruns syfo app init and never copies or commits .git/syfo-hosted-app.json.",
         "Development continues only after App identity, canonical repository identity, and unified markers agree."
       ]
+    },
+    {
+      "id": 7,
+      "prompt": "This existing unified Syfo Site is site/none. Add persistence with TiDB, update this same repository, but do not deploy yet.",
+      "expected_output": "The unified Skill treats the explicit TiDB request as the single informed confirmation, runs syfo app database enable with --confirm-tidb without asking twice, verifies the resulting app/tidb active state, then updates and validates the same repository. It does not rerun init or deploy.",
+      "files": [],
+      "expectations": [
+        "The solution verifies the existing App is exactly unified site/none before mutation.",
+        "The explicit TiDB request counts as the one confirmation and the solution passes --confirm-tidb without a second prompt.",
+        "After enabled or already_enabled, the solution re-reads status, requires app/tidb with active TiDB, and modifies the same repository including database.required: true, migrations, data access, and tests.",
+        "The solution never reruns syfo app init and does not deploy without separate authorization."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "This existing unified site needs a feature that stores data. Make the feature, but I have not approved TiDB or deployment.",
+      "expected_output": "The unified Skill explains that the feature request does not authorize database enablement, asks one focused TiDB consent question, and makes no Syfo database or deployment mutation until answered.",
+      "files": [],
+      "expectations": [
+        "The solution does not infer TiDB consent from the persistence requirement.",
+        "The solution does not run syfo app database enable, edit the repository as app/tidb, rerun init, or deploy before confirmation."
+      ]
     }
   ]
 }
