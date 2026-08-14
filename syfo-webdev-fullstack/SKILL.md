@@ -112,43 +112,24 @@ node <skill-path>/scripts/doctor.mjs
 
 Use `--json` when the result feeds automation. Treat findings as a review queue, not an automatic rewrite plan.
 
-### 1A. Initialize the Hosted App repository correctly
+### 1A. Verify the existing historical App binding
 
-Choose the init path before writing substantial application code:
+This legacy Skill may continue only when all of the following are already true:
 
-- For a brand-new Syfo Hosted App, use the platform-created GitLab template repository. The
-  platform creates the app repository from `syfo_hosted_app/app-templates/web-fullstack`
-  (`nextjs` is a compatibility alias for `fullstack`). In the daemon CLI, run
-  `syfo app init <name> --template fullstack --from-template --clone <dir>` and then work
-  in `<dir>`. Do not recreate the scaffold from a checked-in docs copy.
-- The daemon CLI owns the authenticated Git clone for `--from-template`. Do not run a separate
-  `git clone`, reconstruct the repository URL, or copy a template by hand. Treat initialization
-  as complete only after the command reports `app initialized` and returns a non-empty `cloneDir`
-  plus the local binding path. Then `cd <cloneDir>` and inspect the template before changing it.
-- An initialized App may report `owner=null`. Continue implementation and validation; do not insert
-  `syfo app claim` unless the user explicitly wants ownership established before deployment or the
-  CLI returns a specific ownership-required result.
-- If initialization reports that the outcome is not yet known and returns a `commandId` or
-  `resumeCommand`, run the exact `syfo app init --resume <commandId>` command. Do not rerun the
-  original init command with a new idempotency key, choose another clone directory, manually
-  clone the repository, or overwrite a partial clone. Resume replays the original request and
-  either completes or reuses the exact clone; it fails closed if backend identity, local source,
-  or clone state drifted. Keep the recovery state until both the API and local Git sync succeed.
-- For an existing local Git project, commit a clean first version, then run `syfo app init
-  <name> --template fullstack` from that repository without `--from-template`. The daemon sends `sourceMode=local`,
-  so the platform creates an empty GitLab repository and the daemon pushes the local branch
-  into it.
-- Do not push an existing local repository into a template-initialized remote. That creates
-  unrelated-history or non-fast-forward conflicts. If this has already happened, stop and
-  resolve the Git history intentionally rather than force-pushing over the template baseline.
+- The working directory is an existing Git repository for an existing Syfo App, not a project being converted into one.
+- `syfo.yaml` and the runtime files positively identify the historical fullstack contract: no `template.id: web-unified`, `run.command: node server.js`, and `database.required: true`.
+- Existing App identity or local binding evidence matches this repository. Never create a replacement App, remote, clone, binding, or database allocation from this Skill.
+
+If the repository is new, has no existing Syfo App/binding, contains unified markers, or has missing/conflicting legacy markers, stop before editing or running Syfo CLI. Route new creation to `syfo-webdev`; for uncertain existing repositories, use its read-only classifier and ask the user for the authoritative App/repository identity.
+
+An existing historical App may have `owner=null`. That is a valid draft state; do not insert `syfo app claim` unless the user explicitly requests ownership or the server returns a specific ownership-required result.
 
 ### 1B. Bind database-backed development to the allocated App TiDB
 
-For a new Syfo Hosted App with `database.required: true`, initialize or select the
-Hosted App before app-specific schema, seed, or workflow development. App Init is
-the resource boundary: it provisions the App's physical TiDB database/account and
-records the canonical `prod` database binding used by both local development and
-deployment.
+For an existing historical fullstack App with `database.required: true`, verify the
+already allocated App and canonical `prod` database binding before app-specific schema,
+seed, or workflow development. This legacy Skill never provisions or replaces the App's
+physical TiDB database/account.
 
 - Record the App ID and work inside the initialized App repository.
 - Run App-specific migrations, seed commands, database contract tests, and local
@@ -308,7 +289,7 @@ For a normal Next.js + TiDB application, declare:
 
 - `app.type: nextjs`.
 - Node.js runtime version supported by the platform.
-- `package-lock.json` with `npm ci` and an exact `packageManager: npm@10.x.y` for new official-template Apps. Generate and validate the lock with that npm 10 version because the Node 20 Builder does not accept npm 11-only lock resolution. Preserve another package manager only when its single lock file and every manifest command remain consistent.
+- `package-lock.json` with `npm ci` and an exact `packageManager: npm@10.x.y` when the existing historical repository originated from the official legacy template. Generate and validate the lock with that npm 10 version because the Node 20 Builder does not accept npm 11-only lock resolution. Preserve another package manager only when its single lock file and every manifest command remain consistent.
 - `npm run build`, whose project script runs `next build` and assembles `.fc/artifact`.
 - `.fc/artifact` as `build.output` and `node server.js` as the foreground command inside it.
 - Port 9000 and `/healthz`.

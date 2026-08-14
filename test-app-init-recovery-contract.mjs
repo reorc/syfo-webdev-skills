@@ -1,38 +1,28 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
 
-const cases = [
-  {
-    skill: 'syfo-webdev-static',
-    template: 'static',
-  },
-  {
-    skill: 'syfo-webdev-fullstack',
-    template: 'fullstack',
-  },
-];
+const unified = await readFile(new URL('./syfo-webdev/SKILL.md', import.meta.url), 'utf8');
+const legacy = await Promise.all([
+  readFile(new URL('./syfo-webdev-static/SKILL.md', import.meta.url), 'utf8'),
+  readFile(new URL('./syfo-webdev-fullstack/SKILL.md', import.meta.url), 'utf8'),
+]);
 
-for (const entry of cases) {
-  test(`${entry.skill} owns template clone and recovery discipline`, async () => {
-    const source = await readFile(join(entry.skill, 'SKILL.md'), 'utf8');
+test('unified Skill owns new-App init and ambiguous recovery discipline', () => {
+  assert.match(unified, /syfo app init <name> --template unified --preset site --from-template --clone <dir>/);
+  assert.match(unified, /syfo app init <name> --template unified --preset app --from-template --clone <dir>/);
+  assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
+  assert.match(unified, /maps site to the Core site\/none pair and app to app\/tidb/);
+  assert.match(unified, /Before running `preset=app`, explicitly disclose.*provisions TiDB and obtain human confirmation/s);
+  assert.match(unified, /syfo app init --resume <commandId>/);
+  assert.match(unified, /Never rerun init, generate a new idempotency key, or manually clone/);
+});
 
-    assert.match(
-      source,
-      new RegExp(
-        `syfo app init <name> --template ${entry.template} --from-template --clone <dir>`,
-      ),
-    );
-    assert.match(source, /daemon CLI owns the authenticated Git clone/u);
-    assert.match(source, /Do not run a separate\s+`git clone`/u);
-    assert.match(source, /reports `app initialized`/u);
-    assert.match(source, /non-empty `cloneDir`/u);
-    assert.match(source, /local binding path/u);
-    assert.match(source, /Then `cd <cloneDir>`/u);
-    assert.match(source, /syfo app init --resume <commandId>/u);
-    assert.match(source, /Do not rerun the\s+original init command with a new idempotency key/u);
-    assert.match(source, /overwrite a partial clone/u);
-    assert.match(source, /both the API and local Git sync succeed/u);
-  });
-}
+test('legacy Skills require existing App bindings and never initialize', () => {
+  for (const source of legacy) {
+    assert.match(source, /Verify the existing historical App binding/);
+    assert.match(source, /Existing App identity or local binding evidence matches this repository/);
+    assert.match(source, /Route new creation to `syfo-webdev`/);
+    assert.doesNotMatch(source, /syfo app init/);
+  }
+});

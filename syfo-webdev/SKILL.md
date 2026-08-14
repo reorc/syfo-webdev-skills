@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev
-description: "The only Skill for creating any new Syfo website or Hosted App, plus maintenance of existing template.id: web-unified Apps and read-only classification of an existing Syfo repository. New creation accepts only template=unified with preset=site,database=none or preset=app,database=tidb; if delivery target, preset, database choice, or repository type is unclear, ask the user before any Syfo CLI action and never infer, coerce, or cross pairs. Existing historical static/fullstack Apps remain on the legacy syfo-webdev-static or syfo-webdev-fullstack maintenance Skills unless a human separately authorizes migration. Do not auto-trigger for generic websites, standalone HTML, local previews, or another hosting provider. Never silently migrate, enable a database, deploy, or change access policy."
+description: "The only Skill for creating any new Syfo website or Hosted App, plus maintenance of existing template.id: web-unified Apps and read-only classification of an existing Syfo repository. New creation accepts only template=unified with user-facing preset=site or preset=app; the daemon deterministically maps site to the Core site/none pair and app to app/tidb. If delivery target, preset, or repository type is unclear, ask the user before any Syfo CLI action and never infer or coerce a choice. Before preset=app initialization, disclose that TiDB will be provisioned and obtain explicit confirmation. Existing historical static/fullstack Apps remain on the legacy syfo-webdev-static or syfo-webdev-fullstack maintenance Skills unless a human separately authorizes migration. Do not auto-trigger for generic websites, standalone HTML, local previews, or another hosting provider. Never silently migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
@@ -40,23 +40,23 @@ Detection is read-only. A classification result is not migration consent.
 
 ## New App create contract
 
-For a new App, require the human to choose exactly one valid pair:
+For a new App, require the human to choose exactly one user-facing preset:
 
-- Site: `template=unified`, `preset=site`, `database=none`.
-- App: `template=unified`, `preset=app`, `database=tidb`.
+- Site: `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
+- App: `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
 
-If the request says only “new Syfo website/App” without selecting a valid pair, ask whether they want a site with no database or an app with TiDB. Do not infer from feature hints alone.
+If the request says only “new Syfo website/App” without selecting a preset, ask whether they want a site with no database or an app with TiDB. Do not infer from feature hints alone. Before running `preset=app`, explicitly disclose that the operation provisions TiDB and obtain human confirmation.
 
-Use the corresponding CLI fields exactly:
+Use the corresponding preset-only CLI exactly; `--database` is not a user-facing init flag:
 
 ```bash
-syfo app init --template unified --preset site --database none --from-template --clone
-syfo app init --template unified --preset app --database tidb --from-template --clone
+syfo app init <name> --template unified --preset site --from-template --clone <dir>
+syfo app init <name> --template unified --preset app --from-template --clone <dir>
 ```
 
-Do not omit fields, infer a pair from prose, coerce crossed pairs, or pass unified fields to legacy `template=static|fullstack|nextjs` flows. If the installed CLI does not expose this wire, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
+Do not expose or pass `--database`, infer a preset from prose, or pass unified fields to legacy `template=static|fullstack|nextjs` flows. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. If the installed CLI does not expose this preset-only contract, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
 
-After an ambiguous init timeout, resume only the emitted command ID. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
+After an ambiguous init timeout, run only the emitted `syfo app init --resume <commandId>` recovery command. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
 
 ## Upgrade and database consent
 
