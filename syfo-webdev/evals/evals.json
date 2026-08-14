@@ -87,6 +87,18 @@
         "The solution does not infer TiDB consent from the persistence requirement.",
         "The solution does not run syfo app database enable, edit the repository as app/tidb, rerun init, or deploy before confirmation."
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "Deploy this validated unified Hosted App and keep monitoring until the result is available.",
+      "expected_output": "The unified Skill prepares the authorized deploy with the complete reply target, records its operation identity, then relies on Hosted App confirmation and terminal-result pushes instead of syfo watch or repeated status/version polling. It verifies the pushed terminal result and uses status or versions only for recovery or final verification.",
+      "files": [],
+      "expectations": [
+        "The solution does not register syfo watch or repeatedly poll syfo app status or syfo app versions during the normal deployment path.",
+        "The solution records the deploy identity and waits for the Hosted App service to push confirmation and deployment results to the target.",
+        "The solution uses status and versions only when the pushed result needs terminal verification or recovery from a missing, incomplete, interrupted, or contradictory notification.",
+        "The solution does not report the App live until the intended commit/version and production acceptance are verified."
+      ]
     }
   ]
 }
