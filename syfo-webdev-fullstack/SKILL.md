@@ -1,9 +1,11 @@
 ---
 name: syfo-webdev-fullstack
-description: "Use when the user explicitly asks for a fullstack Syfo App or Syfo Hosted App, or when the repository/request clearly identifies Syfo hosting through syfo.yaml, syfo app init, syfo app validate, syfo app deploy, or an existing Syfo Hosted App. Also use when a Syfo deployment request requires SSR, Route Handlers, Server Actions, cookies, application auth, server secrets, request-time behavior, durable writes, TiDB/database workflows, or migration from Cloudflare Workers, D1, SQLite, Vercel, or Node hosting. Do not auto-trigger for generic website/webpage requests, a standalone HTML file, a local preview, or a deployment to another provider. If the user asks for a website but does not say whether they want a local HTML artifact or a Syfo Hosted App, ask before initializing or deploying Syfo. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate through the allocated App database when needed, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run production acceptance when authorized. Produces standalone .fc/artifact plus syfo.yaml; never s.yaml. Use syfo-webdev-static only when all behavior is build-time or browser-only."
+description: "Legacy compatibility Skill only for maintaining an existing historical Syfo fullstack App. Trigger when the repository has legacy standalone markers such as run.command node server.js and database.required: true, with no template.id: web-unified, or when the user explicitly names syfo-webdev-fullstack/legacy fullstack for an existing App. Preserve its directory, template, TiDB contract, and deployment flow. Do not use for any new website or App; all new Syfo creation routes to syfo-webdev. Do not auto-trigger for generic website/webpage requests, standalone HTML, local preview, another provider, an existing unified repository, or uncertain legacy classification. If delivery target or repository type is unclear, ask the user before any Syfo CLI action. Never silently migrate, change database state, deploy, or change access policy."
 ---
 
 # Syfo WebDev Fullstack for FC and TiDB
+
+This is a legacy compatibility entry. Preserve the old fullstack repository and flow. Do not reinterpret it as unified or change its database/template because a newer capability exists; route an explicitly requested upgrade plan to `syfo-webdev` and require separate human consent.
 
 Produce a Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 and connect to TiDB Cloud Starter or Essential.
 
@@ -16,8 +18,8 @@ This skill owns the Syfo Hosted App lifecycle, not only source generation, datab
 Before running any Syfo CLI command, resolve the delivery target explicitly:
 
 - `local_html`: the user wants an HTML file or local preview only. Do not initialize, validate, package, or deploy a Syfo App; for a standalone browser-only page, hand off to a general HTML/web implementation workflow.
-- `syfo_hosted_app`: the user names Syfo, an existing Syfo App, `syfo.yaml`, or a Syfo CLI/deployment action. Continue with the scope classification below.
-- `unknown`: the user asks for a website/webpage but does not identify a hosting target. Ask whether they want a local HTML artifact or a Syfo Hosted App before choosing a template or running Syfo commands.
+- `syfo_hosted_app`: continue here only when an existing App is positively identified as legacy fullstack. Route every new Syfo website/App to `syfo-webdev`. If an existing App's template type is unclear, ask the user or use the unified read-only classifier before any mutation.
+- `unknown`: the user asks for a website/webpage but does not identify a hosting target or the legacy markers conflict. Ask the minimum question needed to confirm local HTML vs Syfo hosting and, for an existing Syfo App, its authoritative template type. Do not choose a template or run Syfo commands meanwhile.
 
 “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting or deployment.
 

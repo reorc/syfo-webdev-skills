@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "test": "node scripts/validate.mjs && node --test test-app-init-recovery-contract.mjs test-artifact-budget.mjs test-cloud-access-smoke.mjs test-doctor-contracts.mjs test-fullstack-template-canary-contract.mjs test-runtime-env-templates.mjs test-static-server-basic-auth.mjs test-static-template-canary-contract.mjs syfo-webdev-fullstack/scripts/test-syfo-auth-template.mjs",
+    "test": "node scripts/validate.mjs && node --test test-app-init-recovery-contract.mjs test-artifact-budget.mjs test-cloud-access-smoke.mjs test-doctor-contracts.mjs test-fullstack-template-canary-contract.mjs test-release-contract.mjs test-runtime-env-templates.mjs test-static-server-basic-auth.mjs test-static-template-canary-contract.mjs test-trigger-exclusivity-contract.mjs test-unified-routing-contract.mjs test-unified-template-canary-contract.mjs syfo-webdev-fullstack/scripts/test-syfo-auth-template.mjs syfo-webdev/scripts/test-syfo-auth-template.mjs",
     "test:fullstack-template-canary": "node scripts/test-fullstack-template-canary.mjs",
     "test:static-template-canary": "node scripts/test-static-template-canary.mjs",
+    "test:unified-template-canary": "node scripts/test-unified-template-canary.mjs",
     "package:release": "bash scripts/package-release.sh"
   },
   "devDependencies": {

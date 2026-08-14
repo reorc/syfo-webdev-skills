@@ -1,9 +1,11 @@
 ---
 name: syfo-webdev-static
-description: "Use when the user explicitly asks for a static Syfo App or Syfo Hosted App, or when the repository/request clearly identifies Syfo hosting through syfo.yaml, syfo app init, syfo app validate, syfo app deploy, or an existing Syfo Hosted App. Also use for a Syfo deployment request covering landing pages, marketing sites, docs, portfolios, blogs, showcases, or browser-only Next.js experiences that are fully generated at build time. Do not auto-trigger for generic website/webpage requests, a standalone HTML file, a local preview, or a deployment to another provider. If the user asks for a website but does not say whether they want a local HTML artifact or a Syfo Hosted App, ask before initializing or deploying Syfo. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run access-aware production smoke when authorized. Produces output: export, .fc/artifact with static adapter, /healthz, and syfo.yaml; never s.yaml. Route cookies, application auth, server routes/actions, secrets, ISR, writes, and database requirements to syfo-webdev-fullstack."
+description: "Legacy compatibility Skill only for maintaining an existing historical Syfo static App. Trigger when the repository has legacy static markers such as the static export adapter, run.command node server.mjs, and no template.id: web-unified, or when the user explicitly names syfo-webdev-static/legacy static for an existing App. Preserve its directory, template, database=false contract, and deployment flow. Do not use for any new website or App; all new Syfo creation routes to syfo-webdev. Do not auto-trigger for generic website/webpage requests, standalone HTML, local preview, another provider, an existing unified repository, or uncertain legacy classification. If delivery target or repository type is unclear, ask the user before any Syfo CLI action. Never silently migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Static for FC
+
+This is a legacy compatibility entry. Preserve the old static repository and flow. A request for APIs, login, or persistence is not consent to migrate or enable TiDB; route upgrade planning to `syfo-webdev` and require separate explicit human authorization.
 
 Produce a static Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
 
@@ -16,8 +18,8 @@ This skill owns the Syfo Hosted App lifecycle, not only source generation or FC 
 Before running any Syfo CLI command, resolve the delivery target explicitly:
 
 - `local_html`: the user wants an HTML file or local preview only. Do not initialize, validate, package, or deploy a Syfo App; provide the requested local artifact instead.
-- `syfo_hosted_app`: the user names Syfo, an existing Syfo App, `syfo.yaml`, or a Syfo CLI/deployment action. Continue with the scope classification below.
-- `unknown`: the user asks for a website/webpage but does not identify a hosting target. Ask whether they want a local HTML artifact or a Syfo Hosted App before choosing a template or running Syfo commands.
+- `syfo_hosted_app`: continue here only when an existing App is positively identified as legacy static. Route every new Syfo website/App to `syfo-webdev`. If an existing App's template type is unclear, ask the user or use the unified read-only classifier before any mutation.
+- `unknown`: the user asks for a website/webpage but does not identify a hosting target or the legacy markers conflict. Ask the minimum question needed to confirm local HTML vs Syfo hosting and, for an existing Syfo App, its authoritative template type. Do not choose a template or run Syfo commands meanwhile.
 
 “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting or deployment.
 
