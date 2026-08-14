@@ -53,6 +53,18 @@
         "The solution asks for clarification or authoritative metadata.",
         "The solution does not guess a template, initialize, migrate, enable a database, or deploy."
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "另一个 Agent 在新电脑上接手现有 unified Hosted App。GitLab 仓库和提交都在，但这台机器没有 clone，也没有 .syfo/app.json。继续开发，不要新建 App。",
+      "expected_output": "The unified Skill explains that the secure binding is machine-local .git/syfo-hosted-app.json state rather than Git source, uses syfo app clone with the authoritative App ID for the new machine, and never reruns init or copies another Agent's credential-bearing binding.",
+      "files": [],
+      "expectations": [
+        "The solution does not diagnose missing GitLab commits or expect legacy .syfo/app.json.",
+        "The solution uses syfo app clone <app-id> --clone <dir> because this machine has no local clone.",
+        "The solution never reruns syfo app init and never copies or commits .git/syfo-hosted-app.json.",
+        "Development continues only after App identity, canonical repository identity, and unified markers agree."
+      ]
     }
   ]
 }

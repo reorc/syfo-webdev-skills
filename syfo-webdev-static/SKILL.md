@@ -113,13 +113,27 @@ Treat findings as a review queue, not an automatic rewrite plan.
 
 ### 2. Verify the existing historical App binding
 
-This legacy Skill may continue only when all of the following are already true:
+This legacy Skill may continue only when all of the following are true after any safe machine-local
+binding recovery:
 
-- The working directory is an existing Git repository for an existing Syfo App, not a project being converted into one.
+- The source is the canonical Git repository for an existing Syfo App, not a project being converted into one.
 - `syfo.yaml` and the runtime files positively identify the historical static contract: no `template.id: web-unified`, `run.command: node server.mjs`, and `database.required: false`.
-- Existing App identity or local binding evidence matches this repository. Never create a replacement App, remote, clone, or binding from this Skill.
+- Existing App identity and canonical repository identity agree. Never create a replacement App or remote from this Skill.
 
-If the repository is new, has no existing Syfo App/binding, contains unified markers, or has missing/conflicting legacy markers, stop before editing or running Syfo CLI. Route new creation to `syfo-webdev`; for uncertain existing repositories, use its read-only classifier and ask the user for the authoritative App/repository identity.
+The binding is clone-local `.git/syfo-hosted-app.json` state with a short-lived Git credential. It is
+not source, must never be committed or copied between Agents, and must not be recreated as legacy
+`.syfo/app.json`. A missing binding on another machine is therefore recoverable and is not evidence
+that GitLab commits are missing:
+
+- If the canonical repository already exists locally, verify that a credential-free Git remote points
+  to the App's canonical repository, then run `syfo app bind <app-id>` from that worktree.
+- If this machine has no clone, run `syfo app clone <app-id> --clone <dir>`, then verify the historical
+  static markers before editing.
+- Never run `syfo app init` to recover an existing App, manually clone and then initialize, or copy
+  another machine's binding. If the App ID is unknown, the remote mismatches, or the destination is
+  ambiguous, stop for authoritative App/repository identity.
+
+If the repository is new, has no existing Syfo App, contains unified markers, or has missing/conflicting legacy markers, stop before editing or further Syfo mutation. Route new creation to `syfo-webdev`; for uncertain existing repositories, use its read-only classifier and ask the user for the authoritative App/repository identity.
 
 An existing historical App may have `owner=null`. That is a valid draft state; do not insert `syfo app claim` unless the user explicitly requests ownership or the server returns a specific ownership-required result.
 

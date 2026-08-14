@@ -166,6 +166,18 @@
         "If clarification is needed, the question is limited to current SSR, server API, authentication, secrets, runtime personalization, or durable-write requirements.",
         "The solution does not initialize a legacy static or fullstack template."
       ]
+    },
+    {
+      "id": 14,
+      "prompt": "另一个 Agent 已经在这台电脑普通 git clone 了现有 historical legacy static App，remote 指向正确仓库，但本地没有 Hosted App binding。继续维护，不要重建 App。",
+      "expected_output": "The legacy static Skill verifies the credential-free canonical remote, restores only the machine-local binding with syfo app bind, and preserves the existing App and source history without initialization.",
+      "files": [],
+      "expectations": [
+        "The solution runs syfo app bind <app-id> in the existing canonical worktree rather than syfo app init.",
+        "The solution treats .git/syfo-hosted-app.json as machine-local credential-bearing state and never commits or copies it.",
+        "The solution does not expect or recreate legacy .syfo/app.json.",
+        "The historical static markers are reverified before maintenance continues."
+      ]
     }
   ]
 }
