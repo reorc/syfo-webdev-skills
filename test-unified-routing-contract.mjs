@@ -27,8 +27,8 @@ test('trigger matrix covers unified, legacy, ambiguous, and no-consent database 
   const cases = [
     [/unified site/, true],
     [/unified app preset/, true],
-    [/web-static/, false],
-    [/fullstack 模板/, false],
+    [/旧 web-static App/, false],
+    [/旧 web-fullstack App/, false],
     [/markers 冲突/, true],
     [/还没授权迁移或启用 TiDB/, true],
   ];

@@ -5,8 +5,8 @@
   { "query": "先判断这个现有 Syfo App 是 unified 还是 legacy，不要修改。", "should_trigger": true },
   { "query": "这个 Syfo 仓库的 static/fullstack markers 冲突，先判断类型，不要修改。", "should_trigger": true },
   { "query": "旧 static Syfo App 现在需要数据库，直接升级但我还没授权迁移或启用 TiDB。", "should_trigger": true },
-  { "query": "这是旧 web-static App，继续修复静态 adapter，不要迁移。", "should_trigger": false },
-  { "query": "这是旧 fullstack 模板，修 TiDB migration，保持 legacy。", "should_trigger": false },
+  { "query": "这是旧 web-static App，保持 legacy static 修复 adapter。", "should_trigger": false },
+  { "query": "这是旧 web-fullstack App，保持 legacy fullstack 修复 migration。", "should_trigger": false },
   { "query": "做一个普通网站，先给本地 HTML，不使用 Syfo。", "should_trigger": false },
   { "query": "把这个网站部署到 Vercel。", "should_trigger": false }
 ]

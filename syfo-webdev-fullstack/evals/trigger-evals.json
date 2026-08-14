@@ -1,19 +1,19 @@
 [
   {
-    "query": "当前是 Syfo Hosted App，继续做完登录和用户数据保存然后上线。",
+    "query": "当前是旧 web-fullstack Syfo Hosted App，继续做完登录和用户数据保存然后上线。",
     "should_trigger": true
   },
   {
-    "query": "syfo app deploy 前帮我修好 Route Handler 和 TiDB migration。",
+    "query": "旧 fullstack contract 在 syfo app deploy 前要修好 Route Handler 和 TiDB migration。",
     "should_trigger": true
   },
   {
-    "query": "这个带 syfo.yaml 的 Next.js App 登录后 500，修复并部署给测试人员。",
+    "query": "这个带 legacy fullstack syfo.yaml 的 Next.js App 登录后 500，修复并部署给测试人员。",
     "should_trigger": true
   },
   {
-    "query": "从官方模板新建一个带登录和 TiDB 的 Syfo App，app init 超时后继续恢复。",
-    "should_trigger": true
+    "query": "Create a new Syfo app with the unified app preset and TiDB.",
+    "should_trigger": false
   },
   {
     "query": "这是旧 web-fullstack App，保持 legacy fullstack 修复 migration。",
@@ -21,6 +21,18 @@
   },
   {
     "query": "syfo.yaml 包含 template.id: web-unified，preset=app，database=tidb。",
+    "should_trigger": false
+  },
+  {
+    "query": "新建一个 Syfo Hosted App 官网，使用 unified site，不要数据库。",
+    "should_trigger": false
+  },
+  {
+    "query": "这是旧 web-static App，保持 legacy static 修复 adapter。",
+    "should_trigger": false
+  },
+  {
+    "query": "这个 Syfo 仓库的 static/fullstack markers 冲突，先判断类型，不要修改。",
     "should_trigger": false
   },
   {
