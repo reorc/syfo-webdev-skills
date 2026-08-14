@@ -15,11 +15,22 @@
     {
       "id": 2,
       "prompt": "Create a new Syfo Hosted App with login, runtime APIs, and TiDB.",
-      "expected_output": "The unified Skill discloses TiDB provisioning, obtains confirmation, then uses the preset-only template=unified,preset=app CLI with --confirm-tidb while the daemon sends the Core app/tidb pair.",
+      "expected_output": "Because the request explicitly authorizes a TiDB-backed App, the unified Skill treats it as the single informed confirmation and directly uses the preset-only template=unified,preset=app CLI with --confirm-tidb while the daemon sends the Core app/tidb pair. It does not ask again.",
       "files": [],
       "expectations": [
-        "The solution does not expose --database, obtains confirmation before preset=app initialization, then passes --confirm-tidb and maps only to the Core app/tidb pair.",
+        "The solution does not expose --database, treats the explicit TiDB App request as confirmation, does not ask a second time, passes --confirm-tidb, and maps only to the Core app/tidb pair.",
         "The solution keeps deployment and access-policy changes behind separate authorization."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create a new Syfo website/App for my project.",
+      "expected_output": "The unified Skill asks once whether the human wants a site with no database or an app that provisions TiDB. If the human chooses App after that disclosure, the choice is the confirmation and the Skill proceeds with --preset app --confirm-tidb without asking again.",
+      "files": [],
+      "expectations": [
+        "The solution does not infer a preset from feature hints and asks one informed site-versus-App question.",
+        "The solution states that choosing App after the TiDB disclosure counts as confirmation and never requires a second prompt.",
+        "The solution does not expose --database or initialize before the preset choice."
       ]
     },
     {
