@@ -10,12 +10,13 @@ ARCHIVE="syfo-webdev-skills.tar.gz"
 rm -rf "${DIST}"
 mkdir -p "${DIST}"
 
-COPYFILE_DISABLE=1 tar \
-  -czf "${DIST}/${ARCHIVE}" \
-  -C "${ROOT}" \
+LC_ALL=C git -C "${ROOT}" archive \
+  --format=tar \
+  HEAD \
   syfo-webdev \
   syfo-webdev-static \
-  syfo-webdev-fullstack
+  syfo-webdev-fullstack \
+  | gzip -n -9 > "${DIST}/${ARCHIVE}"
 
 cat > "${DIST}/manifest.json" <<EOF
 {

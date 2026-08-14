@@ -22,3 +22,24 @@ test('release packages three skills and declares daemon-owned marker contract', 
     assert.match(checksums, /manifest\.json/);
   } finally { await rm(output, { recursive: true, force: true }); }
 });
+
+test('release archive and checksums are byte reproducible', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'syfo-skills-repro-'));
+  const outputs = [join(root, 'first'), join(root, 'second')];
+  try {
+    for (const output of outputs) {
+      const run = spawnSync('bash', ['scripts/package-release.sh', output], { cwd: process.cwd(), encoding: 'utf8' });
+      assert.equal(run.status, 0, run.stderr);
+    }
+    for (const filename of ['syfo-webdev-skills.tar.gz', 'manifest.json', 'checksums.txt']) {
+      assert.deepEqual(
+        await readFile(join(outputs[0], filename)),
+        await readFile(join(outputs[1], filename)),
+        `${filename} differs across identical package runs`,
+      );
+    }
+    const archive = await readFile(join(outputs[0], 'syfo-webdev-skills.tar.gz'));
+    assert.deepEqual([...archive.subarray(4, 8)], [0, 0, 0, 0], 'gzip mtime must be zero');
+    assert.equal(archive[3] & 0x08, 0, 'gzip header must not include an original filename');
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
