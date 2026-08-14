@@ -9,8 +9,8 @@ from another.
 | `initialized` | Local binding exists; `owner` may be `null` | Implement and validate the App |
 | `validated` | Local checks and `syfo app validate --json` pass | Commit and push immutable source |
 | `source_ready` | Clean pushed commit SHA exists | Run `syfo app deploy --target "<reply-target>" --json` when authorized |
-| `awaiting_confirmation` | Deploy/action-card identifiers and intended commit recorded | Wait for human confirmation |
-| `building` / `publishing` | Status or version reports a non-terminal state | Poll status and versions |
+| `awaiting_confirmation` | Deploy/action-card identifiers and intended commit recorded | Wait for human confirmation and Hosted App notifications |
+| `building` / `publishing` | A pushed deployment notification reports a non-terminal state | Wait for the pushed terminal result; do not poll or register a watch |
 | `failed` | Structured failure stage/code is available | Follow the failure branch below |
 | `active` | Intended commit is the live version | Read access policy, then run production acceptance |
 
@@ -51,11 +51,14 @@ from another.
   activation failed. Inspect provider/publication diagnostics and preserve the build identity.
 
 Record the deploy response's `operationId`, `actionCardId`, intended commit, App ID, and version when
-present. Reuse that identity through confirmation, polling, terminal verification, and reporting;
+present. Reuse that identity through confirmation, pushed results, terminal verification, and reporting;
 do not create a second deploy operation merely to recover status.
 
-Until the CLI provides operation-by-ID lookup, `syfo app status --json` and
-`syfo app versions --json` are the fallback diagnostic surface. Correlate their results with the recorded operation,
+Hosted App confirmation and deployment results are pushed to the deploy `target`. During the normal
+deployment path, do not register `syfo watch` or repeatedly call `syfo app status --json` or
+`syfo app versions --json`; end the active wait and resume when the pushed notification wakes the
+Agent. Use status and versions only to verify a terminal result or recover an interrupted, missing,
+incomplete, or contradictory notification. Correlate fallback results with the recorded operation,
 version, and commit instead of assuming the latest deploy is the intended one. Do not query product
 databases as a routine workaround. If the fallback cannot identify the same operation or structured
 failure fields are unavailable, state that CLI observability is insufficient, preserve the raw
