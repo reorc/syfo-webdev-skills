@@ -54,7 +54,7 @@ syfo app init <name> --template unified --preset site --from-template --clone <d
 syfo app init <name> --template unified --preset app --confirm-tidb --from-template --clone <dir>
 ```
 
-Never pass `--confirm-tidb` for `preset=site` or without an informed explicit App/TiDB choice. Never ask twice when that choice already confirms TiDB provisioning. Do not expose or pass `--database`, infer a preset from feature prose, or pass unified fields to legacy `template=static|fullstack|nextjs` flows. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. If the installed CLI does not expose this preset-only contract, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
+Never pass `--confirm-tidb` for `preset=site` or without an informed explicit App/TiDB choice. Never ask twice when that choice already confirms TiDB provisioning. Do not expose or pass `--database`, infer a preset from feature prose, or pass unified fields to legacy `template=static|fullstack` flows. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. If the installed CLI does not expose this preset-only contract, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
 
 After an ambiguous init timeout, run only the emitted `syfo app init --resume <commandId>` recovery command. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
 

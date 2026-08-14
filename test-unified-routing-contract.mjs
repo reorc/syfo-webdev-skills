@@ -11,6 +11,7 @@ test('unified create contract accepts only frozen pairs', () => {
   assert.match(unified, /--template unified --preset app --confirm-tidb --from-template --clone <dir>/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--preset site[^\n]*--confirm-tidb/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
+  assert.doesNotMatch(unified, /legacy `template=[^`]*nextjs/);
   assert.match(unified, /daemon sends the complete Core pair `site\/none`/);
   assert.match(unified, /daemon sends the complete Core pair `app\/tidb`/);
   assert.match(unified, /Do not expose or pass `--database`, infer a preset from feature prose/);
