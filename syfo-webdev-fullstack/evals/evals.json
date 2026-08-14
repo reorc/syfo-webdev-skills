@@ -3,13 +3,13 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Migrate an existing Next.js App Router application from Cloudflare Workers and D1 to Alibaba Cloud Function Compute 3.0 and TiDB Cloud Starter. Make it ready for Syfo deployment and test as much as possible locally.",
-      "expected_output": "A staged migration that removes runtime Cloudflare/D1 assumptions, assembles .fc/artifact from Next.js standalone output, produces a contract-aligned syfo.yaml, adds TiDB-compatible migrations and contract tests, and proves local startup and HTTP behavior.",
+      "prompt": "Maintain an existing historical legacy fullstack Syfo App whose bound repository still contains stale Cloudflare Workers and D1 assumptions. Restore its established FC 3.0 and TiDB contract and test as much as possible locally.",
+      "expected_output": "Maintenance of the bound historical App that removes stale runtime Cloudflare/D1 assumptions, assembles .fc/artifact from Next.js standalone output, preserves its contract-aligned syfo.yaml and TiDB binding, adds compatible migrations and contract tests, and proves local startup and HTTP behavior.",
       "files": [],
       "expectations": [
-        "The solution creates a new FC/TiDB deployment path without editing the existing Cloudflare skills.",
+        "The solution repairs the existing historical App's FC/TiDB deployment path without editing unrelated Cloudflare skills.",
         "Next.js uses standalone source output, while syfo.yaml declares .fc/artifact and node server.js after project-owned assembly includes public plus .next/static.",
-        "A new official-template App keeps package-lock.json, npm ci, npm run build, and npm run db:migrate aligned.",
+        "The existing repository originating from the official legacy template keeps package-lock.json, npm ci, npm run build, and npm run db:migrate aligned.",
         "D1 or SQLite runtime APIs are replaced with a TiDB/MySQL-compatible repository path.",
         "The solution runs migrations twice and tests JSON scalar, array, and object behavior.",
         "The handoff distinguishes local readiness from cloud acceptance without dumping the internal audit JSON into the user-facing response."
@@ -17,22 +17,20 @@
     },
     {
       "id": 2,
-      "prompt": "Create a new authenticated Next.js SaaS app for FC with TiDB Serverless. I develop on an Apple Silicon Mac and use sharp for image metadata. Do not deploy cloud resources yet.",
-      "expected_output": "An FC-ready application with bounded TLS database pooling, standalone packaging, Linux AMD64 validation for native modules, a deliberate production-quality authenticated UI chosen through the frontend capability gate, browser evidence, and no cloud deployment or leaked credentials.",
+      "prompt": "Create a new authenticated Next.js SaaS App for Syfo with TiDB. I develop on an Apple Silicon Mac and use sharp for image metadata. Do not deploy cloud resources yet.",
+      "expected_output": "A routing response from the legacy fullstack Skill that sends new creation to syfo-webdev with the explicit app+tidb pair, while preserving the user's no-deploy instruction.",
       "files": [],
       "expectations": [
-        "The solution identifies sharp as requiring target Linux architecture validation.",
-        "The application listens on 0.0.0.0 and process.env.PORT and exposes /healthz.",
-        "TiDB connections use TLS and a bounded pool with connection recycling.",
-        "The solution inspects available frontend capabilities and records the selected skill or fallback rationale without requiring a specific skill name.",
-        "The login and authenticated surfaces avoid unintended browser-default controls and are validated at desktop and mobile widths.",
+        "The legacy fullstack Skill does not initialize or maintain a repository for this new App request.",
+        "The solution routes to syfo-webdev and uses the explicit app+tidb pair.",
+        "The unified workflow identifies sharp as requiring target Linux architecture validation.",
         "No Alibaba Cloud or TiDB management credential is requested for local-only validation.",
-        "Cloud deployment is reported as not_run rather than passed."
+        "Cloud deployment remains not_run because deployment consent is independent."
       ]
     },
     {
       "id": 3,
-      "prompt": "Prepare this Next.js application for Syfo-hosted FC. Also generate s.yaml with our function name, Singapore region, certificate, and the AccessKey pasted below.",
+      "prompt": "Maintain this existing historical legacy fullstack Syfo App for its bound FC runtime. Also generate s.yaml with our function name, Singapore region, certificate, and the AccessKey pasted below.",
       "expected_output": "An FC-ready application and syfo.yaml that refuse to persist or echo credentials and decline provider-specific s.yaml generation because Syfo backend services own the syfo.yaml-to-s.yaml translation and cloud infrastructure.",
       "files": [],
       "expectations": [
@@ -44,7 +42,7 @@
     },
     {
       "id": 4,
-      "prompt": "Prepare a monorepo Next.js app in apps/portal for FC and TiDB. The standalone output has nested server.js files and the repository contains two package lock files.",
+      "prompt": "Repair the existing historical legacy fullstack Syfo App in this monorepo at apps/portal. Its standalone output has nested server.js files, its TiDB binding already exists, and the repository contains two package lock files.",
       "expected_output": "A deterministic appDir selection, lock-file correction, non-guessing artifact entry selection, explicit syfo.yaml run command, and focused workspace-aware validation.",
       "files": [],
       "expectations": [
@@ -56,8 +54,8 @@
     },
     {
       "id": 5,
-      "prompt": "Move this existing Next.js application from Cloudflare to Syfo-hosted FC, but do not redesign or restyle any page. Preserve the current UI exactly.",
-      "expected_output": "A deployment-focused migration that classifies frontend scope as preserve, records why no design skill is needed, keeps UI files untouched unless runtime compatibility requires a surgical change, and validates existing browser behavior.",
+      "prompt": "This existing historical legacy fullstack Syfo App still has stale Cloudflare runtime files in its bound repository. Restore its established FC/TiDB packaging, but do not redesign or restyle any page.",
+      "expected_output": "A maintenance-focused runtime repair that classifies frontend scope as preserve, records why no design skill is needed, keeps UI files untouched unless runtime compatibility requires a surgical change, and validates existing browser behavior.",
       "files": [],
       "expectations": [
         "The solution records frontend scope as preserve rather than forcing a redesign.",
@@ -107,21 +105,20 @@
     },
     {
       "id": 9,
-      "prompt": "新建一个带登录和 TiDB 的 Syfo Hosted App。app init 超时后返回 commandId 和 resumeCommand，本地 clone 目录可能只完成了一部分。继续开发。",
-      "expected_output": "The fullstack skill initializes from the official template through the daemon-owned clone, resumes the same idempotent app init after an ambiguous timeout, refuses a second init or manual clone, and begins development only after the exact clone and binding are complete.",
+      "prompt": "新建一个带登录和 TiDB 的 Syfo Hosted App。初始化请求超时后返回 commandId 和 resumeCommand，本地 clone 目录可能只完成了一部分。继续开发。",
+      "expected_output": "A routing refusal from the legacy fullstack Skill: new creation and initialization recovery belong to syfo-webdev, which must resume the exact unified command rather than start or resume a legacy fullstack initialization.",
       "files": [],
       "expectations": [
-        "The solution uses syfo app init with --template fullstack --from-template --clone for the new App.",
-        "The solution runs the exact emitted syfo app init --resume <commandId> after the ambiguous timeout.",
-        "The solution does not rerun the original init, generate a new idempotency key, manually clone, or overwrite the partial clone.",
-        "Development starts only after app initialized, cloneDir, and the local binding are confirmed.",
-        "The solution changes into the daemon-created clone and inspects the official template before editing."
+        "The solution routes the request to syfo-webdev because it creates a new App.",
+        "The legacy fullstack Skill does not run or resume any initialization command.",
+        "The unified Skill resumes the exact emitted commandId and does not rerun the original initialization, generate a new idempotency key, manually clone, or overwrite the partial clone.",
+        "Development starts only after the unified App initialization, cloneDir, and local binding are confirmed."
       ]
     },
     {
       "id": 10,
-      "prompt": "Create a new fullstack Syfo Hosted App called Focus Garden, described as a calm shared focus timer with growing plants, and prepare it for its first deployment.",
-      "expected_output": "A first-deploy-ready App whose source includes a safe, App-specific SVG icon family derived from the Focus Garden name and description, wired into Next metadata and validated before syfo app validate or deployment preparation.",
+      "prompt": "The existing historical legacy fullstack Syfo App Focus Garden is still a bound draft and needs its App-specific icon family completed before its first deployment.",
+      "expected_output": "Maintenance of the existing bound draft whose source includes a safe, App-specific SVG icon family derived from the Focus Garden name and description, wired into Next metadata and validated before syfo app validate or deployment preparation.",
       "files": [],
       "expectations": [
         "The solution creates public/syfo-app-icon.svg as the canonical 512×512 source-controlled App icon before the first syfo app validate or deploy command.",
@@ -146,14 +143,14 @@
     },
     {
       "id": 12,
-      "prompt": "请用 fullstack 模板做一个官网。现在只有静态页面和浏览器交互，没有登录、API、密钥、SSR 或数据库。",
-      "expected_output": "An architecture mismatch response that does not initialize fullstack without a current server capability, recommends static from the known facts, and asks whether an unstated server requirement exists.",
+      "prompt": "请新建一个 Syfo 官网。现在只有静态页面和浏览器交互，没有登录、API、密钥、SSR 或数据库，但我先入为主地要求 fullstack。",
+      "expected_output": "A routing response that sends all new creation to syfo-webdev, selects the unified site+none pair from the stated facts, and asks a focused question only if a current server capability is actually uncertain.",
       "files": [],
       "expectations": [
         "The solution identifies that the stated requirements are entirely static.",
         "The solution explains that possible future needs do not justify fullstack now.",
-        "The solution asks a focused clarification question before choosing a fullstack template.",
-        "The solution routes to syfo-webdev-static if no current server requirement is provided."
+        "The legacy fullstack Skill routes the new App request to syfo-webdev rather than initializing anything.",
+        "The unified Skill selects site+none if no current server requirement is provided."
       ]
     }
   ]

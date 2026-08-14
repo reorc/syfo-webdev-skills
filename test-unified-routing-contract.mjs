@@ -7,9 +7,13 @@ const staticSkill = await readFile(new URL('./syfo-webdev-static/SKILL.md', impo
 const fullstackSkill = await readFile(new URL('./syfo-webdev-fullstack/SKILL.md', import.meta.url), 'utf8');
 
 test('unified create contract accepts only frozen pairs', () => {
-  assert.match(unified, /--template unified --preset site --database none/);
-  assert.match(unified, /--template unified --preset app --database tidb/);
-  assert.match(unified, /Do not omit fields, infer a pair from prose, coerce crossed pairs/);
+  assert.match(unified, /--template unified --preset site --from-template --clone <dir>/);
+  assert.match(unified, /--template unified --preset app --from-template --clone <dir>/);
+  assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
+  assert.match(unified, /daemon sends the complete Core pair `site\/none`/);
+  assert.match(unified, /daemon sends the complete Core pair `app\/tidb`/);
+  assert.match(unified, /Do not expose or pass `--database`, infer a preset from prose/);
+  assert.match(unified, /Before running `preset=app`, explicitly disclose.*provisions TiDB and obtain human confirmation/s);
 });
 
 test('legacy aliases preserve flow and require explicit upgrade consent', () => {

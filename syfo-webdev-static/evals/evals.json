@@ -3,8 +3,8 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Create a polished multi-page Next.js marketing site for Syfo deployment. It has no login, API, database, or server secrets.",
-      "expected_output": "A polished Next.js App Router static export with frontend capability selection, a deliberate design direction, deterministic FC artifact assembly, static adapter, health endpoint, syfo.yaml, desktop/mobile browser validation, and no s.yaml or database configuration.",
+      "prompt": "Finish the remaining pages and polish an existing historical legacy static Syfo App. Its repository already has the static export adapter, run.command node server.mjs, an existing App binding, and no login, API, database, or server secrets.",
+      "expected_output": "Maintenance of the bound historical App as a polished Next.js App Router static export with frontend capability selection, a deliberate design direction, deterministic FC artifact assembly, static adapter, health endpoint, syfo.yaml, desktop/mobile browser validation, and no s.yaml or database configuration.",
       "files": [],
       "expectations": [
         "The solution uses output: export and generates every route at build time.",
@@ -13,15 +13,15 @@
         "The finished pages avoid unintended browser-default controls and obvious scaffold placeholders.",
         "Desktop and mobile browser evidence is recorded.",
         "The artifact contains exported files plus a foreground static server entry.",
-        "The official-template default uses package-lock.json, npm ci, and one npm run build command whose project script owns assembly.",
+        "The existing repository originating from the official legacy template uses package-lock.json, npm ci, and one npm run build command whose project script owns assembly.",
         "The static adapter delegates platform Basic Auth, fails closed, preserves unauthenticated health, and blocks symlink escapes.",
         "The handoff distinguishes local readiness from cloud acceptance without dumping the internal audit JSON into the user-facing response."
       ]
     },
     {
       "id": 2,
-      "prompt": "Migrate a self-contained HTML audio showcase with hundreds of local MP3 files into a Next.js static site for Syfo-hosted FC. Preserve playback and seeking.",
-      "expected_output": "A static Next.js migration that inventories the media artifact, preserves local assets when within budget, serves correct MIME types and byte ranges, and validates playback without adding TiDB or business APIs.",
+      "prompt": "An existing historical legacy static Syfo App contains a self-contained HTML audio showcase with hundreds of local MP3 files. Maintain its bound repository while converting that section to Next.js and preserve playback and seeking.",
+      "expected_output": "A maintenance change inside the bound historical App that inventories the media artifact, preserves local assets when within budget, serves correct MIME types and byte ranges, and validates playback without adding TiDB or business APIs.",
       "files": [],
       "expectations": [
         "The solution does not blindly reject all local media or copy Manus-specific upload instructions.",
@@ -32,19 +32,19 @@
     },
     {
       "id": 3,
-      "prompt": "Build a static Next.js customer portal that reads a private API key on the server, authenticates users with cookies, and updates data without redeploying.",
-      "expected_output": "A clear static-eligibility rejection that routes the request to syfo-webdev-fullstack instead of exposing secrets or weakening authentication.",
+      "prompt": "Upgrade this existing historical legacy static Syfo App into a customer portal that reads a private API key on the server, authenticates users with cookies, and updates data without redeploying.",
+      "expected_output": "A clear legacy-static eligibility rejection that routes migration planning to syfo-webdev, keeps migration and database consent separate, and does not expose secrets or weaken authentication.",
       "files": [],
       "expectations": [
         "The solution identifies cookies, private credentials, and runtime mutations as fullstack blockers.",
         "The solution does not move the private key into NEXT_PUBLIC variables.",
-        "The solution recommends syfo-webdev-fullstack with the smallest viable architecture change."
+        "The solution routes to syfo-webdev for explicit migration planning and asks separately for consent to migrate and enable TiDB."
       ]
     },
     {
       "id": 4,
-      "prompt": "Prepare a Next.js documentation site with dynamic [slug] routes for Syfo FC. The complete document list is available during build, and unknown slugs must return 404.",
-      "expected_output": "A static export using generateStaticParams, real route-specific HTML and 404 behavior, deterministic artifact assembly, syfo.yaml, and direct-navigation smoke checks.",
+      "prompt": "Maintain the documentation section of an existing historical legacy static Syfo App with dynamic [slug] routes. The complete document list is available during build, and unknown slugs must return 404.",
+      "expected_output": "Maintenance of the bound historical App using generateStaticParams, real route-specific HTML and 404 behavior, deterministic artifact assembly, syfo.yaml, and direct-navigation smoke checks.",
       "files": [],
       "expectations": [
         "The solution enumerates dynamic routes at build time.",
@@ -55,8 +55,8 @@
     },
     {
       "id": 5,
-      "prompt": "Convert this existing Next.js static site from Cloudflare hosting to Syfo FC packaging. Do not change its visual design or component styling.",
-      "expected_output": "A packaging-focused migration that classifies frontend scope as preserve, keeps the existing interface intact, avoids unnecessary design-skill work, and validates that browser behavior remains unchanged.",
+      "prompt": "This existing historical legacy static Syfo App still has stale Cloudflare hosting files in its bound repository. Restore its established Syfo FC packaging without changing its visual design or component styling.",
+      "expected_output": "A packaging-focused maintenance change that classifies frontend scope as preserve, keeps the existing interface intact, avoids unnecessary design-skill work, and validates that browser behavior remains unchanged.",
       "files": [],
       "expectations": [
         "The solution records frontend scope as preserve.",
@@ -106,21 +106,20 @@
     },
     {
       "id": 9,
-      "prompt": "从官方模板创建一个新的静态 Syfo 网站。app init 请求超时并给出 commandId 和 resumeCommand，目标目录可能已有未完成 clone。继续完成网站。",
-      "expected_output": "The static skill initializes through the daemon-owned official template clone, resumes the same idempotent app init after an ambiguous timeout, refuses a second init or manual clone, and begins site work only after the exact clone and binding are complete.",
+      "prompt": "从官方模板创建一个新的静态 Syfo 网站。初始化请求超时并给出 commandId 和 resumeCommand，目标目录可能已有未完成 clone。继续完成网站。",
+      "expected_output": "A routing refusal from the legacy static Skill: new creation and initialization recovery belong to syfo-webdev, which must resume the exact unified command rather than start or resume a legacy static initialization.",
       "files": [],
       "expectations": [
-        "The solution uses syfo app init with --template static --from-template --clone for the new App.",
-        "The solution runs the exact emitted syfo app init --resume <commandId> after the ambiguous timeout.",
-        "The solution does not rerun the original init, generate a new idempotency key, manually clone, or overwrite the partial clone.",
-        "Site work starts only after app initialized, cloneDir, and the local binding are confirmed.",
-        "The solution changes into the daemon-created clone and inspects the official template before editing."
+        "The solution routes the request to syfo-webdev because it creates a new App.",
+        "The legacy static Skill does not run or resume any initialization command.",
+        "The unified Skill resumes the exact emitted commandId and does not rerun the original initialization, generate a new idempotency key, manually clone, or overwrite the partial clone.",
+        "Site work starts only after the unified App initialization, cloneDir, and local binding are confirmed."
       ]
     },
     {
       "id": 10,
-      "prompt": "Create a new static Syfo Hosted App called Trail Notes, described as a lightweight hiking journal and route scrapbook, and prepare it for its first deployment.",
-      "expected_output": "A first-deploy-ready static App whose source includes a safe, App-specific SVG icon family derived from the Trail Notes name and description, wired into Next metadata and validated before syfo app validate or deployment preparation.",
+      "prompt": "The existing historical legacy static Syfo App Trail Notes is still a bound draft and needs its App-specific icon family completed before its first deployment.",
+      "expected_output": "Maintenance of the existing bound draft whose source includes a safe, App-specific SVG icon family derived from the Trail Notes name and description, wired into Next metadata and validated before syfo app validate or deployment preparation.",
       "files": [],
       "expectations": [
         "The solution creates public/syfo-app-icon.svg as the canonical 512×512 source-controlled App icon before the first syfo app validate or deploy command.",
@@ -133,11 +132,11 @@
     },
     {
       "id": 11,
-      "prompt": "app init 成功但 owner=null。不要让我多走没必要的流程，继续准备第一次部署。",
+      "prompt": "这个现有历史 legacy static App 已绑定且仍是 draft，owner=null。不要让我多走没必要的流程，继续准备第一次部署。",
       "expected_output": "The Agent treats owner=null as a valid draft, does not run claim by default, prepares the deploy confirmation from the immutable commit, and explains that the confirming human may become owner on first deploy.",
       "files": [],
       "expectations": [
-        "The solution does not classify owner=null as initialization failure.",
+        "The solution does not classify owner=null on the existing historical App as a binding failure.",
         "The solution does not run syfo app claim as a routine prerequisite.",
         "The Agent prepares syfo app deploy after validation and immutable push.",
         "Human confirmation remains the paid mutation boundary and may establish ownership."
@@ -157,14 +156,15 @@
     },
     {
       "id": 13,
-      "prompt": "做一个纯展示型官网，没有登录、API、数据库或服务端写入。为了以后扩展，我觉得是不是直接 fullstack 更保险？",
-      "expected_output": "A static-first architecture decision that rejects speculative future expansion as a fullstack requirement and asks only if an unstated current server capability may exist.",
+      "prompt": "要新建一个纯展示型 Syfo 官网，没有登录、API、数据库或服务端写入。为了以后扩展，我觉得是不是直接 fullstack 更保险？",
+      "expected_output": "A routing response that sends all new creation to syfo-webdev, selects the unified site+none pair from the stated current requirements, and rejects speculative future expansion as a database requirement.",
       "files": [],
       "expectations": [
-        "The solution selects static from the stated current requirements.",
+        "The legacy static Skill routes the new App request to syfo-webdev rather than initializing anything.",
+        "The unified Skill selects site+none from the stated current requirements.",
         "The solution does not treat possible future expansion as sufficient reason for fullstack.",
         "If clarification is needed, the question is limited to current SSR, server API, authentication, secrets, runtime personalization, or durable-write requirements.",
-        "The solution does not initialize a fullstack template before resolving an architecture-changing ambiguity."
+        "The solution does not initialize a legacy static or fullstack template."
       ]
     }
   ]
