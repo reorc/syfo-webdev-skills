@@ -8,12 +8,14 @@ const fullstackSkill = await readFile(new URL('./syfo-webdev-fullstack/SKILL.md'
 
 test('unified create contract accepts only frozen pairs', () => {
   assert.match(unified, /--template unified --preset site --from-template --clone <dir>/);
-  assert.match(unified, /--template unified --preset app --from-template --clone <dir>/);
+  assert.match(unified, /--template unified --preset app --confirm-tidb --from-template --clone <dir>/);
+  assert.doesNotMatch(unified, /syfo app init[^\n]*--preset site[^\n]*--confirm-tidb/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
   assert.match(unified, /daemon sends the complete Core pair `site\/none`/);
   assert.match(unified, /daemon sends the complete Core pair `app\/tidb`/);
   assert.match(unified, /Do not expose or pass `--database`, infer a preset from prose/);
-  assert.match(unified, /Before running `preset=app`, explicitly disclose.*provisions TiDB and obtain human confirmation/s);
+  assert.match(unified, /Only after that confirmation may the exact command include `--confirm-tidb`/);
+  assert.match(unified, /Never pass `--confirm-tidb` for `preset=site` or before the App\/TiDB confirmation/);
 });
 
 test('legacy aliases preserve flow and require explicit upgrade consent', () => {

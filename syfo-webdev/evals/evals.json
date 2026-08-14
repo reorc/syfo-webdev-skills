@@ -15,10 +15,10 @@
     {
       "id": 2,
       "prompt": "Create a new Syfo Hosted App with login, runtime APIs, and TiDB.",
-      "expected_output": "The unified Skill discloses TiDB provisioning, obtains confirmation, then uses the preset-only template=unified,preset=app CLI while the daemon sends the Core app/tidb pair.",
+      "expected_output": "The unified Skill discloses TiDB provisioning, obtains confirmation, then uses the preset-only template=unified,preset=app CLI with --confirm-tidb while the daemon sends the Core app/tidb pair.",
       "files": [],
       "expectations": [
-        "The solution does not expose --database, obtains confirmation before preset=app initialization, and maps only to the Core app/tidb pair.",
+        "The solution does not expose --database, obtains confirmation before preset=app initialization, then passes --confirm-tidb and maps only to the Core app/tidb pair.",
         "The solution keeps deployment and access-policy changes behind separate authorization."
       ]
     },
