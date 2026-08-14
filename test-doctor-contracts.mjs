@@ -149,13 +149,28 @@ async function createFullstackFixture() {
   return project;
 }
 
+async function createUnifiedFixture() {
+  const project = await createFullstackFixture();
+  const manifestPath = join(project, 'syfo.yaml');
+  const manifest = await readFile(manifestPath, 'utf8');
+  await writeFile(
+    manifestPath,
+    manifest
+      .replace('version: 1\n', 'version: 1\n\ntemplate:\n  id: web-unified\n  version: 1\n')
+      .replace('required: true', 'required: false'),
+  );
+  return project;
+}
+
 test('official npm fixtures satisfy doctor contract checks', async () => {
-  const projects = await Promise.all([createStaticFixture(), createFullstackFixture()]);
+  const projects = await Promise.all([createStaticFixture(), createFullstackFixture(), createUnifiedFixture()]);
   try {
     const staticRun = runDoctor('syfo-webdev-static', projects[0]);
     const fullstackRun = runDoctor('syfo-webdev-fullstack', projects[1]);
+    const unifiedRun = runDoctor('syfo-webdev', projects[2]);
     assert.deepEqual(errorCodes(staticRun), [], staticRun.stderr);
     assert.deepEqual(errorCodes(fullstackRun), [], fullstackRun.stderr);
+    assert.deepEqual(errorCodes(unifiedRun), [], unifiedRun.stderr);
   } finally {
     await Promise.all(projects.map((project) => rm(project, { recursive: true, force: true })));
   }
@@ -341,7 +356,7 @@ test('skill architecture choice rejects speculative fullstack upgrades', async (
   const staticSkill = await readFile(join(repositoryRoot, 'syfo-webdev-static', 'SKILL.md'), 'utf8');
   const fullstackSkill = await readFile(join(repositoryRoot, 'syfo-webdev-fullstack', 'SKILL.md'), 'utf8');
 
-  assert.match(staticSkill, /Use static by default/);
+  assert.match(staticSkill, /Preserve static/);
   assert.match(staticSkill, /may need a backend later/i);
   assert.match(staticSkill, /ask the user rather than[\s\S]*guessing/);
   assert.match(fullstackSkill, /Do not choose fullstack only for possible future expansion/);

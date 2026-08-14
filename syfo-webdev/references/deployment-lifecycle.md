@@ -26,7 +26,7 @@ from another.
 
 ## Ownership and deploy authority
 
-- `owner=null` on an existing historical App is a valid unclaimed draft, not a binding failure.
+- `owner=null` after `syfo app init` is a valid unclaimed draft, not an initialization failure.
 - Do not run `syfo app claim` as a routine prerequisite. A first deploy confirmation may claim the
   App for the confirming human.
 - Use `syfo app claim` only when the user explicitly wants ownership established before deployment,

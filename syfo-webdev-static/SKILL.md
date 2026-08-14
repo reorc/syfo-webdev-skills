@@ -1,11 +1,13 @@
 ---
 name: syfo-webdev-static
-description: "Use when the user explicitly asks for a static Syfo App or Syfo Hosted App, or when the repository/request clearly identifies Syfo hosting through syfo.yaml, syfo app init, syfo app validate, syfo app deploy, or an existing Syfo Hosted App. Also use for a Syfo deployment request covering landing pages, marketing sites, docs, portfolios, blogs, showcases, or browser-only Next.js experiences that are fully generated at build time. Do not auto-trigger for generic website/webpage requests, a standalone HTML file, a local preview, or a deployment to another provider. If the user asks for a website but does not say whether they want a local HTML artifact or a Syfo Hosted App, ask before initializing or deploying Syfo. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run access-aware production smoke when authorized. Produces output: export, .fc/artifact with static adapter, /healthz, and syfo.yaml; never s.yaml. Route cookies, application auth, server routes/actions, secrets, ISR, writes, and database requirements to syfo-webdev-fullstack."
+description: "Legacy maintenance only for a positively identified existing historical Syfo static App. Trigger on legacy static markers such as the static export adapter, run.command node server.mjs, and no template.id: web-unified, or an explicit request for syfo-webdev-static/legacy static on an existing App. If its machine-local binding is missing, use syfo app bind <app-id> in the canonical local repository, or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Preserve its directory, template, database=false contract, and deployment flow. Do not use for any new website or App; route new Syfo creation to syfo-webdev. Do not trigger for generic websites, standalone HTML, local previews, other providers, unified repositories, or uncertain classification. If target, repository type, or App identity is unclear, ask before any Syfo CLI action. Never silently migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Static for FC
 
-Produce a static Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
+This is a legacy compatibility entry. Hard stop: this Skill must never run `syfo app init`, create a new App, or create a replacement App. Preserve the old static repository and flow. If no existing historical App and canonical repository can be verified, route the request to `syfo-webdev`. A request for APIs, login, or persistence is not consent to migrate or enable TiDB; route upgrade planning to `syfo-webdev` and require separate explicit human authorization.
+
+Maintain an existing historical static Next.js application that Syfo deploys deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
 
 The site is static at the product layer. A small Node.js HTTP adapter exists only because FC requires a foreground HTTP process; it serves exported files, health checks, correct 404 responses, cache headers, byte ranges for media, and delegates platform Basic Auth policy checks. It must not contain business APIs, application-owned authentication, user credentials, persistence, or request-time rendering.
 
@@ -16,8 +18,8 @@ This skill owns the Syfo Hosted App lifecycle, not only source generation or FC 
 Before running any Syfo CLI command, resolve the delivery target explicitly:
 
 - `local_html`: the user wants an HTML file or local preview only. Do not initialize, validate, package, or deploy a Syfo App; provide the requested local artifact instead.
-- `syfo_hosted_app`: the user names Syfo, an existing Syfo App, `syfo.yaml`, or a Syfo CLI/deployment action. Continue with the scope classification below.
-- `unknown`: the user asks for a website/webpage but does not identify a hosting target. Ask whether they want a local HTML artifact or a Syfo Hosted App before choosing a template or running Syfo commands.
+- `syfo_hosted_app`: continue here only when an existing App is positively identified as legacy static. Route every new Syfo website/App to `syfo-webdev`. If an existing App's template type is unclear, ask the user or use the unified read-only classifier before any mutation.
+- `unknown`: the user asks for a website/webpage but does not identify a hosting target or the legacy markers conflict. Ask the minimum question needed to confirm local HTML vs Syfo hosting and, for an existing Syfo App, its authoritative template type. Do not choose a template or run Syfo commands meanwhile.
 
 “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting or deployment.
 
@@ -48,13 +50,13 @@ immutable source identity, local result, and exact remaining state-machine step.
 
 ## Eligibility gate
 
-Before initialization, record a concise capability decision based on current requirements, not
+Before continuing maintenance on the existing historical App, record a concise capability decision based on current requirements, not
 speculative future expansion:
 
-- Use static by default when no request-time server capability is required.
-- “We may need a backend later” is not sufficient reason to initialize fullstack now.
+- Preserve static when no current request-time server capability is required.
+- “We may need a backend later” is not sufficient reason to migrate the existing App to fullstack.
 - If the user names fullstack but the stated requirements are entirely build-time or browser-only,
-  point out the mismatch and ask whether there is an unstated server requirement before initializing.
+  point out the mismatch and ask whether there is an unstated server requirement before proposing any migration.
 - If a requirement is ambiguous and the answer changes the template, ask the user rather than
   guessing. Keep the question focused on the missing capability, such as authentication, secrets,
   runtime APIs, request-time rendering, or durable writes.
@@ -109,33 +111,31 @@ node <skill-path>/scripts/doctor.mjs --json
 
 Treat findings as a review queue, not an automatic rewrite plan.
 
-### 2. Initialize the Hosted App repository correctly
+### 2. Verify the existing historical App binding
 
-Choose the init path before writing substantial site code:
+This legacy Skill may continue only when all of the following are true after any safe machine-local
+binding recovery:
 
-- For a brand-new Syfo Hosted App, use the platform-created GitLab template repository. The
-  platform creates the app repository from `syfo_hosted_app/app-templates/web-static`.
-  In the daemon CLI, run `syfo app init <name> --template static --from-template --clone <dir>`
-  and then work in `<dir>`. Do not recreate the scaffold from a checked-in docs copy.
-- The daemon CLI owns the authenticated Git clone for `--from-template`. Do not run a separate
-  `git clone`, reconstruct the repository URL, or copy a template by hand. Treat initialization
-  as complete only after the command reports `app initialized` and returns a non-empty `cloneDir`
-  plus the local binding path. Then `cd <cloneDir>` and inspect the template before changing it.
-- An initialized App may report `owner=null`. Continue implementation and validation; do not insert
-  `syfo app claim` unless the user explicitly wants ownership established before deployment or the
-  CLI returns a specific ownership-required result.
-- If initialization reports that the outcome is not yet known and returns a `commandId` or
-  `resumeCommand`, run the exact `syfo app init --resume <commandId>` command. Do not rerun the
-  original init command with a new idempotency key, choose another clone directory, manually
-  clone the repository, or overwrite a partial clone. Resume replays the original request and
-  either completes or reuses the exact clone; it fails closed if backend identity, local source,
-  or clone state drifted. Keep the recovery state until both the API and local Git sync succeed.
-- For an existing local Git project, commit a clean first version, then run `syfo app init
-  <name> --template static` from that repository without `--from-template`. The daemon sends `sourceMode=local`, so
-  the platform creates an empty GitLab repository and the daemon pushes the local branch into it.
-- Do not push an existing local repository into a template-initialized remote. That creates
-  unrelated-history or non-fast-forward conflicts. If this has already happened, stop and
-  resolve the Git history intentionally rather than force-pushing over the template baseline.
+- The source is the canonical Git repository for an existing Syfo App, not a project being converted into one.
+- `syfo.yaml` and the runtime files positively identify the historical static contract: no `template.id: web-unified`, `run.command: node server.mjs`, and `database.required: false`.
+- Existing App identity and canonical repository identity agree. Never create a replacement App or remote from this Skill.
+
+The binding is clone-local `.git/syfo-hosted-app.json` state with a short-lived Git credential. It is
+not source, must never be committed or copied between Agents, and must not be recreated as legacy
+`.syfo/app.json`. A missing binding on another machine is therefore recoverable and is not evidence
+that GitLab commits are missing:
+
+- If the canonical repository already exists locally, verify that a credential-free Git remote points
+  to the App's canonical repository, then run `syfo app bind <app-id>` from that worktree.
+- If this machine has no clone, run `syfo app clone <app-id> --clone <dir>`, then verify the historical
+  static markers before editing.
+- Never run `syfo app init` to recover an existing App, manually clone and then initialize, or copy
+  another machine's binding. If the App ID is unknown, the remote mismatches, or the destination is
+  ambiguous, stop for authoritative App/repository identity.
+
+If the repository is new, has no existing Syfo App, contains unified markers, or has missing/conflicting legacy markers, stop before editing or further Syfo mutation. Route new creation to `syfo-webdev`; for uncertain existing repositories, use its read-only classifier and ask the user for the authoritative App/repository identity.
+
+An existing historical App may have `owner=null`. That is a valid draft state; do not insert `syfo app claim` unless the user explicitly requests ownership or the server returns a specific ownership-required result.
 
 ### 3. Pass the frontend capability gate
 
@@ -278,7 +278,7 @@ The baseline declares:
 
 - `app.type: nextjs`.
 - Node.js runtime intent without provider runtime identifiers.
-- `package-lock.json` with `npm ci` and an exact `packageManager: npm@10.x.y` for new official-template Apps. Generate and validate the lock with that npm 10 version because the Node 20 Builder does not accept npm 11-only lock resolution. Preserve another package manager only when its single lock file and every manifest command remain consistent.
+- `package-lock.json` with `npm ci` and an exact `packageManager: npm@10.x.y` when the existing historical repository originated from the official legacy template. Generate and validate the lock with that npm 10 version because the Node 20 Builder does not accept npm 11-only lock resolution. Preserve another package manager only when its single lock file and every manifest command remain consistent.
 - `npm run build`, whose project-owned build script performs `next build` and artifact assembly; do not put compound shell commands in `syfo.yaml`.
 - `.fc/artifact` as the build output.
 - `node server.mjs` as the foreground command inside the artifact.
@@ -337,7 +337,7 @@ inspection alone.
 For Apple Silicon development or architecture-specific dependencies, validate the assembled artifact in Linux AMD64 even though the application itself is static.
 
 After an authorized deployment, read `app.visibility` with `syfo app status --json`. Never modify
-the policy: App initialization supplies the default and only a human may change it in the Hosted App
+the policy: the existing App already has a default and only a human may change it in the Hosted App
 management UI. If it conflicts with the requested audience, stop for the human change, then re-read
 status. Run the matching cloud smoke only when the policy is `public` or when the human explicitly
 supplies Basic Auth test credentials. Pass credentials only through environment variables so they do

@@ -1,0 +1,92 @@
+{
+  "skill_name": "syfo-webdev",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a new Syfo Hosted App marketing site with no database.",
+      "expected_output": "The unified Skill uses the preset-only template=unified,preset=site CLI, explains the deterministic daemon mapping to the Core site/none pair, and follows the web-unified lifecycle without deploying unless authorized.",
+      "files": [],
+      "expectations": [
+        "The user-facing CLI does not expose --database and the daemon deterministically sends the complete Core site/none pair.",
+        "The solution does not fall back to a legacy static template.",
+        "The solution does not append the raw skill handoff JSON."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a new Syfo Hosted App with login, runtime APIs, and TiDB.",
+      "expected_output": "Because the request explicitly authorizes a TiDB-backed App, the unified Skill treats it as the single informed confirmation and directly uses the preset-only template=unified,preset=app CLI with --confirm-tidb while the daemon sends the Core app/tidb pair. It does not ask again.",
+      "files": [],
+      "expectations": [
+        "The solution does not expose --database, treats the explicit TiDB App request as confirmation, does not ask a second time, passes --confirm-tidb, and maps only to the Core app/tidb pair.",
+        "The solution keeps deployment and access-policy changes behind separate authorization."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Create a new Syfo website/App for my project.",
+      "expected_output": "The unified Skill asks once whether the human wants a site with no database or an app that provisions TiDB. If the human chooses App after that disclosure, the choice is the confirmation and the Skill proceeds with --preset app --confirm-tidb without asking again.",
+      "files": [],
+      "expectations": [
+        "The solution does not infer a preset from feature hints and asks one informed site-versus-App question.",
+        "The solution states that choosing App after the TiDB disclosure counts as confirmation and never requires a second prompt.",
+        "The solution does not expose --database or initialize before the preset choice."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "This existing legacy static Syfo App now needs an API and database. Make it work.",
+      "expected_output": "The Skill detects legacy static, preserves the legacy workflow, and asks separately for migration and database-enable consent instead of silently changing the App.",
+      "files": [],
+      "expectations": [
+        "Feature requirements are not treated as migration consent.",
+        "Database enablement is not inferred.",
+        "The current App is not deployed or rewritten."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "The repo has conflicting Syfo markers and I am not sure which template created it.",
+      "expected_output": "The Skill classifies the repository as ambiguous and stops before mutation.",
+      "files": [],
+      "expectations": [
+        "The solution asks for clarification or authoritative metadata.",
+        "The solution does not guess a template, initialize, migrate, enable a database, or deploy."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "另一个 Agent 在新电脑上接手现有 unified Hosted App。GitLab 仓库和提交都在，但这台机器没有 clone，也没有 .syfo/app.json。继续开发，不要新建 App。",
+      "expected_output": "The unified Skill explains that the secure binding is machine-local .git/syfo-hosted-app.json state rather than Git source, uses syfo app clone with the authoritative App ID for the new machine, and never reruns init or copies another Agent's credential-bearing binding.",
+      "files": [],
+      "expectations": [
+        "The solution does not diagnose missing GitLab commits or expect legacy .syfo/app.json.",
+        "The solution uses syfo app clone <app-id> --clone <dir> because this machine has no local clone.",
+        "The solution never reruns syfo app init and never copies or commits .git/syfo-hosted-app.json.",
+        "Development continues only after App identity, canonical repository identity, and unified markers agree."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "This existing unified Syfo Site is site/none. Add persistence with TiDB, update this same repository, but do not deploy yet.",
+      "expected_output": "The unified Skill treats the explicit TiDB request as the single informed confirmation, runs syfo app database enable with --confirm-tidb without asking twice, verifies the resulting app/tidb active state, then updates and validates the same repository. It does not rerun init or deploy.",
+      "files": [],
+      "expectations": [
+        "The solution verifies the existing App is exactly unified site/none before mutation.",
+        "The explicit TiDB request counts as the one confirmation and the solution passes --confirm-tidb without a second prompt.",
+        "After enabled or already_enabled, the solution re-reads status, requires app/tidb with active TiDB, and modifies the same repository including database.required: true, migrations, data access, and tests.",
+        "The solution never reruns syfo app init and does not deploy without separate authorization."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "This existing unified site needs a feature that stores data. Make the feature, but I have not approved TiDB or deployment.",
+      "expected_output": "The unified Skill explains that the feature request does not authorize database enablement, asks one focused TiDB consent question, and makes no Syfo database or deployment mutation until answered.",
+      "files": [],
+      "expectations": [
+        "The solution does not infer TiDB consent from the persistence requirement.",
+        "The solution does not run syfo app database enable, edit the repository as app/tidb, rerun init, or deploy before confirmation."
+      ]
+    }
+  ]
+}
