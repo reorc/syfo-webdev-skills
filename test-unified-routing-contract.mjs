@@ -37,6 +37,19 @@ test('legacy aliases preserve flow and require explicit upgrade consent', () => 
   assert.match(fullstackSkill, /Do not use for any new website or App/);
 });
 
+test('existing unified site database enable uses one consent and preserves lifecycle boundaries', () => {
+  assert.match(unified, /Only the exact `preset=site,database=none` state can use the database-enable flow/);
+  assert.match(unified, /syfo app database enable \[app-id\] --confirm-tidb/);
+  assert.match(unified, /that is the single informed confirmation\. Do not ask again/);
+  assert.match(unified, /does not modify source, validate, deploy, change the live version, domain, or access policy/);
+  assert.match(unified, /After `state=enabled` or `state=already_enabled`/);
+  assert.match(unified, /exact unified `app\/tidb` state with an active TiDB binding/);
+  assert.match(unified, /Modify the same original repository for App\/TiDB usage, including `database.required: true`/);
+  assert.match(unified, /Database consent is not deploy consent/);
+  assert.match(unified, /do not edit the repository as though the transition succeeded/);
+  assert.match(unified, /Do not use `syfo app database enable` for a legacy App/);
+});
+
 test('uncertain Syfo requests ask once before choosing a template or mutating', () => {
   assert.match(unified, /If the request says only “new Syfo website\/App”.*ask once/s);
   assert.match(unified, /`unknown`.*Ask the minimum focused question/s);
@@ -64,6 +77,19 @@ test('evals distinguish informed App consent from an ambiguous new-App request',
   assert.match(ambiguousCreate.expected_output, /without asking again/);
 });
 
+test('evals cover explicit and missing consent for existing unified site upgrade', async () => {
+  const evals = JSON.parse(await readFile(new URL('./syfo-webdev/evals/evals.json', import.meta.url), 'utf8'));
+  const explicitUpgrade = evals.evals.find(({ id }) => id === 7);
+  const missingConsent = evals.evals.find(({ id }) => id === 8);
+
+  assert.match(explicitUpgrade.expected_output, /single informed confirmation/);
+  assert.match(explicitUpgrade.expected_output, /without asking twice/);
+  assert.match(explicitUpgrade.expected_output, /same repository/);
+  assert.match(explicitUpgrade.expected_output, /does not rerun init or deploy/);
+  assert.match(missingConsent.expected_output, /does not authorize database enablement/);
+  assert.match(missingConsent.expected_output, /no Syfo database or deployment mutation/);
+});
+
 test('trigger matrix covers unified, legacy, ambiguous, and no-consent database request', async () => {
   const triggers = JSON.parse(await readFile(new URL('./syfo-webdev/evals/trigger-evals.json', import.meta.url), 'utf8'));
   const cases = [
@@ -76,6 +102,8 @@ test('trigger matrix covers unified, legacy, ambiguous, and no-consent database 
     [/^我想做一个网站。$/, true],
     [/部署目标暂时不确定/, true],
     [/syfo-web 产品仓库实现搜索功能/, false],
+    [/unified site\/none 要启用 TiDB/, true],
+    [/unified site 的新功能要存数据/, true],
   ];
   for (const [pattern, expected] of cases) {
     assert.ok(

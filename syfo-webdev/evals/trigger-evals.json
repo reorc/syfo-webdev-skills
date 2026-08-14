@@ -11,6 +11,8 @@
   { "query": "我想做一个网站。", "should_trigger": true },
   { "query": "做一个普通网站，部署目标暂时不确定。", "should_trigger": true },
   { "query": "旧 static Syfo App 现在需要数据库，直接升级但我还没授权迁移或启用 TiDB。", "should_trigger": true },
+  { "query": "现有 unified site/none 要启用 TiDB，修改同一个仓库，但先不要部署。", "should_trigger": true },
+  { "query": "现有 unified site 的新功能要存数据，但我还没同意启用 TiDB。", "should_trigger": true },
   { "query": "这是旧 web-static App，保持 legacy static 修复 adapter。", "should_trigger": false },
   { "query": "这是旧 web-fullstack App，保持 legacy fullstack 修复 migration。", "should_trigger": false },
   { "query": "给我一个可以直接打开的单文件 HTML 页面，不需要部署。", "should_trigger": false },
