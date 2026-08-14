@@ -10,10 +10,11 @@ const legacy = await Promise.all([
 
 test('unified Skill owns new-App init and ambiguous recovery discipline', () => {
   assert.match(unified, /syfo app init <name> --template unified --preset site --from-template --clone <dir>/);
-  assert.match(unified, /syfo app init <name> --template unified --preset app --from-template --clone <dir>/);
+  assert.match(unified, /syfo app init <name> --template unified --preset app --confirm-tidb --from-template --clone <dir>/);
+  assert.doesNotMatch(unified, /syfo app init[^\n]*--preset site[^\n]*--confirm-tidb/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
   assert.match(unified, /maps site to the Core site\/none pair and app to app\/tidb/);
-  assert.match(unified, /Before running `preset=app`, explicitly disclose.*provisions TiDB and obtain human confirmation/s);
+  assert.match(unified, /Before running `preset=app`, explicitly disclose.*provisions TiDB and obtain human confirmation.*Only after that confirmation.*`--confirm-tidb`/s);
   assert.match(unified, /syfo app init --resume <commandId>/);
   assert.match(unified, /Never rerun init, generate a new idempotency key, or manually clone/);
 });
