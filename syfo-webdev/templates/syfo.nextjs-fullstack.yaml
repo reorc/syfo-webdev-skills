@@ -1,0 +1,50 @@
+version: 1
+
+app:
+  name: replace-with-app-slug
+  type: nextjs
+
+runtime:
+  family: nodejs
+  version: "20"
+
+build:
+  install: npm ci
+  command: npm run build
+  output: .fc/artifact
+
+run:
+  command: node server.js
+  port: 9000
+  healthCheck:
+    method: GET
+    path: /healthz
+    timeoutSeconds: 5
+
+resources:
+  memoryMB: 1024
+  timeoutSeconds: 60
+  concurrency: 10
+
+database:
+  engine: tidb
+  required: true
+  migrations:
+    command: npm run db:migrate
+
+env:
+  required: []
+  optional:
+    - LOG_LEVEL
+
+routing:
+  public: true
+  methods:
+    - GET
+    - POST
+    - PUT
+    - PATCH
+    - DELETE
+    - HEAD
+    - OPTIONS
+  spaFallback: false

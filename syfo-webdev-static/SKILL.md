@@ -1,9 +1,11 @@
 ---
 name: syfo-webdev-static
-description: "Use whenever a user asks to create, build, continue, fix, migrate, validate, package, publish, deploy, or take live a static Syfo App or Syfo Hosted App. Trigger without being named when the request or repository indicates Syfo hosting, including website, Hosted App, 上线, 部署, syfo.yaml, syfo app init, syfo app validate, or syfo app deploy. Covers landing pages, marketing sites, docs, portfolios, blogs, showcases, and browser-only Next.js App Router experiences fully generated at build time. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run access-aware production smoke when authorized. Produces output: export, .fc/artifact with static adapter, /healthz, and syfo.yaml; never s.yaml. Route cookies, application auth, server routes/actions, secrets, ISR, writes, and database requirements to syfo-webdev-fullstack."
+description: "Legacy compatibility Skill for an existing Syfo static App or an explicit legacy template=static create flow. Trigger when the repository has legacy static markers such as the static export adapter, run.command node server.mjs, and no template.id: web-unified, or when the user explicitly names syfo-webdev-static/legacy static. Preserve the existing directory, template, database=false contract, and deployment flow. Do not use for new unified Apps, generic websites, or an existing unified repository. Never silently migrate to web-unified, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Static for FC
+
+This is a legacy compatibility entry. Preserve the old static repository and flow. A request for APIs, login, or persistence is not consent to migrate or enable TiDB; route upgrade planning to `syfo-webdev` and require separate explicit human authorization.
 
 Produce a static Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 without application backend logic or a database.
 

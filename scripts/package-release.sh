@@ -13,6 +13,7 @@ mkdir -p "${DIST}"
 COPYFILE_DISABLE=1 tar \
   -czf "${DIST}/${ARCHIVE}" \
   -C "${ROOT}" \
+  syfo-webdev \
   syfo-webdev-static \
   syfo-webdev-fullstack
 
@@ -22,7 +23,13 @@ cat > "${DIST}/manifest.json" <<EOF
   "version": "${VERSION}",
   "commit": "${COMMIT}",
   "archive": "${ARCHIVE}",
+  "managedMarker": {
+    "name": ".syfo-managed.json",
+    "managedBy": "syfo-daemon",
+    "schemaVersion": 1
+  },
   "skills": [
+    "syfo-webdev",
     "syfo-webdev-static",
     "syfo-webdev-fullstack"
   ]

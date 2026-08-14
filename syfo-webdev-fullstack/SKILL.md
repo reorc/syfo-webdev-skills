@@ -1,9 +1,11 @@
 ---
 name: syfo-webdev-fullstack
-description: "Use whenever a user asks to create, build, continue, fix, migrate, validate, package, publish, deploy, or take live a fullstack Syfo App or Syfo Hosted App. Trigger without being named when the request or repository indicates Syfo hosting, including app, Hosted App, 上线, 部署, syfo.yaml, syfo app init, syfo app validate, or syfo app deploy. Use for SSR, Route Handlers, Server Actions, cookies, application auth, server secrets, request-time behavior, durable writes, TiDB/database workflows, or migration from Cloudflare Workers, D1, SQLite, Vercel, or Node hosting. Own the full lifecycle: choose/init the template or bind an existing repo, implement, validate through the allocated App database when needed, create and push immutable source, prepare the human-confirmed deploy, check status/version, and run production acceptance when authorized. Produces standalone .fc/artifact plus syfo.yaml; never s.yaml. Use syfo-webdev-static only when all behavior is build-time or browser-only."
+description: "Legacy compatibility Skill for an existing Syfo fullstack App or an explicit legacy template=fullstack/nextjs create flow. Trigger when the repository has legacy standalone/TiDB markers, run.command node server.js, database.required true, and no template.id: web-unified, or when the user explicitly names syfo-webdev-fullstack/legacy fullstack. Preserve the existing directory, template, database, and deployment flow. Do not use for new unified Apps, generic websites, or an existing unified repository. Never silently migrate to web-unified, deploy, or change access policy."
 ---
 
 # Syfo WebDev Fullstack for FC and TiDB
+
+This is a legacy compatibility entry. Preserve the old fullstack repository and flow. Do not reinterpret it as unified or change its database/template because a newer capability exists; route an explicitly requested upgrade plan to `syfo-webdev` and require separate human consent.
 
 Produce a Next.js application that Syfo can deploy deterministically to Alibaba Cloud Function Compute 3.0 and connect to TiDB Cloud Starter or Essential.
 

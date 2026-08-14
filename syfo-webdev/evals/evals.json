@@ -1,0 +1,47 @@
+{
+  "skill_name": "syfo-webdev",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a new Syfo Hosted App marketing site with no database.",
+      "expected_output": "The unified Skill requires and uses template=unified,preset=site,database=none, then follows the web-unified lifecycle without deploying unless authorized.",
+      "files": [],
+      "expectations": [
+        "The create contract includes all three explicit fields and does not infer or omit database=none.",
+        "The solution does not fall back to a legacy static template.",
+        "The solution does not append the raw skill handoff JSON."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a new Syfo Hosted App with login, runtime APIs, and TiDB.",
+      "expected_output": "The unified Skill requires template=unified,preset=app,database=tidb and validates the standalone/TiDB path.",
+      "files": [],
+      "expectations": [
+        "The solution uses only the app+tidb pair.",
+        "The solution keeps deployment and access-policy changes behind separate authorization."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "This existing legacy static Syfo App now needs an API and database. Make it work.",
+      "expected_output": "The Skill detects legacy static, preserves the legacy workflow, and asks separately for migration and database-enable consent instead of silently changing the App.",
+      "files": [],
+      "expectations": [
+        "Feature requirements are not treated as migration consent.",
+        "Database enablement is not inferred.",
+        "The current App is not deployed or rewritten."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "The repo has conflicting Syfo markers and I am not sure which template created it.",
+      "expected_output": "The Skill classifies the repository as ambiguous and stops before mutation.",
+      "files": [],
+      "expectations": [
+        "The solution asks for clarification or authoritative metadata.",
+        "The solution does not guess a template, initialize, migrate, enable a database, or deploy."
+      ]
+    }
+  ]
+}

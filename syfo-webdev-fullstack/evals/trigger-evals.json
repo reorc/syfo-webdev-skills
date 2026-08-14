@@ -16,6 +16,14 @@
     "should_trigger": true
   },
   {
+    "query": "这是旧 web-fullstack App，保持 legacy fullstack 修复 migration。",
+    "should_trigger": true
+  },
+  {
+    "query": "syfo.yaml 包含 template.id: web-unified，preset=app，database=tidb。",
+    "should_trigger": false
+  },
+  {
     "query": "做一个没有登录、API、secret 或数据库的静态 Syfo 宣传网站。",
     "should_trigger": false
   },

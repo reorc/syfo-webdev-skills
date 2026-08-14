@@ -16,6 +16,14 @@
     "should_trigger": true
   },
   {
+    "query": "这是旧 web-static App，保持 legacy static 修复 adapter。",
+    "should_trigger": true
+  },
+  {
+    "query": "syfo.yaml 包含 template.id: web-unified，preset=site，修复后部署。",
+    "should_trigger": false
+  },
+  {
     "query": "做一个带登录、cookie 和 TiDB 用户数据的 Syfo Hosted App。",
     "should_trigger": false
   },
