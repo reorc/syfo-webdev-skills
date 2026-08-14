@@ -14,7 +14,9 @@ test('unified Skill owns new-App init and ambiguous recovery discipline', () => 
   assert.doesNotMatch(unified, /syfo app init[^\n]*--preset site[^\n]*--confirm-tidb/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
   assert.match(unified, /maps site to the Core site\/none pair and app to app\/tidb/);
-  assert.match(unified, /Before running `preset=app`, explicitly disclose.*provisions TiDB and obtain human confirmation.*Only after that confirmation.*`--confirm-tidb`/s);
+  assert.match(unified, /selection of App after that disclosure is the required confirmation/);
+  assert.match(unified, /initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation/);
+  assert.match(unified, /never requires a second confirmation prompt/);
   assert.match(unified, /syfo app init --resume <commandId>/);
   assert.match(unified, /Never rerun init, generate a new idempotency key, or manually clone/);
 });

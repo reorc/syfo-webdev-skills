@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev
-description: "The only Skill for creating any new Syfo website or Hosted App, plus maintenance of existing template.id: web-unified Apps and read-only classification of an existing Syfo repository. New creation accepts only template=unified with user-facing preset=site or preset=app; the daemon deterministically maps site to the Core site/none pair and app to app/tidb. If delivery target, preset, or repository type is unclear, ask the user before any Syfo CLI action and never infer or coerce a choice. Before preset=app initialization, disclose that TiDB will be provisioned, obtain explicit confirmation, and only then pass --confirm-tidb. Existing historical static/fullstack Apps remain on the legacy syfo-webdev-static or syfo-webdev-fullstack maintenance Skills unless a human separately authorizes migration. Do not auto-trigger for generic websites, standalone HTML, local previews, or another hosting provider. Never silently migrate, enable a database, deploy, or change access policy."
+description: "The only Skill for creating any new Syfo website or Hosted App, plus maintenance of template.id: web-unified Apps and read-only classification of a Syfo repository. New creation accepts only template=unified with preset=site or preset=app; the daemon deterministically maps site to the Core site/none pair and app to app/tidb. If delivery target, preset, or repository type is unclear, ask the user before any Syfo CLI action and never infer or coerce a choice. For preset=app, disclose that TiDB will be provisioned; the human's informed App selection or explicit TiDB App request is the single confirmation, so pass --confirm-tidb without asking twice. Existing historical static/fullstack Apps remain on the legacy syfo-webdev-static or syfo-webdev-fullstack maintenance Skills unless a human separately authorizes migration. Do not auto-trigger for generic websites, standalone HTML, local previews, or another hosting provider. Never silently migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
@@ -45,7 +45,7 @@ For a new App, require the human to choose exactly one user-facing preset:
 - Site: `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
 - App: `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
 
-If the request says only “new Syfo website/App” without selecting a preset, ask whether they want a site with no database or an app with TiDB. Do not infer from feature hints alone. Before running `preset=app`, explicitly disclose that the operation provisions TiDB and obtain human confirmation. Only after that confirmation may the exact command include `--confirm-tidb`.
+If the request says only “new Syfo website/App” without an informed preset choice, ask once whether they want a site with no database or an app that provisions TiDB. Do not infer from feature hints alone. A human selection of App after that disclosure is the required confirmation. An initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation, so do not ask again. Include `--confirm-tidb` only when one of those informed explicit choices exists; the flag records that consent for the daemon and never requires a second confirmation prompt.
 
 Use the corresponding preset-only CLI exactly; `--database` is not a user-facing init flag:
 
@@ -54,7 +54,7 @@ syfo app init <name> --template unified --preset site --from-template --clone <d
 syfo app init <name> --template unified --preset app --confirm-tidb --from-template --clone <dir>
 ```
 
-Never pass `--confirm-tidb` for `preset=site` or before the App/TiDB confirmation. Do not expose or pass `--database`, infer a preset from prose, or pass unified fields to legacy `template=static|fullstack|nextjs` flows. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. If the installed CLI does not expose this preset-only contract, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
+Never pass `--confirm-tidb` for `preset=site` or without an informed explicit App/TiDB choice. Never ask twice when that choice already confirms TiDB provisioning. Do not expose or pass `--database`, infer a preset from feature prose, or pass unified fields to legacy `template=static|fullstack|nextjs` flows. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. If the installed CLI does not expose this preset-only contract, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
 
 After an ambiguous init timeout, run only the emitted `syfo app init --resume <commandId>` recovery command. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
 

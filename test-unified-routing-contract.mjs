@@ -13,9 +13,13 @@ test('unified create contract accepts only frozen pairs', () => {
   assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
   assert.match(unified, /daemon sends the complete Core pair `site\/none`/);
   assert.match(unified, /daemon sends the complete Core pair `app\/tidb`/);
-  assert.match(unified, /Do not expose or pass `--database`, infer a preset from prose/);
-  assert.match(unified, /Only after that confirmation may the exact command include `--confirm-tidb`/);
-  assert.match(unified, /Never pass `--confirm-tidb` for `preset=site` or before the App\/TiDB confirmation/);
+  assert.match(unified, /Do not expose or pass `--database`, infer a preset from feature prose/);
+  assert.match(unified, /the human's informed App selection or explicit TiDB App request is the single confirmation/);
+  assert.match(unified, /selection of App after that disclosure is the required confirmation/);
+  assert.match(unified, /initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation/);
+  assert.match(unified, /never requires a second confirmation prompt/);
+  assert.match(unified, /Never ask twice when that choice already confirms TiDB provisioning/);
+  assert.match(unified, /Never pass `--confirm-tidb` for `preset=site` or without an informed explicit App\/TiDB choice/);
 });
 
 test('legacy aliases preserve flow and require explicit upgrade consent', () => {
@@ -32,10 +36,22 @@ test('legacy aliases preserve flow and require explicit upgrade consent', () => 
   assert.match(fullstackSkill, /Do not use for any new website or App/);
 });
 
-test('uncertain Syfo requests ask before choosing a template or mutating', () => {
-  assert.match(unified, /If the request says only “new Syfo website\/App”.*ask/s);
+test('uncertain Syfo requests ask once before choosing a template or mutating', () => {
+  assert.match(unified, /If the request says only “new Syfo website\/App”.*ask once/s);
   assert.match(unified, /`unknown`.*Ask the minimum focused question/s);
   assert.match(unified, /do not choose a template, initialize, migrate, enable a database, or deploy meanwhile/);
+});
+
+test('evals distinguish informed App consent from an ambiguous new-App request', async () => {
+  const evals = JSON.parse(await readFile(new URL('./syfo-webdev/evals/evals.json', import.meta.url), 'utf8'));
+  const explicitTidb = evals.evals.find(({ id }) => id === 2);
+  const ambiguousCreate = evals.evals.find(({ id }) => id === 5);
+
+  assert.match(explicitTidb.expected_output, /single informed confirmation/);
+  assert.match(explicitTidb.expected_output, /does not ask again/);
+  assert.match(ambiguousCreate.expected_output, /asks once/);
+  assert.match(ambiguousCreate.expected_output, /choice is the confirmation/);
+  assert.match(ambiguousCreate.expected_output, /without asking again/);
 });
 
 test('trigger matrix covers unified, legacy, ambiguous, and no-consent database request', async () => {
