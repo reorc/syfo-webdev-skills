@@ -271,6 +271,35 @@ test('fullstack doctor requires the Next.js 16 Node engine contract', async () =
   }
 });
 
+test('unified doctor requires Next.js 16 generated route types in the fast gate', async () => {
+  const project = await createUnifiedFixture();
+  try {
+    const packagePath = join(project, 'package.json');
+    const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));
+    packageJson.dependencies.next = '16.3.0';
+    packageJson.engines = { node: '>=20.9.0' };
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    let codes = errorCodes(runDoctor('syfo-webdev', project));
+    assert.ok(codes.includes('next16-typegen-script'));
+    assert.ok(codes.includes('next16-fast-check-script'));
+
+    packageJson.scripts.typegen = 'next typegen';
+    packageJson.scripts['check:fast'] = 'npm run typecheck && npm run typegen && npm test';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    codes = errorCodes(runDoctor('syfo-webdev', project));
+    assert.ok(!codes.includes('next16-typegen-script'));
+    assert.ok(codes.includes('next16-fast-check-script'));
+
+    packageJson.scripts['check:fast'] = 'npm run typegen && npm run typecheck && npm test';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    codes = errorCodes(runDoctor('syfo-webdev', project));
+    assert.ok(!codes.includes('next16-typegen-script'));
+    assert.ok(!codes.includes('next16-fast-check-script'));
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
 test('doctor blocks malformed, externally-referencing, and non-regular App icons', async () => {
   const project = await createStaticFixture();
   const outsideIcon = join(tmpdir(), `syfo-outside-icon-${Date.now()}.svg`);

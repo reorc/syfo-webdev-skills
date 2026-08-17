@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
@@ -12,7 +12,15 @@ async function fixture({ manifestId = 'web-unified', required = 'false', templat
     private: true,
     packageManager: 'npm@10.9.4',
     engines: { node: '>=20.9.0' },
-    scripts: { lint: 'eslint .', typecheck: 'tsc --noEmit', test: 'node --test', build: 'next build', 'db:migrate': 'tsx db/migrate.ts' },
+    scripts: {
+      lint: 'eslint .',
+      typegen: 'next typegen',
+      typecheck: 'tsc --noEmit',
+      'check:fast': 'npm run typegen && npm run typecheck && npm run lint && npm test',
+      test: 'node --test',
+      build: 'next build',
+      'db:migrate': 'tsx db/migrate.ts',
+    },
     dependencies: { next: '16.3.0', mysql2: '3.23.1' },
   }, null, 2)}\n`);
   await writeFile(join(root, '.gitignore'), 'next-env.d.ts\n');
@@ -41,5 +49,27 @@ test('unified canary rejects legacy or database-required baseline markers', asyn
   } finally {
     await rm(legacy, { recursive: true, force: true });
     await rm(required, { recursive: true, force: true });
+  }
+});
+
+test('unified canary requires generated route types in the fast gate', async () => {
+  const root = await fixture();
+  try {
+    const packagePath = join(root, 'package.json');
+    const packageJson = JSON.parse(await readFile(packagePath, 'utf8'));
+    packageJson.scripts.typegen = 'echo skipped';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    await assert.rejects(validateUnifiedTemplateContract(root), /typegen script must run next typegen/);
+
+    packageJson.scripts.typegen = 'next typegen';
+    packageJson.scripts['check:fast'] = 'npm run typecheck && npm test';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    await assert.rejects(validateUnifiedTemplateContract(root), /check:fast must run typegen before typecheck/);
+
+    packageJson.scripts['check:fast'] = 'npm run typecheck && npm run typegen && npm test';
+    await writeFile(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
+    await assert.rejects(validateUnifiedTemplateContract(root), /check:fast must run typegen before typecheck/);
+  } finally {
+    await rm(root, { recursive: true, force: true });
   }
 });

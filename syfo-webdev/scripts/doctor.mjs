@@ -356,6 +356,16 @@ if (!existsSync(packagePath)) {
     if (local[0] < 20 || (local[0] === 20 && local[1] < 9)) {
       add("error", "next16-local-node", "package.json", `Next.js 16 requires Node >=20.9.0; current Node is ${process.versions.node}.`);
     }
+    const typegen = String(packageJson.scripts?.typegen || "").trim();
+    if (!/(?:^|&&|;)\s*(?:npx\s+)?next\s+typegen(?:\s|$)/.test(typegen)) {
+      add("error", "next16-typegen-script", "package.json", "Next.js 16 requires a typegen script that runs `next typegen` before TypeScript checking.");
+    }
+    const fastCheck = String(packageJson.scripts?.["check:fast"] || "").trim();
+    const typegenIndex = fastCheck.search(/npm\s+run\s+typegen/);
+    const typecheckIndex = fastCheck.search(/npm\s+run\s+typecheck/);
+    if (!fastCheck || typegenIndex < 0 || typecheckIndex < 0 || typegenIndex > typecheckIndex) {
+      add("error", "next16-fast-check-script", "package.json", "Next.js 16 requires check:fast to run typegen before typecheck.");
+    }
   }
   for (const script of ["build", "typecheck", "test", "db:migrate"]) {
     if (!packageJson.scripts?.[script]) add("warning", `missing-${script}-script`, "package.json", `No ${script} script was found.`);
