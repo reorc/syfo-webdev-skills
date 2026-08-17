@@ -52,8 +52,17 @@ export async function validateUnifiedTemplateContract(template) {
   if (templateJson.id !== 'web-unified' || templateJson.kind !== 'unified') {
     throw new Error('Official unified template.json must declare id=web-unified and kind=unified.');
   }
-  for (const script of ['lint', 'typecheck', 'test', 'build', 'db:migrate']) {
+  for (const script of ['lint', 'typegen', 'typecheck', 'check:fast', 'test', 'build', 'db:migrate']) {
     if (!packageJson.scripts?.[script]) throw new Error(`Official template is missing npm script: ${script}.`);
+  }
+  if (!/(?:^|&&|;)\s*(?:npx\s+)?next\s+typegen(?:\s|$)/.test(packageJson.scripts.typegen)) {
+    throw new Error('Official template typegen script must run next typegen.');
+  }
+  const fastCheck = packageJson.scripts['check:fast'];
+  const typegenIndex = fastCheck.search(/npm\s+run\s+typegen/);
+  const typecheckIndex = fastCheck.search(/npm\s+run\s+typecheck/);
+  if (typegenIndex < 0 || typecheckIndex < 0 || typegenIndex > typecheckIndex) {
+    throw new Error('Official template check:fast must run typegen before typecheck.');
   }
 
   return { nextVersion, packageManager, nodeEngine: packageJson.engines.node };
@@ -94,7 +103,7 @@ export async function runUnifiedCanary(options) {
     }
 
     const npmVersion = contract.packageManager.slice('npm@'.length);
-    for (const script of ['lint', 'typecheck', 'test', 'build']) {
+    for (const script of ['check:fast', 'build']) {
       run('npx', ['--yes', `npm@${npmVersion}`, 'run', script], workspace);
     }
 

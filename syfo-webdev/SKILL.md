@@ -160,6 +160,23 @@ The unified doctor treats missing, unsafe, incorrectly sized, conflicting, inval
 
 ## Validation workflow
 
+Select and record one validation mode before running checks:
+
+- `fast`: the default for routine product, UI, icon, and ordinary API changes. It does not run a
+  production build, assemble `.fc/artifact`, or start the production server. For Next.js 16+, it
+  must generate framework route types before TypeScript checking; bare `tsc --noEmit` is
+  insufficient.
+- `production`: required for the first deployment; Next.js, Node, lockfile, build-script,
+  `next.config.*`, middleware/proxy, route-wrapper, standalone assembly, native dependency, image
+  pipeline, server-module initialization, or static-generation changes; any prior cloud build
+  failure not fully explained by the fast gate; and explicit production acceptance requests.
+- `diagnostic_exception`: allowed once after a cloud build failure when operation diagnostics and
+  Build Service logs are unavailable, incomplete, or indicate bundling, artifact assembly, or
+  static-generation behavior that the fast gate cannot reproduce. It runs the production checks
+  for diagnosis without authorizing another deploy.
+
+Then:
+
 1. Run the unified doctor from the selected App root:
 
 ```bash
@@ -169,9 +186,23 @@ node <skill-path>/scripts/doctor.mjs --json
 2. Verify one lock file, exact npm 10 pin for official templates, Node compatibility, `output: standalone`, `.fc/artifact`, `/healthz`, App icons, and secret-free `syfo.yaml`.
 3. Keep `database.required: false` for `site+none`; do not exercise migrations or request database credentials.
 4. For `app+tidb`, validate migrations only through the allocated App environment and never print connection values.
-5. Run lint, typecheck, tests, build, artifact budget, Linux AMD64 validation when architecture-sensitive, and representative server smoke.
-6. Run `syfo app validate --json` only after local gates pass.
-7. Push a clean immutable commit before deployment preparation.
+5. In `fast` mode, run the frozen install, lint, tests, and typecheck. For Next.js 16+, run
+   `npm run typegen` immediately before `npm run typecheck`. Run relevant development-server,
+   HTTP, and browser smoke when behavior changed. For a database-enabled website, run migrations
+   through `syfo app dev -- npm run db:migrate`.
+6. In `production` or `diagnostic_exception` mode, additionally run the production build,
+   standalone artifact assembly, artifact budget, representative production-server smoke, and
+   Linux AMD64 validation when architecture-sensitive.
+7. Run `syfo app validate --json` only after the selected local gates pass. This validates the
+   repository contract; it does not replace skipped production checks.
+8. Before deployment preparation, push a clean immutable commit with the binding-aware command:
+
+```bash
+syfo app push --remote syfo --branch main --json
+```
+
+Do not substitute `syfo app git-auth -- push ...` during the normal workflow; it is a lower-level
+escape hatch and does not provide the same binding-aware summary.
 
 The official cross-repo canary is:
 
@@ -198,7 +229,14 @@ Report:
 - Detected contract: unified, legacy static, legacy fullstack, or ambiguous.
 - Current user-facing capability state: cloud database not enabled or cloud database enabled. Include TiDB and exact internal preset/database values only when diagnosing a contract mismatch.
 - Requested scope and whether migration, database enablement, deployment, and access changes were authorized separately.
+- Selected validation mode and why it applied.
 - Immutable source revision and checks actually run.
+- Checks intentionally skipped, especially production bundle, standalone artifact, artifact
+  budget, production-server smoke, full static generation, Linux target validation, and browser
+  acceptance.
+- Checks still delegated to the Syfo clean Builder or production acceptance.
+- For `diagnostic_exception`, the cloud failure identity, available diagnostics/logs, why the
+  exception was necessary, and confirmation that no second deploy was created merely to diagnose.
 - Live URL/version only after terminal deployment and production acceptance.
 
 Never report an unexecuted check as passed. Distinguish local readiness from backend/cloud acceptance.

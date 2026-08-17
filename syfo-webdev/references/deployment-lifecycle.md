@@ -50,6 +50,23 @@ from another.
 - `publish`: the build succeeded but FC publication, health, database/runtime activation, or domain
   activation failed. Inspect provider/publication diagnostics and preserve the build identity.
 
+For `build` failures, inspect the exact recorded operation before changing source or running a local
+production build:
+
+```bash
+syfo app operation <operation-id> --app-id <app-id> --json
+```
+
+- If the diagnostic or Build Service logs identify a problem covered by `fast`, fix it and rerun the
+  fast gate.
+- If logs are unavailable, incomplete, or show bundling, standalone assembly, artifact, or static
+  generation behavior, one `diagnostic_exception` production run is allowed.
+- Never create another deploy operation merely to obtain logs or reproduce a failure.
+- If operation lookup returns `NOT_FOUND`, perform one bounded recovery sequence using
+  `syfo app status <app-id> --json` and, only when needed, `syfo app versions <app-id> --json`.
+  Correlate app ID, intended commit, version, and operation identity. Do not assume the latest
+  operation is the intended one.
+
 Record the deploy response's `operationId`, `actionCardId`, intended commit, App ID, and version when
 present. Reuse that identity through confirmation, pushed results, terminal verification, and reporting;
 do not create a second deploy operation merely to recover status.
