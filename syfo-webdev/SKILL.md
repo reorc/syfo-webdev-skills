@@ -1,13 +1,13 @@
 ---
 name: syfo-webdev
-description: "Create and maintain websites hosted by Syfo using the web-unified contract, including binding recovery, optional TiDB enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as a legacy synonym for Syfo website hosting only, never as TiDB intent. In a Syfo runtime, use as the routing gate when a new website, web app, landing page, or dashboard has no delivery target; ask local/source-only versus Syfo hosting once. New Syfo-hosted websites default to no database. Ask a focused TiDB consent question only when persistence is required and TiDB was not explicitly approved. If an existing website's machine-local binding is missing, use syfo app bind <app-id> or syfo app clone <app-id> --clone <dir>; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Existing static/fullstack contracts route to legacy Skills. Never silently initialize, migrate, enable TiDB, deploy, or change access policy."
+description: "Create and maintain Syfo-hosted websites using the web-unified contract, including binding recovery, optional cloud database enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as legacy hosting wording, never as database intent. For an unspecified new website target in a Syfo runtime, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. Keep TiDB, app/tidb, preset=app, and --confirm-tidb internal. Recover missing bindings with syfo app bind or syfo app clone, never init or copied credentials. Route historical static/fullstack contracts to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
 
 Build, repair, validate, package, and—only when explicitly authorized—deploy a Syfo-hosted website based on the `web-unified` template.
 
-Use **Syfo website**, **Syfo-hosted website**, or **Syfo Websites** in user-facing language. `Hosted App`, `App`, `site`, `app`, `site/none`, and `app/tidb` are legacy or internal contract terms. Do not teach, offer, or repeat those terms to the user unless quoting an existing identifier or diagnosing a technical contract mismatch.
+Use **Syfo website**, **Syfo-hosted website**, or **Syfo Websites** in user-facing language. Call the optional persistence capability a **Syfo cloud database** or simply **cloud database**. `Hosted App`, `App`, `site`, `app`, `TiDB`, `site/none`, `app/tidb`, and `--confirm-tidb` are legacy, provider-specific, or internal contract terms. Do not teach, offer, or repeat those terms to the user unless the user explicitly names one, an existing identifier must be quoted, or a technical contract mismatch is being diagnosed. Even when the user says “TiDB,” describe the resulting user-facing capability as a cloud database while preserving the TiDB-compatible command internally.
 
 ## Activation boundary
 
@@ -22,7 +22,7 @@ Use this Skill when at least one positive signal exists:
 
 Do not activate merely because a repository, product, package, team, feature, organization, CLI, daemon, template, API, or infrastructure component is named Syfo or discusses internal hosted-app concepts. In an existing repository without a recognized website contract marker, requests such as “implement Syfo Web search” or “fix the Syfo website login” are ordinary product-development work unless the user separately selects Syfo hosting as the delivery target.
 
-Consulting this Skill is not authorization to initialize, provision TiDB, migrate, deploy, or change access policy.
+Consulting this Skill is not authorization to initialize, provision a cloud database, migrate, deploy, or change access policy.
 
 ## Delivery target and Skill relationship
 
@@ -42,7 +42,7 @@ For an unspecified new website target, ask once in the user's language: “Do yo
 - Treat `syfo.yaml` with `template.id: web-unified` as the deterministic unified marker.
 - Preserve existing legacy static/fullstack repositories and route them to the matching legacy Skill.
 - Never reinterpret an existing App as unified because a feature request mentions login, APIs, or a database.
-- Never enable TiDB, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
+- Never enable a cloud database, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
 - To keep access policy human-owned, never call `syfo app access set`.
 - Do not generate provider-specific `s.yaml` or persist cloud credentials.
 
@@ -61,12 +61,12 @@ Detection is read-only. A classification result is not migration consent.
 
 All new Syfo-hosted websites use the unified template. Presets are internal daemon compatibility values, not user-facing website types:
 
-- A website without TiDB uses `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
-- A website with TiDB uses `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
+- A website without a cloud database uses `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
+- A website with a cloud database currently uses `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
 
-When the user selects Syfo hosting without explicitly requesting or approving TiDB, default to the website-without-database path. Do not ask the user to choose “Site” versus “App,” and do not interpret the words “app,” “web app,” or the legacy phrase “Syfo Hosted App” as TiDB consent.
+When the user selects Syfo hosting without explicitly requesting or approving a database, default to the website-without-database path. Do not ask the user to choose “Site” versus “App,” and do not interpret the words “app,” “web app,” or the legacy phrase “Syfo Hosted App” as cloud-database consent.
 
-If the requested functionality requires persistence, that requirement may trigger one focused consent question but does not itself authorize TiDB. Ask in the user's language: “This website needs persistent data. Syfo will provision a TiDB cloud database for it. Should I enable TiDB?” An explicit TiDB request or a yes after this disclosure is the single informed confirmation, so do not ask again. Include `--confirm-tidb` only after that confirmation; the flag records consent for the daemon and never requires a second confirmation prompt.
+If the requested functionality requires persistence, that requirement may trigger one focused consent question but does not itself authorize a cloud database. Ask in the user's language using provider-neutral wording, for example: “这个网站需要持久化保存数据。是否为它启用 Syfo 云数据库？” or “This website needs persistent data. Should I enable a Syfo cloud database for it?” An explicit request for a database, cloud database, or TiDB—or a yes after this disclosure—is the single informed confirmation, so do not ask again. Include the internal `--confirm-tidb` flag only after that confirmation; the flag records consent for the daemon and never requires a second confirmation prompt.
 
 Use the corresponding preset-only CLI exactly; `--database` is not a user-facing init flag:
 
@@ -75,7 +75,7 @@ syfo app init <name> --template unified --preset site --from-template --clone <d
 syfo app init <name> --template unified --preset app --confirm-tidb --from-template --clone <dir>
 ```
 
-Never pass `--confirm-tidb` for `preset=site` or without informed explicit TiDB consent. Never ask twice when the user already approved TiDB provisioning. Do not expose `--database`, `preset=site`, `preset=app`, `site/none`, or `app/tidb` as product choices. Feature requirements may establish the need to ask about persistence, but they never establish consent. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. Do not pass unified fields to legacy `template=static|fullstack` flows. If the installed CLI does not expose this internal preset-only contract, stop and report that Syfo website creation is unavailable; do not fall back to a legacy template.
+Never pass `--confirm-tidb` for `preset=site` or without informed explicit cloud-database consent. Never ask twice when the user already approved database provisioning. Do not expose `--database`, `preset=site`, `preset=app`, `site/none`, `app/tidb`, TiDB, or `--confirm-tidb` as product choices. Feature requirements may establish the need to ask about persistence, but they never establish consent. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. Do not pass unified fields to legacy `template=static|fullstack` flows. If the installed CLI does not expose this internal preset-only contract, stop and report that Syfo website creation is unavailable; do not fall back to a legacy template.
 
 After an ambiguous init timeout, run only the emitted `syfo app init --resume <commandId>` recovery command. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
 
@@ -100,11 +100,11 @@ history is broken.
 After bind or clone, re-run repository classification and continue only when the source markers and
 App identity agree.
 
-## Existing unified website database enable
+## Existing unified website cloud database enable
 
 For an existing repository classified as unified, read current state with `syfo app status --json`. Only the exact `preset=site,database=none` state can use the database-enable flow. If the App identity is omitted, the daemon resolves the machine-local binding; if identity or state is ambiguous, stop before mutation.
 
-When the human explicitly asks to add TiDB, or approves persistence after being told that TiDB will be provisioned, that is the single informed confirmation. Do not ask again. Record the consent in the daemon command:
+When the human explicitly asks to add a database, cloud database, or TiDB, or approves persistence after being offered a Syfo cloud database, that is the single informed confirmation. Do not ask again and do not reframe the user-facing confirmation around the current provider. Record the consent in the daemon command:
 
 ```bash
 syfo app database enable [app-id] --confirm-tidb
@@ -114,9 +114,9 @@ Never run this command from a generic feature hint alone, never pass a second co
 
 After `state=enabled` or `state=already_enabled`:
 
-1. Re-read `syfo app status --json` and require the exact unified `app/tidb` state with an active TiDB binding.
-2. Modify the same original repository for TiDB usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Do not clone a replacement project or rewrite it as a legacy template.
-3. Run the TiDB-enabled website validation workflow below, then commit and push the immutable source.
+1. Re-read `syfo app status --json` and require the exact internal unified `app/tidb` state with an active database binding.
+2. Modify the same original repository for cloud-database usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Use TiDB-specific implementation guidance only where the current allocated provider requires it. Do not clone a replacement project or rewrite it as a legacy template.
+3. Run the database-enabled website validation workflow below, then commit and push the immutable source.
 4. Stop at local/deploy-ready handoff unless the human separately authorized deployment. Database consent is not deploy consent.
 
 If the enable command returns a stable state conflict or other backend error, do not edit the repository as though the transition succeeded. Re-read status and either resume from the observed exact state or report the blocker.
@@ -196,7 +196,7 @@ Do not append raw CLI JSON or an internal audit object by default.
 Report:
 
 - Detected contract: unified, legacy static, legacy fullstack, or ambiguous.
-- Current user-facing capability state: database not enabled or TiDB enabled. Include exact internal preset/database values only when diagnosing a contract mismatch.
+- Current user-facing capability state: cloud database not enabled or cloud database enabled. Include TiDB and exact internal preset/database values only when diagnosing a contract mismatch.
 - Requested scope and whether migration, database enablement, deployment, and access changes were authorized separately.
 - Immutable source revision and checks actually run.
 - Live URL/version only after terminal deployment and production acceptance.
