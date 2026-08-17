@@ -16,9 +16,10 @@
     {
       "id": 2,
       "prompt": "Create a new Syfo Hosted App with login, runtime APIs, and TiDB.",
-      "expected_output": "The unified Skill calls the product a Syfo-hosted website. Because TiDB is explicitly requested, it treats that request as the single informed confirmation and internally uses template=unified,preset=app with --confirm-tidb. It does not ask again or present App as a product type.",
+      "expected_output": "The unified Skill calls the product a Syfo-hosted website and the persistence capability a cloud database. Because TiDB is explicitly requested, it treats that request as the single informed database confirmation and internally uses template=unified,preset=app with --confirm-tidb. It does not ask again or present App or TiDB as product types.",
       "files": [],
       "expectations": [
+        "The solution describes the user-facing capability as a cloud database rather than presenting TiDB as the product choice.",
         "The solution does not expose --database or App as a product choice, treats the explicit TiDB request as confirmation, does not ask a second time, passes --confirm-tidb, and maps only to the internal Core app/tidb pair.",
         "The solution keeps deployment and access-policy changes behind separate authorization."
       ]
@@ -26,11 +27,11 @@
     {
       "id": 5,
       "prompt": "Create a new Syfo website/App for my project.",
-      "expected_output": "The unified Skill treats the request as Syfo hosting and defaults to a Syfo-hosted website without a database. It does not ask the user to choose Site versus App, and the legacy wording App does not authorize TiDB. If later functionality requires persistence, it asks only the focused TiDB consent question.",
+      "expected_output": "The unified Skill treats the request as Syfo hosting and defaults to a Syfo-hosted website without a database. It does not ask the user to choose Site versus App, and the legacy wording App does not authorize a database. If later functionality requires persistence, it asks only the focused provider-neutral cloud-database consent question.",
       "files": [],
       "expectations": [
         "The solution defaults to the no-database website path and does not ask a site-versus-App question.",
-        "The solution treats App and Hosted App as legacy hosting wording rather than TiDB consent.",
+        "The solution treats App and Hosted App as legacy hosting wording rather than cloud-database consent.",
         "The solution does not expose --database or internal preset/state values as product concepts."
       ]
     },
@@ -70,11 +71,11 @@
     {
       "id": 7,
       "prompt": "This existing unified Syfo Site is site/none. Add persistence with TiDB, update this same repository, but do not deploy yet.",
-      "expected_output": "The unified Skill treats the explicit TiDB request as the single informed confirmation, runs syfo app database enable with --confirm-tidb without asking twice, verifies the resulting app/tidb active state, then updates and validates the same repository. It does not rerun init or deploy.",
+      "expected_output": "The unified Skill treats the explicit TiDB request as the single informed cloud-database confirmation, describes the capability to the user as a cloud database, runs syfo app database enable with --confirm-tidb without asking twice, verifies the resulting internal app/tidb active state, then updates and validates the same repository. It does not rerun init or deploy.",
       "files": [],
       "expectations": [
         "The solution verifies the existing App is exactly unified site/none before mutation.",
-        "The explicit TiDB request counts as the one confirmation and the solution passes --confirm-tidb without a second prompt.",
+        "The explicit TiDB request counts as the one confirmation; user-facing language says cloud database, while the internal command still passes --confirm-tidb without a second prompt.",
         "After enabled or already_enabled, the solution re-reads status, requires app/tidb with active TiDB, and modifies the same repository including database.required: true, migrations, data access, and tests.",
         "The solution never reruns syfo app init and does not deploy without separate authorization."
       ]
@@ -82,11 +83,22 @@
     {
       "id": 8,
       "prompt": "This existing unified site needs a feature that stores data. Make the feature, but I have not approved TiDB or deployment.",
-      "expected_output": "The unified Skill explains that the feature request does not authorize database enablement, asks one focused TiDB consent question, and makes no Syfo database or deployment mutation until answered.",
+      "expected_output": "The unified Skill explains that the feature request does not authorize database enablement, asks one focused provider-neutral Syfo cloud-database consent question, and makes no Syfo database or deployment mutation until answered.",
       "files": [],
       "expectations": [
-        "The solution does not infer TiDB consent from the persistence requirement.",
+        "The solution does not infer database consent from the persistence requirement and does not mention TiDB in the confirmation question.",
         "The solution does not run syfo app database enable, edit the repository as app/tidb, rerun init, or deploy before confirmation."
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "这个 Syfo 网站要保存用户提交的数据，但我还没有同意开数据库。继续做吧。",
+      "expected_output": "The unified Skill pauses the database-dependent mutation and asks one provider-neutral question such as ‘这个网站需要持久化保存数据。是否为它启用 Syfo 云数据库？’ It does not ask whether to enable TiDB, but after approval it still uses the internal --confirm-tidb compatibility flag.",
+      "files": [],
+      "expectations": [
+        "The user-facing confirmation says Syfo cloud database or cloud database and does not present TiDB as the product or choice.",
+        "No database mutation occurs before explicit confirmation.",
+        "The documented post-confirmation command remains syfo app database enable with --confirm-tidb and the internal state remains app/tidb."
       ]
     },
     {
