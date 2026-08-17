@@ -17,15 +17,16 @@ function frontmatterDescription(source) {
 const unifiedDescription = frontmatterDescription(unified);
 const legacyDescriptions = legacy.map(frontmatterDescription);
 
-test('unified Skill owns new-App init and ambiguous recovery discipline', () => {
+test('unified Skill owns new website init and ambiguous recovery discipline', () => {
   assert.match(unified, /syfo app init <name> --template unified --preset site --from-template --clone <dir>/);
   assert.match(unified, /syfo app init <name> --template unified --preset app --confirm-tidb --from-template --clone <dir>/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--preset site[^\n]*--confirm-tidb/);
   assert.doesNotMatch(unified, /syfo app init[^\n]*--database/);
   assert.match(unified, /daemon sends the complete Core pair `site\/none`/);
   assert.match(unified, /daemon sends the complete Core pair `app\/tidb`/);
-  assert.match(unified, /selection of App after that disclosure is the required confirmation/);
-  assert.match(unified, /initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation/);
+  assert.match(unified, /default to the website-without-database path/);
+  assert.match(unified, /legacy phrase “Syfo Hosted App” as TiDB consent/);
+  assert.match(unified, /explicit TiDB request or a yes after this disclosure is the single informed confirmation/);
   assert.match(unified, /never requires a second confirmation prompt/);
   assert.match(unified, /syfo app init --resume <commandId>/);
   assert.match(unified, /Never rerun init, generate a new idempotency key, or manually clone/);

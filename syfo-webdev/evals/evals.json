@@ -4,10 +4,11 @@
     {
       "id": 1,
       "prompt": "Create a new Syfo Hosted App marketing site with no database.",
-      "expected_output": "The unified Skill uses the preset-only template=unified,preset=site CLI, explains the deterministic daemon mapping to the Core site/none pair, and follows the web-unified lifecycle without deploying unless authorized.",
+      "expected_output": "The unified Skill treats Hosted App as legacy wording for a Syfo-hosted website, does not offer Site versus App as product choices, and internally uses the preset-only template=unified,preset=site CLI without deploying unless authorized.",
       "files": [],
       "expectations": [
-        "The user-facing CLI does not expose --database and the daemon deterministically sends the complete Core site/none pair.",
+        "The response calls the product a Syfo-hosted website and does not teach the user Hosted App, Site/App presets, or site/none.",
+        "The internal CLI does not expose --database and the daemon deterministically sends the complete Core site/none pair.",
         "The solution does not fall back to a legacy static template.",
         "The solution does not append the raw skill handoff JSON."
       ]
@@ -15,22 +16,22 @@
     {
       "id": 2,
       "prompt": "Create a new Syfo Hosted App with login, runtime APIs, and TiDB.",
-      "expected_output": "Because the request explicitly authorizes a TiDB-backed App, the unified Skill treats it as the single informed confirmation and directly uses the preset-only template=unified,preset=app CLI with --confirm-tidb while the daemon sends the Core app/tidb pair. It does not ask again.",
+      "expected_output": "The unified Skill calls the product a Syfo-hosted website. Because TiDB is explicitly requested, it treats that request as the single informed confirmation and internally uses template=unified,preset=app with --confirm-tidb. It does not ask again or present App as a product type.",
       "files": [],
       "expectations": [
-        "The solution does not expose --database, treats the explicit TiDB App request as confirmation, does not ask a second time, passes --confirm-tidb, and maps only to the Core app/tidb pair.",
+        "The solution does not expose --database or App as a product choice, treats the explicit TiDB request as confirmation, does not ask a second time, passes --confirm-tidb, and maps only to the internal Core app/tidb pair.",
         "The solution keeps deployment and access-policy changes behind separate authorization."
       ]
     },
     {
       "id": 5,
       "prompt": "Create a new Syfo website/App for my project.",
-      "expected_output": "The unified Skill asks once whether the human wants a site with no database or an app that provisions TiDB. If the human chooses App after that disclosure, the choice is the confirmation and the Skill proceeds with --preset app --confirm-tidb without asking again.",
+      "expected_output": "The unified Skill treats the request as Syfo hosting and defaults to a Syfo-hosted website without a database. It does not ask the user to choose Site versus App, and the legacy wording App does not authorize TiDB. If later functionality requires persistence, it asks only the focused TiDB consent question.",
       "files": [],
       "expectations": [
-        "The solution does not infer a preset from feature hints and asks one informed site-versus-App question.",
-        "The solution states that choosing App after the TiDB disclosure counts as confirmation and never requires a second prompt.",
-        "The solution does not expose --database or initialize before the preset choice."
+        "The solution defaults to the no-database website path and does not ask a site-versus-App question.",
+        "The solution treats App and Hosted App as legacy hosting wording rather than TiDB consent.",
+        "The solution does not expose --database or internal preset/state values as product concepts."
       ]
     },
     {
@@ -98,6 +99,18 @@
         "The solution records the deploy identity and waits for the Hosted App service to push confirmation and deployment results to the target.",
         "The solution uses status and versions only when the pushed result needs terminal verification or recovery from a missing, incomplete, interrupted, or contradictory notification.",
         "The solution does not report the App live until the intended commit/version and production acceptance are verified."
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Create a new Syfo-hosted website from the web-unified template. The template already contains favicon and icon files, so leave them unchanged and prepare it for deployment.",
+      "expected_output": "The unified Skill recognizes the bundled icon family as official template placeholders, designs a website-specific icon from the product name and purpose, replaces all four public SVG variants and all four Next PNG variants, removes competing icon metadata files, visually checks every size, reruns the unified doctor with zero icon errors, and only then runs syfo app validate or prepares deployment.",
+      "files": [],
+      "expectations": [
+        "The solution does not accept the template icons merely because the files exist or pass size and safety validation.",
+        "The solution replaces public/favicon-16.svg, public/favicon-32.svg, public/app-icon-180.svg, public/syfo-app-icon.svg, and app or src/app icon1.png through icon4.png.",
+        "The icon concept is specific to the website and is not a generic letter tile, framework logo, Syfo logo, copied artwork, or the official four-square placeholder.",
+        "The enforced order is replace icons, inspect 16/32/180/512 renderings, rerun doctor with zero icon errors, then validate or prepare deployment."
       ]
     }
   ]

@@ -86,6 +86,27 @@ async function createAppIcons(project) {
   ]) await writeFile(join(project, 'app', file), createPng(size));
 }
 
+async function writeOfficialUnifiedPlaceholderSvgs(project) {
+  const shapes = [
+    '  <rect x="24" y="24" width="464" height="464" rx="112" fill="#1f2937"/>',
+    '  <rect x="104" y="104" width="132" height="132" rx="32" fill="#f8fafc"/>',
+    '  <rect x="276" y="104" width="132" height="132" rx="32" fill="#cbd5e1"/>',
+    '  <rect x="104" y="276" width="132" height="132" rx="32" fill="#94a3b8"/>',
+    '  <rect x="276" y="276" width="132" height="132" rx="32" fill="#38bdf8"/>',
+  ].join('\n');
+  for (const [file, size] of [
+    ['favicon-16.svg', 16],
+    ['favicon-32.svg', 32],
+    ['app-icon-180.svg', 180],
+    ['syfo-app-icon.svg', 512],
+  ]) {
+    await writeFile(
+      join(project, 'public', file),
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 512 512">\n${shapes}\n</svg>\n`,
+    );
+  }
+}
+
 async function createStaticFixture() {
   const project = await mkdtemp(join(tmpdir(), 'syfo-static-doctor-'));
   await mkdir(join(project, 'scripts'), { recursive: true });
@@ -278,6 +299,17 @@ test('doctor blocks malformed, externally-referencing, and non-regular App icons
   }
 });
 
+test('unified doctor rejects the official template placeholder icon family', async () => {
+  const project = await createUnifiedFixture();
+  try {
+    await writeOfficialUnifiedPlaceholderSvgs(project);
+    const codes = errorCodes(runDoctor('syfo-webdev', project));
+    assert.equal(codes.filter((code) => code === 'app-icon-placeholder').length, 4);
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
 test('doctor rejects encoded CSS, namespaces, entities, and SMIL mutation', async () => {
   const cases = [
     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><style>@im&#x70;ort "https://attacker.example/x.css"</style></svg>\n',
@@ -335,7 +367,7 @@ test('doctor rejects unsupported, empty, and undecodable PNG pixel data', async 
 });
 
 test('skill lifecycle keeps icon validation and deploy state machine explicit', async () => {
-  for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
+  for (const skill of ['syfo-webdev', 'syfo-webdev-static', 'syfo-webdev-fullstack']) {
     const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
     const lifecycle = await readFile(
       join(repositoryRoot, skill, 'references', 'deployment-lifecycle.md'),
