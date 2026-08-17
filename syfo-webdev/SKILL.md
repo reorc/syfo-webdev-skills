@@ -1,24 +1,26 @@
 ---
 name: syfo-webdev
-description: "The only Skill for creating a website or App whose selected delivery target is Syfo Hosted App, maintaining web-unified Apps, recovering bindings, and classifying Hosted App contracts. In a Syfo runtime, also use as the routing gate for a new website, web app, landing page, or dashboard with an unspecified target; ask once whether the user wants local/source-only delivery or Syfo hosting before implementation. If an existing App's machine-local binding is missing, use syfo app bind <app-id> or syfo app clone <app-id> --clone <dir>; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Do not trigger merely because a repository, product, package, team, feature, or organization is named Syfo. Explicit local HTML, source-only, preview, or another provider does not use this Skill. Historical static/fullstack Apps route to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
+description: "Create and maintain websites hosted by Syfo using the web-unified contract, including binding recovery, optional TiDB enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as a legacy synonym for Syfo website hosting only, never as TiDB intent. In a Syfo runtime, use as the routing gate when a new website, web app, landing page, or dashboard has no delivery target; ask local/source-only versus Syfo hosting once. New Syfo-hosted websites default to no database. Ask a focused TiDB consent question only when persistence is required and TiDB was not explicitly approved. If an existing website's machine-local binding is missing, use syfo app bind <app-id> or syfo app clone <app-id> --clone <dir>; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Existing static/fullstack contracts route to legacy Skills. Never silently initialize, migrate, enable TiDB, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
 
-Build, repair, validate, package, and—only when explicitly authorized—deploy a Syfo Hosted App based on the `web-unified` template.
+Build, repair, validate, package, and—only when explicitly authorized—deploy a Syfo-hosted website based on the `web-unified` template.
+
+Use **Syfo website**, **Syfo-hosted website**, or **Syfo Websites** in user-facing language. `Hosted App`, `App`, `site`, `app`, `site/none`, and `app/tidb` are legacy or internal contract terms. Do not teach, offer, or repeat those terms to the user unless quoting an existing identifier or diagnosing a technical contract mismatch.
 
 ## Activation boundary
 
-Selection is based on delivery intent and Hosted App contract evidence, not on the word “Syfo” alone.
+Selection is based on delivery intent and recognized Syfo website contract evidence, not on the word “Syfo” alone.
 
 Use this Skill when at least one positive signal exists:
 
-1. The current application has a recognized Syfo Hosted App contract marker, including a valid `syfo.yaml`.
-2. The user explicitly asks to create, host, validate, package, publish, or deploy the application through Syfo Hosted App, or explicitly requests a `syfo app` workflow.
+1. The current application has a recognized Syfo website contract marker, including a valid `syfo.yaml`.
+2. The user explicitly asks to create, host, validate, package, publish, or deploy the website through Syfo, explicitly requests a `syfo app` workflow, or uses the legacy phrase “Syfo Hosted App.”
 3. The user explicitly names this Skill.
 4. The daemon-injected runtime context identifies the agent as running in Syfo and the user asks to create a new website, web app, landing page, dashboard, or interactive browser experience without specifying a delivery target. In this case, use the Skill only as a routing gate until the target is resolved.
 
-Do not activate merely because a repository, product, package, team, feature, organization, CLI, daemon, template, API, or infrastructure component is named Syfo or discusses Hosted App concepts. In an existing repository without a recognized Hosted App marker, requests such as “implement Syfo Web search” or “fix the Syfo website login” are ordinary product-development work unless the user separately selects Syfo Hosted App as the delivery target.
+Do not activate merely because a repository, product, package, team, feature, organization, CLI, daemon, template, API, or infrastructure component is named Syfo or discusses internal hosted-app concepts. In an existing repository without a recognized website contract marker, requests such as “implement Syfo Web search” or “fix the Syfo website login” are ordinary product-development work unless the user separately selects Syfo hosting as the delivery target.
 
 Consulting this Skill is not authorization to initialize, provision TiDB, migrate, deploy, or change access policy.
 
@@ -27,10 +29,10 @@ Consulting this Skill is not authorization to initialize, provision TiDB, migrat
 For new website creation, resolve the target before implementation. For existing repositories, inspect contract markers before any Syfo CLI command:
 
 - `local_html`: the user explicitly wants HTML/source only, a local preview, or another hosting provider. Exit the Syfo workflow and use the appropriate general web-development workflow. Do not initialize, validate, package, or deploy Syfo.
-- `syfo_hosted_app`: all new Syfo websites and Apps use this unified Skill. Existing `template.id: web-unified` Apps also stay here. Positively identified historical static/fullstack Apps route to their matching legacy maintenance Skill without reinterpretation.
-- `unknown`: a new website request does not specify local/source-only delivery, another provider, or Syfo hosting; a new Syfo App lacks a valid preset/database pair; or existing repository markers are missing/conflicting. Ask the minimum focused question and do not begin implementation, choose a template, initialize, migrate, enable a database, or deploy meanwhile.
+- `syfo_hosted_website`: all new websites hosted by Syfo use this unified Skill. Existing `template.id: web-unified` repositories also stay here. Positively identified historical static/fullstack repositories route to their matching legacy maintenance Skill without reinterpretation.
+- `unknown`: a new website request does not specify local/source-only delivery, another provider, or Syfo hosting; or existing repository markers are missing/conflicting. Ask the minimum focused question and do not begin implementation, initialize, migrate, enable a database, or deploy meanwhile.
 
-For an unspecified new website target, ask once in the user's language: “Do you want local/source-only delivery, or should I create and host it as a Syfo Hosted App?” A direct answer resolves this gate; do not repeatedly ask after the target is clear.
+For an unspecified new website target, ask once in the user's language: “Do you want local/source-only delivery, or should I create and host it as a Syfo website?” A direct answer resolves this gate; do not repeatedly ask after the target is clear.
 
 `syfo-webdev-static` and `syfo-webdev-fullstack` are compatibility aliases for historical Apps only. They never create a new website or App. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
 
@@ -55,16 +57,16 @@ Classify before any Syfo mutation:
 
 Detection is read-only. A classification result is not migration consent.
 
-## New App create contract
+## New website create contract
 
-For a new App, require the human to choose exactly one user-facing preset:
+All new Syfo-hosted websites use the unified template. Presets are internal daemon compatibility values, not user-facing website types:
 
-- Site: `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
-- App: `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
+- A website without TiDB uses `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
+- A website with TiDB uses `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
 
-The human's informed App selection or explicit TiDB App request is the single confirmation for TiDB provisioning.
+When the user selects Syfo hosting without explicitly requesting or approving TiDB, default to the website-without-database path. Do not ask the user to choose “Site” versus “App,” and do not interpret the words “app,” “web app,” or the legacy phrase “Syfo Hosted App” as TiDB consent.
 
-If the request says only “new Syfo website/App” without an informed preset choice, ask once whether they want a site with no database or an app that provisions TiDB. Do not infer from feature hints alone. A human selection of App after that disclosure is the required confirmation. An initial explicit request for a TiDB-backed App or informed `preset=app` selection also counts as confirmation, so do not ask again. Include `--confirm-tidb` only when one of those informed explicit choices exists; the flag records that consent for the daemon and never requires a second confirmation prompt.
+If the requested functionality requires persistence, that requirement may trigger one focused consent question but does not itself authorize TiDB. Ask in the user's language: “This website needs persistent data. Syfo will provision a TiDB cloud database for it. Should I enable TiDB?” An explicit TiDB request or a yes after this disclosure is the single informed confirmation, so do not ask again. Include `--confirm-tidb` only after that confirmation; the flag records consent for the daemon and never requires a second confirmation prompt.
 
 Use the corresponding preset-only CLI exactly; `--database` is not a user-facing init flag:
 
@@ -73,13 +75,13 @@ syfo app init <name> --template unified --preset site --from-template --clone <d
 syfo app init <name> --template unified --preset app --confirm-tidb --from-template --clone <dir>
 ```
 
-Never pass `--confirm-tidb` for `preset=site` or without an informed explicit App/TiDB choice. Never ask twice when that choice already confirms TiDB provisioning. Do not expose or pass `--database`, infer a preset from feature prose, or pass unified fields to legacy `template=static|fullstack` flows. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. If the installed CLI does not expose this preset-only contract, stop and report that the unified create capability is unavailable; do not fall back to a legacy template.
+Never pass `--confirm-tidb` for `preset=site` or without informed explicit TiDB consent. Never ask twice when the user already approved TiDB provisioning. Do not expose `--database`, `preset=site`, `preset=app`, `site/none`, or `app/tidb` as product choices. Feature requirements may establish the need to ask about persistence, but they never establish consent. The daemon owns the deterministic preset-to-Core-pair mapping and must send both Core fields. Do not pass unified fields to legacy `template=static|fullstack` flows. If the installed CLI does not expose this internal preset-only contract, stop and report that Syfo website creation is unavailable; do not fall back to a legacy template.
 
 After an ambiguous init timeout, run only the emitted `syfo app init --resume <commandId>` recovery command. Never rerun init, generate a new idempotency key, or manually clone over a partial destination.
 
-## Existing App machine-local binding recovery
+## Existing website machine-local binding recovery
 
-Hosted App source and Hosted App binding are different things. The binding is clone-local state at
+Website source and its Syfo binding are different things. The binding is clone-local state at
 `.git/syfo-hosted-app.json`; it contains a short-lived Git credential, is created separately on each
 machine, and must never be committed, copied, uploaded, or reconstructed as legacy `.syfo/app.json`.
 A normal Git clone therefore does not carry the binding, and its absence does not mean GitLab source
@@ -98,11 +100,11 @@ history is broken.
 After bind or clone, re-run repository classification and continue only when the source markers and
 App identity agree.
 
-## Existing unified Site database enable
+## Existing unified website database enable
 
 For an existing repository classified as unified, read current state with `syfo app status --json`. Only the exact `preset=site,database=none` state can use the database-enable flow. If the App identity is omitted, the daemon resolves the machine-local binding; if identity or state is ambiguous, stop before mutation.
 
-When the human explicitly asks to add TiDB, or chooses persistence after being told that TiDB will be provisioned, that is the single informed confirmation. Do not ask again. Record the consent in the daemon command:
+When the human explicitly asks to add TiDB, or approves persistence after being told that TiDB will be provisioned, that is the single informed confirmation. Do not ask again. Record the consent in the daemon command:
 
 ```bash
 syfo app database enable [app-id] --confirm-tidb
@@ -113,8 +115,8 @@ Never run this command from a generic feature hint alone, never pass a second co
 After `state=enabled` or `state=already_enabled`:
 
 1. Re-read `syfo app status --json` and require the exact unified `app/tidb` state with an active TiDB binding.
-2. Modify the same original repository for App/TiDB usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Do not clone a replacement project or rewrite it as a legacy template.
-3. Run the App/TiDB validation workflow below, then commit and push the immutable source.
+2. Modify the same original repository for TiDB usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Do not clone a replacement project or rewrite it as a legacy template.
+3. Run the TiDB-enabled website validation workflow below, then commit and push the immutable source.
 4. Stop at local/deploy-ready handoff unless the human separately authorized deployment. Database consent is not deploy consent.
 
 If the enable command returns a stable state conflict or other backend error, do not edit the repository as though the transition succeeded. Re-read status and either resume from the observed exact state or report the blocker.
@@ -140,6 +142,21 @@ Classify requested scope:
 - `deploy_authorized`: the human explicitly requested deploy/publish/go live. Follow `references/deployment-lifecycle.md` through confirmation, terminal status, version verification, and cloud smoke.
 
 For UI work, select the smallest appropriate frontend/design/browser capability set available in the current environment. Preserve existing design when requested.
+
+## Website icon replacement gate
+
+The official `web-unified` template ships a technically valid placeholder icon family so a fresh clone can build. Those files are template residue, not finished product identity. For every newly created Syfo-hosted website, replace the complete placeholder family before the first `syfo app validate`, deployment preparation, or handoff as deploy-ready. File existence or an otherwise clean doctor result does not make the placeholder acceptable.
+
+For an existing unified website, preserve an intentional product-specific icon unless the user requests a redesign. Replace it when it is still the official placeholder, a generic letter tile, a framework/Syfo logo, copied third-party artwork, or otherwise clearly not the website's identity.
+
+1. Use the website name, purpose, and visual language to choose a distinctive, simple metaphor with a strong silhouette and enough contrast at 16×16.
+2. Create source-controlled SVG variants with a shared `viewBox="0 0 512 512"`: `public/favicon-16.svg`, `public/favicon-32.svg`, `public/app-icon-180.svg`, and canonical `public/syfo-app-icon.svg` at 512×512.
+3. Render valid RGBA/RGB PNGs into the root `app/` or `src/app/` directory using Next's native convention: `icon1.png` = 16, `icon2.png` = 32, `icon3.png` = 180, and `icon4.png` = 512.
+4. Remove competing `favicon.ico`, SVG file-convention icons, unnumbered `icon.*`, extra numbered icons, and `apple-icon.*` so Next emits one coherent metadata family.
+5. Keep each SVG regular, self-contained, valid UTF-8, and at most 64 KiB. Require an unprefixed root `<svg xmlns="http://www.w3.org/2000/svg">`; forbid entities, DTD, scripts, event handlers, `foreignObject`, `<style>`/`style=`, SMIL mutation, external resources, secrets, user-uploaded markup, and unlicensed logos. `href`, `src`, and `xlink:href` may reference only a local `#fragment`.
+6. Inspect the actual rendering at 16, 32, 180, and 512 pixels. Simplify small variants rather than merely scaling details that disappear.
+
+The unified doctor treats missing, unsafe, incorrectly sized, conflicting, invalid-PNG, unwired, or official placeholder icons as errors. After icon creation, run the doctor again and record zero icon errors before `syfo app validate` or deployment preparation.
 
 ## Validation workflow
 
@@ -179,7 +196,7 @@ Do not append raw CLI JSON or an internal audit object by default.
 Report:
 
 - Detected contract: unified, legacy static, legacy fullstack, or ambiguous.
-- Current preset/database state when known.
+- Current user-facing capability state: database not enabled or TiDB enabled. Include exact internal preset/database values only when diagnosing a contract mismatch.
 - Requested scope and whether migration, database enablement, deployment, and access changes were authorized separately.
 - Immutable source revision and checks actually run.
 - Live URL/version only after terminal deployment and production acceptance.
