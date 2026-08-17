@@ -1,10 +1,21 @@
 import { existsSync, lstatSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
 import { inflateSync } from "node:zlib";
 import { analyzeArtifactTree, formatBytes } from "./check-artifact-budget.mjs";
 
 const root = process.cwd();
 const findings = [];
+const officialPlaceholderIconHashes = new Map([
+  ["public/favicon-16.svg", "58863bb9fdcf551465b7b10d26d32e60949f1fe323d0e960f9cb54f2427600fa"],
+  ["public/favicon-32.svg", "a6d95fac5054d092363c23460c9774010a45641361adf165ffb19782984449f6"],
+  ["public/app-icon-180.svg", "9286761486eeb6c09cbf3c6ef55b1a6eb8304fea160fed3b8884ea8cfadda0ad"],
+  ["public/syfo-app-icon.svg", "a9824346d1974a7e1260f79bd18184beb663d8d62260c03fa01d99d911c05cfa"],
+  ["app/icon1.png", "252ee33caa1d3b59e4fdf60f53967c53d25c54da608494f944ae848694384851"],
+  ["app/icon2.png", "08c408a6837bc3c66ea2a78219044f56eb155619c18291bb8b487656f891e8f4"],
+  ["app/icon3.png", "caa2b0dd8e7bacc3ce00f5f500c82ddfd7b402b604747a886e2a28237c53c7dd"],
+  ["app/icon4.png", "ea66f709bcd9842121f0fc96dd4e80664f9239fafbc251bba2267b5ec12ba03c"],
+]);
 
 function add(level, code, file, detail) {
   findings.push({ level, code, file, detail });
@@ -12,6 +23,10 @@ function add(level, code, file, detail) {
 
 function read(path) {
   return readFileSync(path, "utf8");
+}
+
+function sha256(bytes) {
+  return createHash("sha256").update(bytes).digest("hex");
 }
 
 function findFirst(names) {
@@ -252,6 +267,9 @@ function validateAppIcons() {
       continue;
     }
     const bytes = readFileSync(path);
+    if (officialPlaceholderIconHashes.get(variant.file) === sha256(bytes)) {
+      add("error", "app-icon-placeholder", variant.file, "Replace the official web-unified placeholder with an icon designed for this website.");
+    }
     if (bytes.byteLength > 64 * 1024) {
       add("error", "app-icon-too-large", variant.file, "Keep each SVG App icon at or below 64 KiB.");
       continue;
@@ -270,6 +288,17 @@ function validateAppIcons() {
     }
   }
   validateAppIconMetadata(variants);
+  const appDirectory = findFirst(["app", "src/app"]);
+  if (appDirectory) {
+    for (const file of ["icon1.png", "icon2.png", "icon3.png", "icon4.png"]) {
+      const path = join(appDirectory, file);
+      if (!existsSync(path) || !lstatSync(path).isFile()) continue;
+      const relativePath = relative(root, path);
+      if (officialPlaceholderIconHashes.get(relativePath) === sha256(readFileSync(path))) {
+        add("error", "app-icon-placeholder", relativePath, "Render this PNG from the website-specific icon instead of keeping the official placeholder.");
+      }
+    }
+  }
 }
 
 function section(source, name) {
@@ -326,6 +355,16 @@ if (!existsSync(packagePath)) {
     const local = process.versions.node.split(".").map(Number);
     if (local[0] < 20 || (local[0] === 20 && local[1] < 9)) {
       add("error", "next16-local-node", "package.json", `Next.js 16 requires Node >=20.9.0; current Node is ${process.versions.node}.`);
+    }
+    const typegen = String(packageJson.scripts?.typegen || "").trim();
+    if (!/(?:^|&&|;)\s*(?:npx\s+)?next\s+typegen(?:\s|$)/.test(typegen)) {
+      add("error", "next16-typegen-script", "package.json", "Next.js 16 requires a typegen script that runs `next typegen` before TypeScript checking.");
+    }
+    const fastCheck = String(packageJson.scripts?.["check:fast"] || "").trim();
+    const typegenIndex = fastCheck.search(/npm\s+run\s+typegen/);
+    const typecheckIndex = fastCheck.search(/npm\s+run\s+typecheck/);
+    if (!fastCheck || typegenIndex < 0 || typecheckIndex < 0 || typegenIndex > typecheckIndex) {
+      add("error", "next16-fast-check-script", "package.json", "Next.js 16 requires check:fast to run typegen before typecheck.");
     }
   }
   for (const script of ["build", "typecheck", "test", "db:migrate"]) {
