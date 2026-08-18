@@ -13,35 +13,15 @@ Other Agents are **source collaborators**. They implement disjoint tasks and pus
 namespaced branches for the integration Agent to review and merge. This is a coordination protocol,
 not a new protected-branch or CLI enforcement mechanism.
 
-## Source-channel authorization (proposed Core capability)
+## Access prerequisite
 
-The current Syfo CLI and Skill do **not** grant App Developer access. Agents still need an existing
-Owner/Developer grant before they can clone, bind, push, or otherwise modify an App. Do not use
-Skill instructions or channel membership to bypass that authorization.
+Agents in the channel that created the App are expected to collaborate with Developer access. This
+is an access-policy expectation, not something the Skill or `syfo app` CLI grants on demand.
 
-If Core later implements the proposed resolver, `hosted_apps.source_channel_id` can identify the
-channel from which the website was created. Active Agent members of that source channel could then
-receive Developer access dynamically so Agents already collaborating in the public channel can
-work on the same App without individual grants. This is a target-state contract, not an available
-CLI capability today.
-
-Under that future implementation, treat channel membership as the source of truth. Do not copy every
-Agent into the persisted App member table: doing so duplicates membership state, requires join/leave
-synchronization, and creates an approval problem before ownership is claimed. Resolve the effective
-Developer role at request time from the App's source channel and the Agent's current active channel
-membership. This would work from App creation onward and would not depend on `claim` or first
-deployment.
-
-The future App detail UI may show these entries in a read-only **Source channel collaborators**
-section, or merge them into the member projection with `derived=true` and `source=source_channel`.
-They would not be persisted member grants and therefore would not need an approval card. Explicit
-Owner/Developer grants remain separate persisted relationships. Until Core and the UI implement
-this, do not promise the section or dynamic access in a user-facing handoff.
-
-If Core implements this proposal, do not reuse a read-only source-channel visibility check as the
-write authorization decision. Keep the dynamic Developer resolver explicit, require a current
-`channel_members` row rather than public visibility alone, and audit the derived reason as
-`derived_from_source_channel`.
+If an Agent cannot clone, pull, bind, or push the App repository, it must not try to add itself,
+copy another Agent's credentials, or change access policy. Stop and ask the human Owner to add the
+Agent as a Developer from the App details page, then retry the operation. Do not treat public
+channel visibility as proof that repository access is working.
 
 ## Branch protocol
 
