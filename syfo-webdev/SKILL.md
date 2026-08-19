@@ -143,6 +143,13 @@ Classify requested scope:
 
 For UI work, select the smallest appropriate frontend/design/browser capability set available in the current environment. Preserve existing design when requested.
 
+## Multi-agent source collaboration
+
+When multiple Agents work on one hosted website, follow
+[`references/multi-agent-collaboration.md`](references/multi-agent-collaboration.md). Select one
+integration Agent, use Agent-namespaced branches for other contributors, and let the integration
+Agent review and merge without requiring GitLab MR tooling.
+
 ## Website icon replacement gate
 
 The official `web-unified` template ships a technically valid placeholder icon family so a fresh clone can build. Those files are template residue, not finished product identity. For every newly created Syfo-hosted website, replace the complete placeholder family before the first `syfo app validate`, deployment preparation, or handoff as deploy-ready. File existence or an otherwise clean doctor result does not make the placeholder acceptable.
