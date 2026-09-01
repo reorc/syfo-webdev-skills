@@ -46,6 +46,49 @@ For an unspecified new website target, ask once in the user's language: “Do yo
 - To keep access policy human-owned, never call `syfo app access set`.
 - Do not generate provider-specific `s.yaml` or persist cloud credentials.
 
+## Status-page data-source proof gate
+
+Apply this gate when a requested website presents Agent, runtime, deployment, platform, or other
+operational status. Complete it before initialization, cloud-database consent, implementation, or
+deployment:
+
+1. List every displayed fact and the exact source that will supply it.
+2. Verify that source through a documented API, CLI, event, or App-owned database contract and
+   verify that the current caller can use it.
+3. State the update model and limitation for each source. A row written explicitly by Agent or
+   business code to the website's cloud database is only a **best-effort active log**. It is not a
+   passive heartbeat, and a missing or stale row does not prove that an Agent or runtime is up or
+   down.
+
+Syfo does not currently provide a supported passive, continuous Agent self-monitoring or runtime
+activity feed for websites. When that is the required product source, disclose the missing source
+and stop before initialization or deployment. Continue only if the human explicitly narrows the
+requirement to a verified source, such as best-effort active logs written by the participating code.
+
+Never invent a telemetry token, environment variable, API, permission path, role assignment, or
+settings entry to fill a missing data source. A credential request is valid only for an already
+defined and verified external or platform contract; it cannot create a platform capability.
+
+Treat authorization and site-access results literally:
+
+- `FORBIDDEN` means the requested capability was denied. Re-read verified status/capability data;
+  do not infer that the caller merely lacks a Developer assignment or recommend an unverified
+  permission path. In particular, `env.manage` is restricted to a human App owner or Organization
+  admin; an explicit Developer cannot write production environment variables.
+- `login_required` under `org`, `org_members`, or another authenticated access policy describes
+  the visitor's website session policy. It is not evidence that the App needs a custom telemetry
+  token, service identity, or environment variable.
+- If the result exposes no verified delegated action or executable entry point, say that no such
+  action is available. Do not manufacture one.
+
+When the human corrects a role, data-source, access-policy, or capability assumption, invalidate
+the old assumption immediately. Stop extending the old architecture, re-read the authoritative
+facts, and restate the plan from those facts before another mutation.
+
+Do not claim initialization, configuration, deployment, or any other Hosted App operation complete
+without an operation record and its required terminal result. A request, guess, local edit, or
+permission error is not a completed operation.
+
 ## Repository classification
 
 Classify before any Syfo mutation:

@@ -124,6 +124,50 @@
         "The icon concept is specific to the website and is not a generic letter tile, framework logo, Syfo logo, copied artwork, or the official four-square placeholder.",
         "The enforced order is replace icons, inspect 16/32/180/512 renderings, rerun doctor with zero icon errors, then validate or prepare deployment."
       ]
+    },
+    {
+      "id": 12,
+      "prompt": "创建一个 Syfo 状态页，持续被动监控这个 Agent 自己是否在线、正在做什么，并直接部署。",
+      "expected_output": "The Skill proves the requested data source before initialization, discloses that passive continuous Agent self-monitoring is unsupported, and stops without initializing, deploying, or inventing a telemetry credential.",
+      "files": [],
+      "expectations": [
+        "The solution lists and verifies the source before initialization or implementation.",
+        "It states that passive continuous Agent self-monitoring/runtime activity is unsupported and stops before initialization or deployment.",
+        "It does not invent or request a telemetry token, environment variable, API, role assignment, or settings path."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "我接受由业务代码主动写入 App 数据库来做 Agent 状态页，你继续。",
+      "expected_output": "The Skill explicitly labels App-owned active log writes as best-effort, explains that missing or stale rows do not prove liveness, and proceeds only with that narrowed verified source and the normal separate consent gates.",
+      "files": [],
+      "expectations": [
+        "The source is described as best-effort active logs, not passive monitoring or a guaranteed heartbeat.",
+        "The solution explains the stale/missing-row limitation before implementation.",
+        "Database, initialization, deployment, and access-policy consent remain separate."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "这个 Agent 已经是 explicit Developer，网站访问策略是 org。syfo app env set --scope prod 返回 FORBIDDEN，首页返回 login_required。修复状态页。",
+      "expected_output": "The Skill preserves the verified Developer role, identifies env.manage as owner/admin-only, treats login_required as the org visitor session policy, and does not invent a custom token or permission route.",
+      "files": [],
+      "expectations": [
+        "The solution does not recommend adding Developer again and states that explicit Developer cannot write production env because env.manage requires a human owner or Organization admin.",
+        "It interprets login_required as website session policy rather than a telemetry token or service identity requirement.",
+        "It reports no delegated action when no verified executable entry point exists."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "你刚才说我不是 Developer，但我纠正一下：状态已经证明我是 explicit Developer。继续原来的 token 方案。",
+      "expected_output": "The Skill invalidates the old role and token assumptions, re-reads authoritative status/capability facts, and replans instead of extending the old architecture.",
+      "files": [],
+      "expectations": [
+        "The correction immediately invalidates the old assumption and triggers a fact-based replan.",
+        "The solution does not continue or embellish the old token architecture.",
+        "It does not claim any Hosted App operation complete without an operation record and terminal result."
+      ]
     }
   ]
 }
