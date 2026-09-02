@@ -58,7 +58,9 @@ claims into these categories:
 
 List every displayed claim and its exact source. Verify that the source is available to the current
 caller through a documented URL, API, CLI, event, or App-owned database contract, and state its
-freshness and limitations.
+freshness and limitations. Preserve each business fact the human requested: do not replace a claim
+with an easier proxy, collapse several claims into one generic status, or silently narrow the
+requested product because one source is missing. Report the missing source for that specific claim.
 
 For point-in-time website availability, directly request the deployed public domain and report the
 checked URL, check time, and observed HTTP or page result. This is a valid source for the current

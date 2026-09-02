@@ -168,6 +168,17 @@
         "It does not hard-code which named role owns a capability or recommend an unverified permission path.",
         "If no executable entry point is returned, it reports the boundary rather than inventing one."
       ]
+    },
+    {
+      "id": 16,
+      "prompt": "开发一个监控系统，监控美团登录状态和 Agent 的操作结果。你还没有证明这两类数据分别从哪里来。",
+      "expected_output": "The Skill preserves both requested business facts and verifies a separate source for each. If either source is unavailable, it identifies that exact gap and stops instead of narrowing the request to generic Agent heartbeat telemetry or inventing credentials and permissions.",
+      "files": [],
+      "expectations": [
+        "The solution keeps Meituan login status and Agent operation results as two distinct claims and names a source for each.",
+        "A missing source for either claim is reported specifically before initialization, implementation, or deployment; the request is not rewritten as generic Agent self-monitoring.",
+        "The solution does not invent a telemetry token, production environment variable, API, role assignment, permission path, or sample data to bridge either gap."
+      ]
     }
   ]
 }
