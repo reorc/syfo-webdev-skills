@@ -7,33 +7,41 @@ const evals = JSON.parse(
   await readFile(new URL('./syfo-webdev/evals/evals.json', import.meta.url), 'utf8'),
 );
 
-test('status pages prove a supported data source before mutation', () => {
-  assert.match(skill, /before initialization, cloud-database consent, implementation, or\s+deployment/);
-  assert.match(skill, /List every displayed fact and the exact source/);
+test('point-in-time public-domain availability remains a supported positive path', () => {
+  assert.match(skill, /\*\*Point-in-time availability\*\*/);
+  assert.match(skill, /directly request the deployed public domain/);
+  assert.match(skill, /checked URL, check time, and observed HTTP or page result/);
+  assert.match(skill, /do not block it merely because no monitoring feed exists/);
+  assert.match(skill, /does not prove\s+continuous uptime, history, Agent liveness, or Agent activity/);
+});
+
+test('continuous and historical status stop when no repeatable source exists', () => {
+  assert.match(skill, /\*\*Continuous monitoring\*\*/);
+  assert.match(skill, /\*\*Historical or activity status\*\*/);
+  assert.match(skill, /require a real source that can be consumed\s+repeatedly/);
+  assert.match(skill, /stop\s+before initializing, implementing, or deploying/);
   assert.match(skill, /best-effort active log/);
-  assert.match(skill, /not a\s+passive heartbeat/);
-  assert.match(skill, /does not currently provide a supported passive, continuous Agent self-monitoring/);
-  assert.match(skill, /stop before initialization or deployment/);
-  assert.match(skill, /Never invent a telemetry token, environment variable, API, permission path/);
+  assert.match(skill, /missing or stale row does not prove/);
+  assert.match(skill, /Never invent\s+a telemetry token, environment variable, API, permission path/);
 });
 
-test('authorization and correction rules preserve verified facts', () => {
-  assert.match(skill, /`FORBIDDEN` means the requested capability was denied/);
-  assert.match(skill, /`env\.manage` is restricted to a human App owner or Organization\s+admin/);
-  assert.match(skill, /`login_required` under `org`, `org_members`/);
-  assert.match(skill, /visitor's website session policy/);
-  assert.match(skill, /no verified delegated action or executable entry point/);
-  assert.match(skill, /invalidate\s+the old assumption immediately/);
-  assert.match(skill, /without an operation record and its required terminal result/);
+test('authorization guidance consumes structured facts without embedding a role matrix', () => {
+  assert.match(skill, /structured status, authorization, and access results as authoritative/);
+  assert.match(skill, /without recreating a role matrix in this Skill/);
+  assert.match(skill, /If no verified executable path\s+is returned, report the boundary/);
+  assert.doesNotMatch(skill, /env\.manage/);
+  assert.doesNotMatch(skill, /explicit Developer/);
+  assert.doesNotMatch(skill, /human App owner or Organization admin/);
 });
 
-test('evals cover passive monitoring, best-effort logs, explicit Developer, and replanning', () => {
+test('evals cover the public-domain positive path and no-source stop path', () => {
   const byId = new Map(evals.evals.map((entry) => [entry.id, entry]));
   for (const id of [12, 13, 14, 15]) assert.ok(byId.has(id), `missing eval ${id}`);
-  assert.match(byId.get(12).prompt, /被动监控/);
-  assert.match(byId.get(13).expected_output, /best-effort/);
-  assert.match(byId.get(14).prompt, /explicit Developer/);
-  assert.match(byId.get(14).prompt, /FORBIDDEN/);
-  assert.match(byId.get(14).prompt, /login_required/);
-  assert.match(byId.get(15).expected_output, /invalidates the old role and token assumptions/);
+  assert.match(byId.get(12).prompt, /公网域名/);
+  assert.match(byId.get(12).expected_output, /point-in-time request/);
+  assert.match(byId.get(13).prompt, /持续监控/);
+  assert.match(byId.get(13).prompt, /没有任何 API、事件或日志数据源/);
+  assert.match(byId.get(13).expected_output, /stops before initialization or deployment/);
+  assert.match(byId.get(14).expected_output, /best-effort active logs/);
+  assert.match(byId.get(15).expected_output, /does not recreate a role matrix/);
 });

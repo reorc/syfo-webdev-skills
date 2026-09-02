@@ -46,48 +46,44 @@ For an unspecified new website target, ask once in the user's language: “Do yo
 - To keep access policy human-owned, never call `syfo app access set`.
 - Do not generate provider-specific `s.yaml` or persist cloud credentials.
 
-## Status-page data-source proof gate
+## Operational-status source gate
 
 Apply this gate when a requested website presents Agent, runtime, deployment, platform, or other
-operational status. Complete it before initialization, cloud-database consent, implementation, or
-deployment:
+operational status. Before initialization, implementation, or deployment, separate the requested
+claims into these categories:
 
-1. List every displayed fact and the exact source that will supply it.
-2. Verify that source through a documented API, CLI, event, or App-owned database contract and
-   verify that the current caller can use it.
-3. State the update model and limitation for each source. A row written explicitly by Agent or
-   business code to the website's cloud database is only a **best-effort active log**. It is not a
-   passive heartbeat, and a missing or stale row does not prove that an Agent or runtime is up or
-   down.
+- **Point-in-time availability**: whether a deployed website can be reached now.
+- **Continuous monitoring**: observations collected repeatedly over time.
+- **Historical or activity status**: what an Agent, runtime, or deployment did or is doing.
 
-Syfo does not currently provide a supported passive, continuous Agent self-monitoring or runtime
-activity feed for websites. When that is the required product source, disclose the missing source
-and stop before initialization or deployment. Continue only if the human explicitly narrows the
-requirement to a verified source, such as best-effort active logs written by the participating code.
+List every displayed claim and its exact source. Verify that the source is available to the current
+caller through a documented URL, API, CLI, event, or App-owned database contract, and state its
+freshness and limitations.
 
-Never invent a telemetry token, environment variable, API, permission path, role assignment, or
-settings entry to fill a missing data source. A credential request is valid only for an already
-defined and verified external or platform contract; it cannot create a platform capability.
+For point-in-time website availability, directly request the deployed public domain and report the
+checked URL, check time, and observed HTTP or page result. This is a valid source for the current
+reachability claim, so do not block it merely because no monitoring feed exists. It does not prove
+continuous uptime, history, Agent liveness, or Agent activity.
 
-Treat authorization and site-access results literally:
+Continuous monitoring and historical or activity claims require a real source that can be consumed
+repeatedly. If no such source is documented and accessible, disclose the missing capability and stop
+before initializing, implementing, or deploying a page that would imply those claims. Never invent
+a telemetry token, environment variable, API, permission path, role assignment, settings entry, or
+sample data to fill the gap.
 
-- `FORBIDDEN` means the requested capability was denied. Re-read verified status/capability data;
-  do not infer that the caller merely lacks a Developer assignment or recommend an unverified
-  permission path. In particular, `env.manage` is restricted to a human App owner or Organization
-  admin; an explicit Developer cannot write production environment variables.
-- `login_required` under `org`, `org_members`, or another authenticated access policy describes
-  the visitor's website session policy. It is not evidence that the App needs a custom telemetry
-  token, service identity, or environment variable.
-- If the result exposes no verified delegated action or executable entry point, say that no such
-  action is available. Do not manufacture one.
+A row written explicitly by Agent or business code to the website's cloud database is only a
+**best-effort active log**. Use it only when the participating code really writes it, and explain
+that a missing or stale row does not prove that an Agent or runtime is up or down.
 
-When the human corrects a role, data-source, access-policy, or capability assumption, invalidate
-the old assumption immediately. Stop extending the old architecture, re-read the authoritative
-facts, and restate the plan from those facts before another mutation.
+Treat structured status, authorization, and access results as authoritative. Preserve their
+reported caller, capability, denial reason, required authorization, and documented executable entry
+points without recreating a role matrix in this Skill. An access denial or login requirement does
+not establish a missing telemetry credential or a new data source. If no verified executable path
+is returned, report the boundary instead of inventing one.
 
-Do not claim initialization, configuration, deployment, or any other Hosted App operation complete
-without an operation record and its required terminal result. A request, guess, local edit, or
-permission error is not a completed operation.
+When the human corrects a data-source, access, or capability assumption, invalidate the old
+assumption immediately, re-read the authoritative facts, and restate the plan before another
+mutation.
 
 ## Repository classification
 
