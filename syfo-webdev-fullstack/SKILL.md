@@ -133,6 +133,9 @@ that GitLab commits are missing:
 - Never run `syfo app init` to recover an existing App, manually clone and then initialize, copy
   another machine's binding, or allocate a replacement database. If the App ID is unknown, the remote
   mismatches, or the destination is ambiguous, stop for authoritative App/repository identity.
+- Git push credentials are managed: `syfo app bind` / `syfo app clone` obtain a short-lived
+  App-scoped credential through the managed chain. Never create a `syfo secret request` for a
+  GitLab or personal access token to push, clone, or repair a website.
 
 If the repository is new, has no existing Syfo App, contains unified markers, or has missing/conflicting legacy markers, stop before editing or further Syfo mutation. Route new creation to `syfo-webdev`; for uncertain existing repositories, use its read-only classifier and ask the user for the authoritative App/repository identity.
 

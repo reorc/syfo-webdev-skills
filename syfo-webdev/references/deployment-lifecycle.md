@@ -14,6 +14,16 @@ from another.
 | `failed` | Structured failure stage/code is available | Follow the failure branch below |
 | `active` | Intended commit is the live version | Read access policy, then run production acceptance |
 
+## Git credentials are managed
+
+- Push credentials come only from the managed hosted-app chain: `syfo app push` and `syfo app
+  git-auth` obtain a short-lived App-scoped credential automatically. Never create a `syfo secret
+  request` for a GitLab or personal access token to push, clone, or repair a website.
+- A missing machine-local binding is a bind/clone recovery, not a credential problem: stop at
+  `syfo app bind <app-id>` / `syfo app clone <app-id> --clone <dir>` and report. An App the Agent
+  cannot access ends as the server's `NOT_FOUND` or permission error, never as a request for
+  personal credentials.
+
 ## Access policy ownership
 
 - App initialization assigns the platform default access policy. The Agent must not change it.

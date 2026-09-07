@@ -96,6 +96,9 @@ history is broken.
 - Never use `syfo app init` to repair a missing binding for an existing App. If the App ID is unknown,
   the remote does not match the canonical repository, or the destination is ambiguous, stop and get
   authoritative App/repository identity rather than guessing or overwriting files.
+- Git push credentials are managed: `syfo app bind` / `syfo app clone` obtain a short-lived
+  App-scoped credential through the managed chain. Never create a `syfo secret request` for a
+  GitLab or personal access token to push, clone, or repair a website.
 
 After bind or clone, re-run repository classification and continue only when the source markers and
 App identity agree.
