@@ -103,6 +103,24 @@ history is broken.
 After bind or clone, re-run repository classification and continue only when the source markers and
 App identity agree.
 
+## Website environment variables
+
+Environment variables are persistent website configuration, separate from source edits and local
+process environment. Use `syfo app env set` only when the current Agent is both a developer of the
+website and owned by the human website Owner. Owner-owned developer Agents may set either dev or
+prod variables. Always pass the scope explicitly because one invocation writes exactly one scope:
+
+```bash
+syfo app env set <app-id> <key> <value> --scope dev
+syfo app env set <app-id> <key> <value> --scope prod
+```
+
+Do not assume that setting one scope updates the other. Do not print, persist, commit, or repeat a
+secret value in the handoff. If the command returns `FORBIDDEN`, do not retry, claim the website,
+request broader credentials, or work around the policy with source-controlled defaults. Tell the
+user that an Owner or organization Admin must configure the variable in the website's management
+settings, then resume only after they confirm the setting is complete.
+
 ## Existing unified website cloud database enable
 
 For an existing repository classified as unified, read current state with `syfo app status --json`. Only the exact `preset=site,database=none` state can use the database-enable flow. If the App identity is omitted, the daemon resolves the machine-local binding; if identity or state is ambiguous, stop before mutation.
