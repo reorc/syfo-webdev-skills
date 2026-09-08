@@ -410,6 +410,25 @@ test('skill lifecycle keeps icon validation and deploy state machine explicit', 
     assert.doesNotMatch(lifecycle, /syfo app deploy --json/);
     assert.match(lifecycle, /operationId[\s\S]*do not create a second deploy operation/);
     assert.match(lifecycle, /owner=null[\s\S]*Do not run `syfo app claim` as a routine prerequisite/);
+    // Managed-credential contract (syfo-daemon task #12059): push credentials
+    // come only from the managed hosted-app chain. A GitLab/personal access
+    // token request is never an acceptable recovery for push, clone, or a
+    // missing binding, and an inaccessible App must end as a server error.
+    assert.match(lifecycle, /## Git credentials are managed/);
+    assert.match(
+      lifecycle,
+      /Never create a `syfo secret\n  request` for a GitLab or personal access token to push, clone, or repair a website/,
+    );
+    assert.match(
+      lifecycle,
+      /stop at\n  `syfo app bind <app-id>` \/ `syfo app clone <app-id> --clone <dir>` and report/,
+    );
+    assert.match(lifecycle, /never as a request for\n  personal credentials/);
+    assert.match(source, /Git push credentials are managed/);
+    assert.match(
+      source,
+      /Never create a `syfo secret request` for a\n  GitLab or personal access token to push, clone, or repair a website/,
+    );
   }
 });
 
