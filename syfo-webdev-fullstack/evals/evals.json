@@ -164,6 +164,47 @@
         "The solution preserves the allocated App and TiDB database and does not provision replacements.",
         "Database work starts only after App identity, canonical repository identity, fullstack markers, and the local binding agree."
       ]
+    },
+    {
+      "id": 14,
+      "prompt": "当前 Syfo 托管网站的页面改好了，请完成交付。我没有另外说部署。",
+      "expected_output": "After validation and immutable push, prepare a deploy card without asking for a separate deploy request; actual publication waits for human confirmation.",
+      "files": [],
+      "expectations": [
+        "Absence of the word deploy does not force build_only.",
+        "The solution reports remote preflight separately if it delays card creation.",
+        "The solution never confirms the card on behalf of the human."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "上次审批卡还没点，继续按新需求改这个网站，完成后给我最新版确认。",
+      "expected_output": "Continue source development, validate and push a new commit, then prepare a new card bound to that revision. Tell the human to confirm the new card because creating it does not invalidate the old one.",
+      "files": [],
+      "expectations": [
+        "The new card and old card retain separate operation and commit identities.",
+        "The solution does not claim that a new card automatically cancels older cards.",
+        "The solution reuses a pending card when its App and commit already match."
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "只修改源代码并在本地检查，今天不要部署，也不要发审批卡。",
+      "expected_output": "Complete only the requested source and local checks; do not invoke syfo app deploy or remote deploy preflight.",
+      "files": [],
+      "expectations": [
+        "Explicit no-card and local-only constraints suppress automatic preparation."
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "准备审批卡返回 hosted_app_preflight_in_progress，没有 actionCardId。继续处理。",
+      "expected_output": "Record the preflight identity and use a supported completion or recovery path. Report the CLI capability gap if progress cannot be queried; do not invent a command or report a prepared card.",
+      "files": [],
+      "expectations": [
+        "The solution does not busy-retry app deploy or create duplicate work to obtain status.",
+        "Preparation resumes for the same commit only after verified preflight success."
+      ]
     }
   ]
 }

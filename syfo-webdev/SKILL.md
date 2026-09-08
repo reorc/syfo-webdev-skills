@@ -5,7 +5,7 @@ description: "Create and maintain Syfo-hosted websites using the web-unified con
 
 # Syfo WebDev Unified
 
-Build, repair, validate, package, and—only when explicitly authorized—deploy a Syfo-hosted website based on the `web-unified` template.
+Build, repair, validate, package, and prepare a deploy confirmation card for a Syfo-hosted website based on the `web-unified` template. A human confirms the card to authorize actual deployment.
 
 Use **Syfo website**, **Syfo-hosted website**, or **Syfo Websites** in user-facing language. Call the optional persistence capability a **Syfo cloud database** or simply **cloud database**. `Hosted App`, `App`, `site`, `app`, `TiDB`, `site/none`, `app/tidb`, and `--confirm-tidb` are legacy, provider-specific, or internal contract terms. Do not teach, offer, or repeat those terms to the user unless the user explicitly names one, an existing identifier must be quoted, or a technical contract mismatch is being diagnosed. Even when the user says “TiDB,” describe the resulting user-facing capability as a cloud database while preserving the TiDB-compatible command internally.
 
@@ -138,7 +138,7 @@ After `state=enabled` or `state=already_enabled`:
 1. Re-read `syfo app status --json` and require the exact internal unified `app/tidb` state with an active database binding.
 2. Modify the same original repository for cloud-database usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Use TiDB-specific implementation guidance only where the current allocated provider requires it. Do not clone a replacement project or rewrite it as a legacy template.
 3. Run the database-enabled website validation workflow below, then commit and push the immutable source.
-4. Stop at local/deploy-ready handoff unless the human separately authorized deployment. Database consent is not deploy consent.
+4. Follow the scope and lifecycle below: a completed hosted-website delivery may prepare a deploy card; actual deployment requires human card confirmation. Database consent is not deploy consent.
 
 If the enable command returns a stable state conflict or other backend error, do not edit the repository as though the transition succeeded. Re-read status and either resume from the observed exact state or report the blocker.
 
@@ -152,15 +152,17 @@ An existing legacy App stays legacy by default. Before any upgrade proposal:
 4. Do not use `syfo app database enable` for a legacy App; the supported operation is only for existing unified `site/none`.
 5. Never infer `none -> tidb` merely because requested features need persistence.
 
-Requests such as “add login,” “add an API,” or “store data” authorize product work, not migration, database enablement, or deployment. Ask for the missing decision.
+Requests such as “add login,” “add an API,” or “store data” authorize product work, not migration, database enablement, or actual deployment. Ask for missing migration or database consent; use the deploy card for deployment consent once the website is ready.
 
 ## Scope and lifecycle
 
 Classify requested scope:
 
-- `build_only`: implement and run relevant local checks; no cloud mutation.
-- `deploy_ready`: validate and prepare immutable source; no deployment.
-- `deploy_authorized`: the human explicitly requested deploy/publish/go live. Follow `references/deployment-lifecycle.md` through confirmation, terminal status, version verification, and cloud smoke.
+- `build_only`: the user limits work to source/local checks or review; do not prepare a deploy card.
+- `deploy_ready`: the task delivers a new or updated Syfo-hosted website. Complete validation and push immutable source, then proactively prepare its deploy confirmation card without asking the user to say “deploy” first.
+- `deploy_authorized`: the human already requested deploy/publish/go live. Prepare the card without asking again, then continue after human confirmation through terminal status, version verification, and cloud smoke.
+
+For `deploy_ready` and `deploy_authorized`, follow `references/deployment-lifecycle.md`. An explicit “do not deploy yet,” “no approval cards,” or local/source-only constraint suppresses automatic card preparation; a request specifically to prepare a card still permits preparation. Otherwise, absence of a separate deploy request is not a reason to stop before the card. Actual deployment always requires human card confirmation. Preparation can run remote preflight and create persistent records and notifications; it is not a read-only action.
 
 For UI work, select the smallest appropriate frontend/design/browser capability set available in the current environment. Preserve existing design when requested.
 
@@ -265,6 +267,7 @@ Report:
 - Checks still delegated to the Syfo clean Builder or production acceptance.
 - For `diagnostic_exception`, the cloud failure identity, available diagnostics/logs, why the
   exception was necessary, and confirmation that no second deploy was created merely to diagnose.
+- Pending card and its intended revision, or the preflight/blocker preventing card creation. Do not describe preparation as deployed.
 - Live URL/version only after terminal deployment and production acceptance.
 
 Never report an unexecuted check as passed. Distinguish local readiness from backend/cloud acceptance.
