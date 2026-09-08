@@ -25,20 +25,23 @@ Before running any Syfo CLI command, resolve the delivery target explicitly:
 
 At the start, classify the requested scope so the workflow applies the correct deployment boundary:
 
-- `build_only`: implement or repair the App and run relevant local checks; the user did not ask for Syfo deployment preparation.
-- `deploy_ready`: complete local validation and immutable source preparation, but do not invoke paid/cloud mutation because deployment was not authorized.
-- `deploy_authorized`: the user explicitly asked to deploy, publish, go live, 上线, or otherwise make the Syfo App accessible. Continue through the deployment workflow below.
+- `build_only`: the user limits work to source/local checks or review; do not prepare a deploy card.
+- `deploy_ready`: the task delivers an updated Syfo-hosted website. Complete validation and push immutable source, then proactively prepare its deploy confirmation card without asking the user to say “deploy” first.
+- `deploy_authorized`: the user already asked to deploy, publish, go live, 上线, or make the website accessible. Prepare the card without asking again, then continue after human confirmation through the deployment workflow below.
+
+An explicit “do not deploy yet,” “no approval cards,” or local/source-only constraint suppresses automatic card preparation; a request specifically to prepare a card still permits preparation. Otherwise, absence of a separate deploy request is not a reason to stop before the card. Actual deployment always requires human card confirmation. Preparation can run remote preflight and create persistent records and notifications; it is not a read-only action.
 
 For `deploy_ready` and `deploy_authorized`, read `references/deployment-lifecycle.md` and follow its
 ownership, confirmation, failure-stage, and completion state machine. In particular, `owner=null`
 is a valid draft and `syfo app claim` is not a routine pre-deploy step.
 
-For `deploy_authorized`, finish the icon/npm gates below, pass the Builder-compatible artifact budget
+For `deploy_ready` and `deploy_authorized`, finish the icon/npm gates below, pass the Builder-compatible artifact budget
 gate, run `syfo app validate --json`, prove required database migrations through
 `syfo app dev -- <command>` when applicable, push a clean immutable commit, prepare the
-human-confirmed deploy, poll to a terminal version, and run production acceptance. For `build_only`
-or `deploy_ready`, do not silently deploy; report the immutable source identity, local result, and
-exact remaining state-machine step.
+card unless explicitly excluded, and report the pending card and intended revision. After human
+confirmation, follow the lifecycle through a terminal version and production acceptance. For
+`build_only` or explicitly excluded preparation, report the immutable source identity, local
+result, and exact remaining state-machine step.
 
 ## Boundaries
 
@@ -418,8 +421,9 @@ node <skill-path>/scripts/smoke-cloud-access.mjs \
 - Do not add region, function name, domain, certificate, account ID, AccessKey, provider runtime identifiers, or Serverless Devs access configuration.
 - Record the artifact entry, required application-owned environment-variable names, source revision, and validation results.
 - Record `requestedScope` as `build_only`, `deploy_ready`, or `deploy_authorized`.
+- For `deploy_ready`, prepare and report the pending card unless explicitly excluded. After human confirmation, continue the same completion workflow.
 - For `deploy_authorized`, execute the Completion contract through human confirmation, terminal deployment state, version verification, and cloud acceptance. Do not merely hand the artifact to the backend and stop.
-- For other scopes, hand the accepted manifest and immutable source/artifact identity to the Syfo backend deployment service and list the exact remaining deployment steps.
+- For `build_only` or explicitly excluded preparation, hand off the accepted manifest and immutable source/artifact identity and list the remaining deployment steps.
 - When the delivery Artifact source is a directory, archive it first (for example `.tar.gz`) and
   declare/upload the regular archive file. A directory-upload rejection plus a local card is not a
   successful remote delivery.
@@ -461,7 +465,7 @@ For a completed authorized deployment, report:
 
 For a deployment waiting on human confirmation or still building, state the current stage and the concrete next action. Do not describe a prepared confirmation card as deployed.
 
-For `build_only` or `deploy_ready`, state clearly that no cloud deployment was performed, record the immutable source identity and local validation outcome, and list the exact remaining deployment steps.
+For `build_only` or an unconfirmed `deploy_ready` handoff, state that no live deployment was performed. Record the immutable source identity, local validation outcome, and pending card or excluded preparation. Report any remote preflight separately.
 
 Keep command JSON and the detailed validation matrix as working evidence. If the user or an automation consumer explicitly requests structured output, write a secret-free `deployment-report.json` artifact or provide a compact JSON object on request instead of placing it in every chat response.
 
