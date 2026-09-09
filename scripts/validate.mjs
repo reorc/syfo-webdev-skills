@@ -3,7 +3,7 @@ import { constants } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
-const skills = ['syfo-webdev', 'syfo-webdev-static', 'syfo-webdev-fullstack'];
+const skills = ['syfo-webdev'];
 
 for (const skill of skills) {
   const root = join(process.cwd(), skill);

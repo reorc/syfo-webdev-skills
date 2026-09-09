@@ -3,7 +3,7 @@ import { cp, mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { analyzeArtifactTree } from '../syfo-webdev-fullstack/scripts/check-artifact-budget.mjs';
+import { analyzeArtifactTree } from '../syfo-webdev/legacy/fullstack/scripts/check-artifact-budget.mjs';
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -101,7 +101,7 @@ export async function runFullstackCanary(options) {
     run(
       process.execPath,
       [
-        join(repositoryRoot, 'syfo-webdev-fullstack', 'scripts', 'smoke-server.mjs'),
+        join(repositoryRoot, 'syfo-webdev', 'legacy', 'fullstack', 'scripts', 'smoke-server.mjs'),
         '--port', String(port),
         '--cwd', artifact,
         '--path', '/auth/start',

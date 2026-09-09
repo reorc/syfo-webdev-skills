@@ -118,7 +118,7 @@ export async function runCanary(options) {
     if (summary.textPaths.length === 0) throw new Error('Next.js 16 static export produced no RSC text assets.');
 
     const smokePaths = ['/', '/about', summary.textPaths[0]];
-    const smokeArgs = [join(repositoryRoot, 'syfo-webdev-static', 'scripts', 'smoke-static.mjs'), '--artifact', artifact];
+    const smokeArgs = [join(repositoryRoot, 'syfo-webdev', 'legacy', 'static', 'scripts', 'smoke-static.mjs'), '--artifact', artifact];
     for (const path of smokePaths) smokeArgs.push('--path', path);
     run(process.execPath, smokeArgs, repositoryRoot);
 
