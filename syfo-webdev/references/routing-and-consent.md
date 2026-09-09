@@ -3,8 +3,8 @@
 ## Deterministic routing
 
 - `template.id: web-unified` → `syfo-webdev`.
-- Legacy static markers → `syfo-webdev-static`.
-- Legacy fullstack markers → `syfo-webdev-fullstack`.
+- Legacy static markers → the static branch of `legacy-app-maintenance.md`.
+- Legacy fullstack markers → the fullstack branch of `legacy-app-maintenance.md`.
 - Missing/conflicting markers → stop as ambiguous.
 
 ## Independent consent gates

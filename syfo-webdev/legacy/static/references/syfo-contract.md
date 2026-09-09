@@ -9,7 +9,9 @@ The baseline contract is `syfo.yaml` version 1 unless the repository contains a 
 - Use one matching dependency lock file and a frozen install command.
 - Use `package-lock.json`, `npm ci`, `npm run build`, and an exact `packageManager: npm@10.x.y`
   for the official template. Generate the lock and pass a no-script dry-run `npm ci` with that
-  exact npm 10 version before validation or deployment; keep any migrated package manager
+  exact npm 10 version via
+  `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`
+  before validation or deployment; keep any migrated package manager
   internally consistent instead of switching it implicitly.
 - For Next.js 16, declare `engines.node: ">=20.9.0"` or a newer compatible minimum and verify the
   local and Syfo Builder Node versions satisfy it.

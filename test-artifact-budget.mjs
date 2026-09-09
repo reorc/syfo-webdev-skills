@@ -7,7 +7,7 @@ import test from 'node:test';
 import {
   DEFAULT_MAX_ARTIFACT_BYTES,
   analyzeArtifactTree,
-} from './syfo-webdev-fullstack/scripts/check-artifact-budget.mjs';
+} from './syfo-webdev/legacy/fullstack/scripts/check-artifact-budget.mjs';
 
 const repositoryRoot = process.cwd();
 
@@ -76,7 +76,7 @@ test('fullstack doctor blocks an oversized assembled artifact before deploy', as
     await truncate(server, DEFAULT_MAX_ARTIFACT_BYTES + 1);
     const result = spawnSync(
       process.execPath,
-      [join(repositoryRoot, 'syfo-webdev-fullstack', 'scripts', 'doctor.mjs'), '--json'],
+      [join(repositoryRoot, 'syfo-webdev', 'legacy', 'fullstack', 'scripts', 'doctor.mjs'), '--json'],
       { cwd: project, encoding: 'utf8' },
     );
     assert.equal(result.status, 2);

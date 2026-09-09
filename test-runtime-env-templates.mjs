@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const templates = [
-  'syfo-webdev-fullstack/assets/syfo-auth/src/_core/env.ts',
+  'syfo-webdev/legacy/fullstack/assets/syfo-auth/src/_core/env.ts',
 ];
 
 for (const template of templates) {

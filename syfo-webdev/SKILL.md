@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev
-description: "Create and maintain Syfo-hosted websites using the web-unified contract, including binding recovery, optional cloud database enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as legacy hosting wording, never as database intent. For an unspecified new website target in a Syfo runtime, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. Keep TiDB, app/tidb, preset=app, and --confirm-tidb internal. When an existing website's machine-local binding is missing, use syfo app bind <app-id> for the authoritative local repository or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init and never copy .git/syfo-hosted-app.json from another machine or Agent. Route historical static/fullstack contracts to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
+description: "Create and maintain Syfo-hosted websites, including web-unified sites and positively identified historical static/fullstack Apps through the bundled legacy maintenance reference. Supports binding recovery, optional cloud database enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as legacy hosting wording, never as database intent. For an unspecified new website target in a Syfo runtime, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. When an existing website's machine-local binding is missing, use syfo app bind <app-id> for the authoritative local repository or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Never silently initialize, migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
@@ -29,18 +29,18 @@ Consulting this Skill is not authorization to initialize, provision a cloud data
 For new website creation, resolve the target before implementation. For existing repositories, inspect contract markers before any Syfo CLI command:
 
 - `local_html`: the user explicitly wants HTML/source only, a local preview, or another hosting provider. Exit the Syfo workflow and use the appropriate general web-development workflow. Do not initialize, validate, package, or deploy Syfo.
-- `syfo_hosted_website`: all new websites hosted by Syfo use this unified Skill. Existing `template.id: web-unified` repositories also stay here. Positively identified historical static/fullstack repositories route to their matching legacy maintenance Skill without reinterpretation.
+- `syfo_hosted_website`: all new websites hosted by Syfo use this Skill. Existing `template.id: web-unified` repositories follow the unified workflow; positively identified historical static/fullstack repositories follow the bundled legacy maintenance reference without reinterpretation.
 - `unknown`: a new website request does not specify local/source-only delivery, another provider, or Syfo hosting; or existing repository markers are missing/conflicting. Ask the minimum focused question and do not begin implementation, initialize, migrate, enable a database, or deploy meanwhile.
 
 For an unspecified new website target, ask once in the user's language: “Do you want local/source-only delivery, or should I create and host it as a Syfo website?” A direct answer resolves this gate; do not repeatedly ask after the target is clear.
 
-`syfo-webdev-static` and `syfo-webdev-fullstack` are compatibility aliases for historical Apps only. They never create a new website or App. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
+For a positively identified historical static or fullstack App, read `references/legacy-app-maintenance.md` before editing, validation, or deployment; preserve its existing contract and never initialize or migrate it implicitly. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
 
 ## Safety contract
 
 - Read repository instructions before changing files.
 - Treat `syfo.yaml` with `template.id: web-unified` as the deterministic unified marker.
-- Preserve existing legacy static/fullstack repositories and route them to the matching legacy Skill.
+- Preserve existing legacy static/fullstack repositories and use the matching branch of `references/legacy-app-maintenance.md`.
 - Never reinterpret an existing App as unified because a feature request mentions login, APIs, or a database.
 - Never enable a cloud database, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
 - To keep access policy human-owned, never call `syfo app access set`.
@@ -51,8 +51,8 @@ For an unspecified new website target, ask once in the user's language: “Do yo
 Classify before any Syfo mutation:
 
 1. **Unified**: `syfo.yaml` contains `template.id: web-unified`. Continue here and preserve its current preset/database state.
-2. **Legacy static**: no unified marker, static export/adapter markers, `run.command: node server.mjs`, or `database.required: false` in the legacy static contract. Use `syfo-webdev-static` without rewriting the template.
-3. **Legacy fullstack**: no unified marker, standalone legacy markers, `run.command: node server.js`, and `database.required: true`. Use `syfo-webdev-fullstack` without rewriting the template.
+2. **Legacy static**: no unified marker, static export/adapter markers, `run.command: node server.mjs`, or `database.required: false` in the legacy static contract. Preserve it and use the static branch of `references/legacy-app-maintenance.md`.
+3. **Legacy fullstack**: no unified marker, standalone legacy markers, `run.command: node server.js`, and `database.required: true`. Preserve it and use the fullstack branch of `references/legacy-app-maintenance.md`.
 4. **Ambiguous**: missing or conflicting markers. Stop and ask; do not guess, initialize, migrate, enable a database, or deploy.
 
 Detection is read-only. A classification result is not migration consent.
