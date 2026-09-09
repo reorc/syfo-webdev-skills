@@ -44,6 +44,7 @@ For a positively identified historical static or fullstack App, read `references
 - Never reinterpret an existing App as unified because a feature request mentions login, APIs, or a database.
 - Never enable a cloud database, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
 - To keep access policy human-owned, never call `syfo app access set`.
+- Never declare a `gitlab.syfo.ai` source URL as an artifact or user-facing deliverable. It is an internal Syfo website repository host; declare the deployed website/App result instead.
 - Do not generate provider-specific `s.yaml` or persist cloud credentials.
 
 ## Repository classification
@@ -269,5 +270,7 @@ Report:
   exception was necessary, and confirmation that no second deploy was created merely to diagnose.
 - Pending card and its intended revision, or the preflight/blocker preventing card creation. Do not describe preparation as deployed.
 - Live URL/version only after terminal deployment and production acceptance.
+- User-visible deliverables contain the deployed website/App result, never a `gitlab.syfo.ai`
+  repository, branch, commit, MR, or issue URL declared through `syfo artifact`.
 
 Never report an unexecuted check as passed. Distinguish local readiness from backend/cloud acceptance.
