@@ -55,6 +55,15 @@ commands or creating more work to obtain status.
   cannot access ends as the server's `NOT_FOUND` or permission error, never as a request for
   personal credentials.
 
+## Internal source URLs are not deliverables
+
+`gitlab.syfo.ai` is the internal repository host for Syfo websites. Never declare any URL whose
+parsed hostname is exactly `gitlab.syfo.ai` through `syfo artifact declare`, and never present its
+repository, branch, commit, MR, or issue URL as a user-facing handoff. Keep source identity in the
+managed App/binding/deployment flow and declare only the deployed website/App result when a
+deliverable card is required. Do not evade this boundary with URL shorteners, alternate casing,
+embedded credentials, ports, redirects, or manually written link cards.
+
 ## Access policy ownership
 
 - App initialization assigns the platform default access policy. The Agent must not change it.
