@@ -1,6 +1,6 @@
 ---
 name: syfo-webdev
-description: "Create and maintain Syfo-hosted websites using the web-unified contract, including binding recovery, optional cloud database enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as legacy hosting wording, never as database intent. For an unspecified new website target in a Syfo runtime, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. Keep TiDB, app/tidb, preset=app, and --confirm-tidb internal. When an existing website's machine-local binding is missing, use syfo app bind <app-id> for the authoritative local repository or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init and never copy .git/syfo-hosted-app.json from another machine or Agent. Route historical static/fullstack contracts to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
+description: "Create and maintain Syfo-hosted websites using the web-unified contract, including access/identity/authorization planning, binding recovery, cloud database enablement, validation, and authorized deployment. Treat 'Syfo Hosted App' as legacy hosting wording, never as database intent. For an unspecified new website target in a Syfo runtime, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. Keep TiDB, app/tidb, preset=app, and --confirm-tidb internal. When an existing website's machine-local binding is missing, use syfo app bind <app-id> for the authoritative local repository or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init and never copy .git/syfo-hosted-app.json from another machine or Agent. Route historical static/fullstack contracts to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
@@ -36,6 +36,25 @@ For an unspecified new website target, ask once in the user's language: “Do yo
 
 `syfo-webdev-static` and `syfo-webdev-fullstack` are compatibility aliases for historical Apps only. They never create a new website or App. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
 
+## Access, identity, and authorization
+
+Before implementing a new Syfo-hosted website—or changing login, protected routes, users, roles, or
+visitor access—read `references/access-identity-authorization.md` and record one security plan:
+
+1. Classify the product as an internal tool, external product, or public information website.
+2. Recommend one whole-website platform access level: `public`, `authenticated`, `org`, or
+   `org_members`. Explain the recommendation, but keep the actual policy change in the human UI.
+3. Decide separately whether application code needs Syfo identity. Add Syfo OAuth only when the App
+   must know which user is acting; a platform sign-in requirement does not itself give business code
+   an App user or business permissions.
+4. Define the App-owned authorization model for protected data and actions. Enforce it in server
+   routes and mutations; client visibility is only a presentation mirror.
+
+Infer decisions already determined by the request. Ask only the focused unresolved question instead
+of presenting every combination. If the official Syfo OAuth starter is selected, its App-local user
+store requires a cloud database; obtain the separate database consent before provisioning it. Do not
+invent a machine API or API-key system when the request concerns human website access.
+
 ## Safety contract
 
 - Read repository instructions before changing files.
@@ -44,6 +63,8 @@ For an unspecified new website target, ask once in the user's language: “Do yo
 - Never reinterpret an existing App as unified because a feature request mentions login, APIs, or a database.
 - Never enable a cloud database, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
 - To keep access policy human-owned, never call `syfo app access set`.
+- Treat platform access, Syfo OAuth identity, and App-owned authorization as separate controls. One
+  never substitutes for the next.
 - Do not generate provider-specific `s.yaml` or persist cloud credentials.
 
 ## Repository classification
@@ -236,6 +257,8 @@ Report:
 - Detected contract: unified, legacy static, legacy fullstack, or ambiguous.
 - Current user-facing capability state: cloud database not enabled or cloud database enabled. Include TiDB and exact internal preset/database values only when diagnosing a contract mismatch.
 - Requested scope and whether migration, database enablement, deployment, and access changes were authorized separately.
+- Security plan: product mode, recommended/current platform access, whether Syfo OAuth is used, and
+  the server-side App authorization boundary. State any human access-policy action still pending.
 - Selected validation mode and why it applied.
 - Immutable source revision and checks actually run.
 - Checks intentionally skipped, especially production bundle, standalone artifact, artifact

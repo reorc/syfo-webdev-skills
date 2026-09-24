@@ -60,6 +60,21 @@ stored in `app_users`, the App session cookie, or browser-visible responses. If 
 Syfo product capability, use a separately designed App-scoped capability API; never reuse the login
 token.
 
+## Authorization boundary
+
+The Hosted App platform access level, Syfo OAuth identity, and App business authorization are three
+separate layers:
+
+- Platform access controls who may open the whole website. It does not create an App-local user or
+  grant access to business data.
+- `protectedRoute` requires a valid App session only.
+- `orgProtectedRoute` additionally requires the signed login-time `orgMember` claim only.
+- Record ownership, App roles, subscriptions, and other business permissions belong in App-owned
+  server-side checks. Protect every relevant API route and mutation; hiding UI is not authorization.
+
+Default deny when a route cannot prove its required role, ownership, or entitlement. Do not treat an
+OAuth token or App session as a general Syfo Product API credential.
+
 Run migrations explicitly during the deploy migration phase. Do not run DDL in the OAuth callback or
 ordinary application startup. The migration is repeatable via `CREATE TABLE IF NOT EXISTS`; production
 schema evolution should continue with ordered forward-only migrations.
