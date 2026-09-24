@@ -124,6 +124,50 @@
         "The icon concept is specific to the website and is not a generic letter tile, framework logo, Syfo logo, copied artwork, or the official four-square placeholder.",
         "The enforced order is replace icons, inspect 16/32/180/512 renderings, rerun doctor with zero icon errors, then validate or prepare deployment."
       ]
+    },
+    {
+      "id": 12,
+      "prompt": "Create a Syfo-hosted internal operations dashboard for everyone in my organization. Users need personal work queues and admin/operator roles.",
+      "expected_output": "The unified Skill records an internal-tool security plan, recommends the org platform gate, uses Syfo OAuth because App code needs user identity, and defines server-side App role ACL for personal queues and admin/operator actions. It keeps the access-policy change human-owned and treats cloud-database enablement as separate consent.",
+      "files": [],
+      "expectations": [
+        "The solution distinguishes the org platform gate from Syfo OAuth identity and App role ACL.",
+        "The solution protects server routes and mutations instead of relying on hidden UI controls.",
+        "The solution does not call syfo app access set or silently provision a cloud database."
+      ]
+    },
+    {
+      "id": 13,
+      "prompt": "Build a public Syfo-hosted membership product with anonymous landing pages, Syfo login for accounts, and data that each customer can only see themselves.",
+      "expected_output": "The unified Skill recommends the public platform gate so anonymous pages remain reachable, adds Syfo OAuth only to account flows, and defines server-side ownership and entitlement checks for customer data. It does not mistake OAuth login for business authorization.",
+      "files": [],
+      "expectations": [
+        "The solution keeps public pages anonymous while protecting account routes with Syfo OAuth.",
+        "The solution enforces customer data ownership and entitlement on the server.",
+        "The solution does not invent a machine API or API-key lifecycle."
+      ]
+    },
+    {
+      "id": 14,
+      "prompt": "Create a Syfo-hosted community site that every signed-in Syfo user may open, including users outside my organization. The App has moderator and member permissions.",
+      "expected_output": "The unified Skill recommends the authenticated platform gate for Syfo-wide entry, then separately uses Syfo OAuth for App identity and App authorization for moderator/member actions. Platform sign-in alone is not treated as App authorization.",
+      "files": [],
+      "expectations": [
+        "The solution chooses authenticated rather than org or org_members for cross-organization Syfo users.",
+        "The solution defines moderator/member checks in server-side App authorization.",
+        "The solution keeps access-policy mutation in the human management UI."
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "Create a public Syfo-hosted campaign website. It has no accounts, personal data, or protected actions.",
+      "expected_output": "The unified Skill recommends public platform access, no Syfo OAuth, and no user ACL because the website is public information only. It avoids adding a cloud database or authentication machinery without a requirement.",
+      "files": [],
+      "expectations": [
+        "The solution records a public-information security plan.",
+        "The solution does not add Syfo OAuth, app_users, roles, or protected-route helpers.",
+        "The solution does not infer a cloud database from the word website."
+      ]
     }
   ]
 }

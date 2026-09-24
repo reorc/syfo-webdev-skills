@@ -17,6 +17,10 @@
   { "query": "帮我做一个网页，先给我 html；是否部署还没决定。", "should_trigger": false },
   { "query": "做一个普通网站，部署目标暂时不确定。", "should_trigger": false },
   { "query": "在 syfo-web 产品仓库实现搜索功能，不涉及 Hosted App 托管。", "should_trigger": false },
+  { "query": "做一个给本组织所有成员用的 Syfo 内部运营工具，需要按用户区分工作队列。", "should_trigger": false },
+  { "query": "做一个公开的 Syfo 会员网站，落地页匿名可看，账户页使用 Syfo 登录。", "should_trigger": false },
+  { "query": "做一个所有已登录 Syfo 用户都能访问的社区，不限本组织。", "should_trigger": false },
+  { "query": "做一个没有账户和受保护操作的 Syfo 公益宣传站。", "should_trigger": false },
   { "query": "做一个带登录、cookie 和 TiDB 用户数据的 Syfo Hosted App。", "should_trigger": false },
   { "query": "帮我做一个普通 Vite 官网，部署到 GitHub Pages，不使用 Syfo。", "should_trigger": false },
   { "query": "优化一个 iOS 原生 App 的启动速度。", "should_trigger": false }

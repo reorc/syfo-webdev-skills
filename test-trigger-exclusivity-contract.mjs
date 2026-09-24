@@ -71,6 +71,26 @@ const matrix = [
     query: '做一个普通网站，部署目标暂时不确定。',
     expected: { unified: true, static: false, fullstack: false },
   },
+  {
+    name: 'internal tool access planning',
+    query: '做一个给本组织所有成员用的 Syfo 内部运营工具，需要按用户区分工作队列。',
+    expected: { unified: true, static: false, fullstack: false },
+  },
+  {
+    name: 'external product with optional login',
+    query: '做一个公开的 Syfo 会员网站，落地页匿名可看，账户页使用 Syfo 登录。',
+    expected: { unified: true, static: false, fullstack: false },
+  },
+  {
+    name: 'Syfo-wide authenticated product',
+    query: '做一个所有已登录 Syfo 用户都能访问的社区，不限本组织。',
+    expected: { unified: true, static: false, fullstack: false },
+  },
+  {
+    name: 'public information website',
+    query: '做一个没有账户和受保护操作的 Syfo 公益宣传站。',
+    expected: { unified: true, static: false, fullstack: false },
+  },
 ];
 
 test('trigger fixtures are mutually exclusive across unified and legacy Skills', () => {

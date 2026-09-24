@@ -2,12 +2,13 @@
 
 Syfo Hosted App 的官方 Web 开发 Skills：
 
-- `syfo-webdev`：新建与维护 `web-unified` App 的统一入口；新建时只接受显式 `site+none` 或 `app+tidb`。
+- `syfo-webdev`：新建与维护 `web-unified` 网站的统一入口；负责区分平台访问范围、Syfo OAuth 身份与 App 内业务权限，并在需要持久化时走独立的云数据库确认。
 - `syfo-webdev-static`：仅维护已存在的历史 static Hosted App。
 - `syfo-webdev-fullstack`：仅维护已存在的历史 fullstack Hosted App。
 
-后两者是 legacy 兼容入口，不再用于新建。所有新增 Syfo 网站/App 必须走 `syfo-webdev`；如果用户尚未确认
-本地 HTML vs Syfo 托管、`site+none` vs `app+tidb`，或现有仓库类型不明确，先询问确认，不得猜测。
+后两者是 legacy 兼容入口，不再用于新建。所有新增 Syfo 网站必须走 `syfo-webdev`；如果用户尚未确认
+本地 HTML vs Syfo 托管，或现有仓库类型不明确，先询问确认，不得猜测。Syfo 托管默认不启用数据库；
+只有功能需要持久化且用户尚未授权时，才询问一次 provider-neutral 的云数据库确认。
 已存在的旧 static/fullstack App 继续走原目录和原流程，不会被 `syfo-webdev` 自动迁移、启用数据库或部署。
 本仓库是这三个 Skill 的唯一源码真源。`syfo-daemon` 的发布流水线从本仓库最新的
 GitHub Release 下载经过 checksum 校验的压缩包，并把该版本嵌入 daemon 二进制。

@@ -18,6 +18,11 @@ type ProtectedHandler<Context> = (
   context: Context & { syfoAuth: SyfoAuthSession },
 ) => Response | Promise<Response>;
 
+/**
+ * Requires a valid App session and exposes verified identity context.
+ * Business authorization such as roles, ownership, and entitlements remains
+ * the caller's server-side responsibility.
+ */
 export function protectedRoute<Context extends object = Record<string, never>>(
   handler: ProtectedHandler<Context>,
 ) {
@@ -36,6 +41,10 @@ export function protectedRoute<Context extends object = Record<string, never>>(
   };
 }
 
+/**
+ * Requires a valid App session plus the signed login-time organization-member
+ * snapshot. It does not replace App roles, ownership, or entitlement checks.
+ */
 export function orgProtectedRoute<Context extends object = Record<string, never>>(
   handler: ProtectedHandler<Context>,
 ) {
