@@ -16,11 +16,11 @@ const authServer = await readFile(
   'utf8',
 );
 const legacyAuthReadme = await readFile(
-  new URL('./syfo-webdev-fullstack/assets/syfo-auth/README.md', import.meta.url),
+  new URL('./syfo-webdev/legacy/fullstack/assets/syfo-auth/README.md', import.meta.url),
   'utf8',
 );
 const legacyAuthServer = await readFile(
-  new URL('./syfo-webdev-fullstack/assets/syfo-auth/src/_core/syfo-auth/server.ts', import.meta.url),
+  new URL('./syfo-webdev/legacy/fullstack/assets/syfo-auth/src/_core/syfo-auth/server.ts', import.meta.url),
   'utf8',
 );
 const evals = JSON.parse(

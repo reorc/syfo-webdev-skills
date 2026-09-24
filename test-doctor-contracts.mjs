@@ -7,6 +7,15 @@ import test from 'node:test';
 import { deflateSync } from 'node:zlib';
 
 const repositoryRoot = process.cwd();
+const skillRoots = {
+  'syfo-webdev': ['syfo-webdev'],
+  'syfo-webdev-static': ['syfo-webdev', 'legacy', 'static'],
+  'syfo-webdev-fullstack': ['syfo-webdev', 'legacy', 'fullstack'],
+};
+
+function skillPath(skill, ...parts) {
+  return join(repositoryRoot, ...skillRoots[skill], ...parts);
+}
 
 function crc32(bytes) {
   let crc = 0xffffffff;
@@ -48,7 +57,7 @@ function createPng(size, { colorType = 6, imageData, chunks } = {}) {
 function runDoctor(skill, project) {
   const result = spawnSync(
     process.execPath,
-    [join(repositoryRoot, skill, 'scripts', 'doctor.mjs'), '--json'],
+    [skillPath(skill, 'scripts', 'doctor.mjs'), '--json'],
     { cwd: project, encoding: 'utf8' },
   );
   return {
@@ -125,12 +134,12 @@ async function createStaticFixture() {
   );
   await writeFile(join(project, 'next.config.mjs'), 'export default { output: "export" };\n');
   await cp(
-    join(repositoryRoot, 'syfo-webdev-static', 'templates', 'project-static-server.mjs'),
+    skillPath('syfo-webdev-static', 'templates', 'project-static-server.mjs'),
     join(project, 'scripts', 'static-server.mjs'),
   );
   await writeFile(join(project, 'scripts', 'assemble-static.mjs'), 'export {};\n');
   await cp(
-    join(repositoryRoot, 'syfo-webdev-static', 'templates', 'syfo.nextjs-static.yaml'),
+    skillPath('syfo-webdev-static', 'templates', 'syfo.nextjs-static.yaml'),
     join(project, 'syfo.yaml'),
   );
   await createAppIcons(project);
@@ -163,7 +172,7 @@ async function createFullstackFixture() {
     'export const env = ["TIDB_HOST", "TIDB_PORT", "TIDB_USER", "TIDB_PASSWORD", "TIDB_DATABASE"];\n',
   );
   await cp(
-    join(repositoryRoot, 'syfo-webdev-fullstack', 'templates', 'syfo.nextjs-fullstack.yaml'),
+    skillPath('syfo-webdev-fullstack', 'templates', 'syfo.nextjs-fullstack.yaml'),
     join(project, 'syfo.yaml'),
   );
   await createAppIcons(project);
@@ -395,14 +404,20 @@ test('doctor rejects unsupported, empty, and undecodable PNG pixel data', async 
   }
 });
 
-test('skill lifecycle keeps icon validation and deploy state machine explicit', async () => {
-  for (const skill of ['syfo-webdev', 'syfo-webdev-static', 'syfo-webdev-fullstack']) {
-    const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
-    const lifecycle = await readFile(
-      join(repositoryRoot, skill, 'references', 'deployment-lifecycle.md'),
-      'utf8',
-    );
-    assert.match(source, /After icon creation, run the doctor again[\s\S]*before `syfo app validate`/);
+test('skill lifecycle keeps deploy state machine explicit for unified and legacy flows', async () => {
+  const source = await readFile(skillPath('syfo-webdev', 'SKILL.md'), 'utf8');
+  assert.match(source, /After icon creation, run the doctor again[\s\S]*before `syfo app validate`/);
+  assert.match(source, /Git push credentials are managed/);
+  assert.match(
+    source,
+    /Never create a `syfo secret request` for a\n  GitLab or personal access token to push, clone, or repair a website/,
+  );
+
+  for (const lifecycle of await Promise.all([
+    readFile(skillPath('syfo-webdev', 'references', 'deployment-lifecycle.md'), 'utf8'),
+    readFile(skillPath('syfo-webdev-static', 'references', 'deployment-lifecycle.md'), 'utf8'),
+    readFile(skillPath('syfo-webdev-fullstack', 'references', 'deployment-lifecycle.md'), 'utf8'),
+  ])) {
     assert.match(
       lifecycle,
       /source_ready[\s\S]*syfo app deploy --target "<reply-target>" --json[\s\S]*awaiting_confirmation/,
@@ -410,27 +425,34 @@ test('skill lifecycle keeps icon validation and deploy state machine explicit', 
     assert.doesNotMatch(lifecycle, /syfo app deploy --json/);
     assert.match(lifecycle, /operationId[\s\S]*do not create a second deploy operation/);
     assert.match(lifecycle, /owner=null[\s\S]*Do not run `syfo app claim` as a routine prerequisite/);
+    // Managed-credential contract (syfo-daemon task #12059): push credentials
+    // come only from the managed hosted-app chain. A GitLab/personal access
+    // token request is never an acceptable recovery for push, clone, or a
+    // missing binding, and an inaccessible App must end as a server error.
+    assert.match(lifecycle, /## Git credentials are managed/);
+    assert.match(
+      lifecycle,
+      /Never create a `syfo secret\n  request` for a GitLab or personal access token to push, clone, or repair a website/,
+    );
+    assert.match(
+      lifecycle,
+      /stop at\n  `syfo app bind <app-id>` \/ `syfo app clone <app-id> --clone <dir>` and report/,
+    );
+    assert.match(lifecycle, /never as a request for\n  personal credentials/);
   }
 });
 
 test('skill architecture choice rejects speculative fullstack upgrades', async () => {
-  const staticSkill = await readFile(join(repositoryRoot, 'syfo-webdev-static', 'SKILL.md'), 'utf8');
-  const fullstackSkill = await readFile(join(repositoryRoot, 'syfo-webdev-fullstack', 'SKILL.md'), 'utf8');
-
-  assert.match(staticSkill, /Preserve static/);
-  assert.match(staticSkill, /may need a backend later/i);
-  assert.match(staticSkill, /ask the user rather than[\s\S]*guessing/);
-  assert.match(fullstackSkill, /Do not choose fullstack only for possible future expansion/);
-  assert.match(fullstackSkill, /ask the user rather than guessing/);
+  const legacy = await readFile(skillPath('syfo-webdev', 'references', 'legacy-app-maintenance.md'), 'utf8');
+  assert.match(legacy, /Static remains database-free and request-independent/);
+  assert.match(legacy, /migration proposal, not permission to migrate/);
+  assert.match(legacy, /stop and ask for separate migration authorization/);
 });
 
 test('skill keeps npm 10 gate and immutable deploy preparation explicit', async () => {
   for (const skill of ['syfo-webdev-static', 'syfo-webdev-fullstack']) {
-    const source = await readFile(join(repositoryRoot, skill, 'SKILL.md'), 'utf8');
-    const lifecycle = await readFile(
-      join(repositoryRoot, skill, 'references', 'deployment-lifecycle.md'),
-      'utf8',
-    );
+    const source = await readFile(skillPath(skill, 'references', 'syfo-contract.md'), 'utf8');
+    const lifecycle = await readFile(skillPath(skill, 'references', 'deployment-lifecycle.md'), 'utf8');
     assert.match(
       source,
       /packageManager: npm@10\.x\.y[\s\S]*npx --yes npm@<package\.json packageManager version> ci --ignore-scripts --dry-run/,

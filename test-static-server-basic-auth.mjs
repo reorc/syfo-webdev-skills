@@ -10,7 +10,7 @@ import { promisify } from 'node:util';
 const execFileAsync = promisify(execFile);
 
 const source = await readFile(
-  new URL('syfo-webdev-static/templates/project-static-server.mjs', import.meta.url),
+  new URL('syfo-webdev/legacy/static/templates/project-static-server.mjs', import.meta.url),
   'utf8',
 );
 
@@ -141,7 +141,7 @@ test('static smoke harness injects a local public verifier', async () => {
     const { stdout } = await execFileAsync(
       process.execPath,
       [
-        new URL('syfo-webdev-static/scripts/smoke-static.mjs', import.meta.url).pathname,
+        new URL('syfo-webdev/legacy/static/scripts/smoke-static.mjs', import.meta.url).pathname,
         '--artifact',
         artifact,
         '--path',

@@ -1,11 +1,11 @@
 ---
 name: syfo-webdev
-description: "Create and maintain Syfo-hosted websites using the web-unified contract, including access/identity/authorization planning, binding recovery, cloud database enablement, validation, and authorized deployment. Treat 'Syfo Hosted App' as legacy hosting wording, never as database intent. For an unspecified new website target in a Syfo runtime, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. Keep TiDB, app/tidb, preset=app, and --confirm-tidb internal. When an existing website's machine-local binding is missing, use syfo app bind <app-id> for the authoritative local repository or syfo app clone <app-id> --clone <dir> when no clone exists; never rerun syfo app init and never copy .git/syfo-hosted-app.json from another machine or Agent. Route historical static/fullstack contracts to legacy Skills. Never silently initialize, migrate, enable a database, deploy, or change access policy."
+description: "Create and maintain Syfo-hosted websites, including web-unified sites and positively identified historical static/fullstack Apps through the bundled legacy reference. Supports access/identity/authorization planning, binding recovery, cloud database enablement, validation, packaging, and authorized deployment. Treat 'Syfo Hosted App' as legacy wording, never as database intent. For an unspecified new website target, ask local/source-only versus Syfo hosting once. New Syfo websites default to no database; when persistence is required, ask one provider-neutral cloud-database consent question. Keep TiDB, app/tidb, preset=app, and --confirm-tidb internal. When a machine-local binding is missing, use syfo app bind <app-id> or syfo app clone <app-id> --clone <dir>; never rerun syfo app init or copy .git/syfo-hosted-app.json from another machine or Agent. Never silently initialize, migrate, enable a database, deploy, or change access policy."
 ---
 
 # Syfo WebDev Unified
 
-Build, repair, validate, package, and—only when explicitly authorized—deploy a Syfo-hosted website based on the `web-unified` template.
+Build, repair, validate, package, and prepare a deploy confirmation card for a Syfo-hosted website based on the `web-unified` template. A human confirms the card to authorize actual deployment.
 
 Use **Syfo website**, **Syfo-hosted website**, or **Syfo Websites** in user-facing language. Call the optional persistence capability a **Syfo cloud database** or simply **cloud database**. `Hosted App`, `App`, `site`, `app`, `TiDB`, `site/none`, `app/tidb`, and `--confirm-tidb` are legacy, provider-specific, or internal contract terms. Do not teach, offer, or repeat those terms to the user unless the user explicitly names one, an existing identifier must be quoted, or a technical contract mismatch is being diagnosed. Even when the user says “TiDB,” describe the resulting user-facing capability as a cloud database while preserving the TiDB-compatible command internally.
 
@@ -29,12 +29,12 @@ Consulting this Skill is not authorization to initialize, provision a cloud data
 For new website creation, resolve the target before implementation. For existing repositories, inspect contract markers before any Syfo CLI command:
 
 - `local_html`: the user explicitly wants HTML/source only, a local preview, or another hosting provider. Exit the Syfo workflow and use the appropriate general web-development workflow. Do not initialize, validate, package, or deploy Syfo.
-- `syfo_hosted_website`: all new websites hosted by Syfo use this unified Skill. Existing `template.id: web-unified` repositories also stay here. Positively identified historical static/fullstack repositories route to their matching legacy maintenance Skill without reinterpretation.
+- `syfo_hosted_website`: all new websites hosted by Syfo use this Skill. Existing `template.id: web-unified` repositories follow the unified workflow; positively identified historical static/fullstack repositories follow the bundled legacy maintenance reference without reinterpretation.
 - `unknown`: a new website request does not specify local/source-only delivery, another provider, or Syfo hosting; or existing repository markers are missing/conflicting. Ask the minimum focused question and do not begin implementation, initialize, migrate, enable a database, or deploy meanwhile.
 
 For an unspecified new website target, ask once in the user's language: “Do you want local/source-only delivery, or should I create and host it as a Syfo website?” A direct answer resolves this gate; do not repeatedly ask after the target is clear.
 
-`syfo-webdev-static` and `syfo-webdev-fullstack` are compatibility aliases for historical Apps only. They never create a new website or App. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
+For a positively identified historical static or fullstack App, read `references/legacy-app-maintenance.md` before editing, validation, or deployment; preserve its existing contract and never initialize or migrate it implicitly. “Please send me the HTML” means `local_html` unless the user separately requests Syfo hosting.
 
 ## Access, identity, and authorization
 
@@ -59,12 +59,13 @@ invent a machine API or API-key system when the request concerns human website a
 
 - Read repository instructions before changing files.
 - Treat `syfo.yaml` with `template.id: web-unified` as the deterministic unified marker.
-- Preserve existing legacy static/fullstack repositories and route them to the matching legacy Skill.
+- Preserve existing legacy static/fullstack repositories and use the matching branch of `references/legacy-app-maintenance.md`.
 - Never reinterpret an existing App as unified because a feature request mentions login, APIs, or a database.
 - Never enable a cloud database, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
 - To keep access policy human-owned, never call `syfo app access set`.
 - Treat platform access, Syfo OAuth identity, and App-owned authorization as separate controls. One
   never substitutes for the next.
+- Never declare a `gitlab.syfo.ai` source URL as an artifact or user-facing deliverable. It is an internal Syfo website repository host; declare the deployed website/App result instead.
 - Do not generate provider-specific `s.yaml` or persist cloud credentials.
 
 ## Repository classification
@@ -72,15 +73,15 @@ invent a machine API or API-key system when the request concerns human website a
 Classify before any Syfo mutation:
 
 1. **Unified**: `syfo.yaml` contains `template.id: web-unified`. Continue here and preserve its current preset/database state.
-2. **Legacy static**: no unified marker, static export/adapter markers, `run.command: node server.mjs`, or `database.required: false` in the legacy static contract. Use `syfo-webdev-static` without rewriting the template.
-3. **Legacy fullstack**: no unified marker, standalone legacy markers, `run.command: node server.js`, and `database.required: true`. Use `syfo-webdev-fullstack` without rewriting the template.
+2. **Legacy static**: no unified marker, static export/adapter markers, `run.command: node server.mjs`, or `database.required: false` in the legacy static contract. Preserve it and use the static branch of `references/legacy-app-maintenance.md`.
+3. **Legacy fullstack**: no unified marker, standalone legacy markers, `run.command: node server.js`, and `database.required: true`. Preserve it and use the fullstack branch of `references/legacy-app-maintenance.md`.
 4. **Ambiguous**: missing or conflicting markers. Stop and ask; do not guess, initialize, migrate, enable a database, or deploy.
 
 Detection is read-only. A classification result is not migration consent.
 
 ## New website create contract
 
-All new Syfo-hosted websites use the unified template. Presets are internal daemon compatibility values, not user-facing website types:
+All new Syfo-hosted websites use the unified template. New Syfo websites default to no database. Presets are internal daemon compatibility values, not user-facing website types:
 
 - A website without a cloud database uses `template=unified`, `preset=site`; the daemon sends the complete Core pair `site/none`.
 - A website with a cloud database currently uses `template=unified`, `preset=app`; the daemon sends the complete Core pair `app/tidb`.
@@ -117,9 +118,30 @@ history is broken.
 - Never use `syfo app init` to repair a missing binding for an existing App. If the App ID is unknown,
   the remote does not match the canonical repository, or the destination is ambiguous, stop and get
   authoritative App/repository identity rather than guessing or overwriting files.
+- Git push credentials are managed: `syfo app bind` / `syfo app clone` obtain a short-lived
+  App-scoped credential through the managed chain. Never create a `syfo secret request` for a
+  GitLab or personal access token to push, clone, or repair a website.
 
 After bind or clone, re-run repository classification and continue only when the source markers and
 App identity agree.
+
+## Website environment variables
+
+Environment variables are persistent website configuration, separate from source edits and local
+process environment. Use `syfo app env set` only when the current Agent is both a developer of the
+website and owned by the human website Owner. Owner-owned developer Agents may set either dev or
+prod variables. Always pass the scope explicitly because one invocation writes exactly one scope:
+
+```bash
+syfo app env set <app-id> <key> <value> --scope dev
+syfo app env set <app-id> <key> <value> --scope prod
+```
+
+Do not assume that setting one scope updates the other. Do not print, persist, commit, or repeat a
+secret value in the handoff. If the command returns `FORBIDDEN`, do not retry, claim the website,
+request broader credentials, or work around the policy with source-controlled defaults. Tell the
+user that an Owner or organization Admin must configure the variable in the website's management
+settings, then resume only after they confirm the setting is complete.
 
 ## Existing unified website cloud database enable
 
@@ -138,7 +160,7 @@ After `state=enabled` or `state=already_enabled`:
 1. Re-read `syfo app status --json` and require the exact internal unified `app/tidb` state with an active database binding.
 2. Modify the same original repository for cloud-database usage, including `database.required: true`, migrations, runtime data access, and relevant tests. Use TiDB-specific implementation guidance only where the current allocated provider requires it. Do not clone a replacement project or rewrite it as a legacy template.
 3. Run the database-enabled website validation workflow below, then commit and push the immutable source.
-4. Stop at local/deploy-ready handoff unless the human separately authorized deployment. Database consent is not deploy consent.
+4. Follow the scope and lifecycle below: a completed hosted-website delivery may prepare a deploy card; actual deployment requires human card confirmation. Database consent is not deploy consent.
 
 If the enable command returns a stable state conflict or other backend error, do not edit the repository as though the transition succeeded. Re-read status and either resume from the observed exact state or report the blocker.
 
@@ -152,15 +174,17 @@ An existing legacy App stays legacy by default. Before any upgrade proposal:
 4. Do not use `syfo app database enable` for a legacy App; the supported operation is only for existing unified `site/none`.
 5. Never infer `none -> tidb` merely because requested features need persistence.
 
-Requests such as “add login,” “add an API,” or “store data” authorize product work, not migration, database enablement, or deployment. Ask for the missing decision.
+Requests such as “add login,” “add an API,” or “store data” authorize product work, not migration, database enablement, or actual deployment. Ask for missing migration or database consent; use the deploy card for deployment consent once the website is ready.
 
 ## Scope and lifecycle
 
 Classify requested scope:
 
-- `build_only`: implement and run relevant local checks; no cloud mutation.
-- `deploy_ready`: validate and prepare immutable source; no deployment.
-- `deploy_authorized`: the human explicitly requested deploy/publish/go live. Follow `references/deployment-lifecycle.md` through confirmation, terminal status, version verification, and cloud smoke.
+- `build_only`: the user limits work to source/local checks or review; do not prepare a deploy card.
+- `deploy_ready`: the task delivers a new or updated Syfo-hosted website. Complete validation and push immutable source, then proactively prepare its deploy confirmation card without asking the user to say “deploy” first.
+- `deploy_authorized`: the human already requested deploy/publish/go live. Prepare the card without asking again, then continue after human confirmation through terminal status, version verification, and cloud smoke.
+
+For `deploy_ready` and `deploy_authorized`, follow `references/deployment-lifecycle.md`. An explicit “do not deploy yet,” “no approval cards,” or local/source-only constraint suppresses automatic card preparation; a request specifically to prepare a card still permits preparation. Otherwise, absence of a separate deploy request is not a reason to stop before the card. Actual deployment always requires human card confirmation. Preparation can run remote preflight and create persistent records and notifications; it is not a read-only action.
 
 For UI work, select the smallest appropriate frontend/design/browser capability set available in the current environment. Preserve existing design when requested.
 
@@ -267,6 +291,9 @@ Report:
 - Checks still delegated to the Syfo clean Builder or production acceptance.
 - For `diagnostic_exception`, the cloud failure identity, available diagnostics/logs, why the
   exception was necessary, and confirmation that no second deploy was created merely to diagnose.
+- Pending card and its intended revision, or the preflight/blocker preventing card creation. Do not describe preparation as deployed.
 - Live URL/version only after terminal deployment and production acceptance.
+- User-visible deliverables contain the deployed website/App result, never a `gitlab.syfo.ai`
+  repository, branch, commit, MR, or issue URL declared through `syfo artifact`.
 
 Never report an unexecuted check as passed. Distinguish local readiness from backend/cloud acceptance.

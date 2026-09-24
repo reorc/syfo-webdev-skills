@@ -1,23 +1,18 @@
 # Syfo WebDev Skills
 
-Syfo Hosted App 的官方 Web 开发 Skills：
+Syfo Hosted App 的官方 Web 开发 Skill：
 
-- `syfo-webdev`：新建与维护 `web-unified` 网站的统一入口；负责区分平台访问范围、Syfo OAuth 身份与 App 内业务权限，并在需要持久化时走独立的云数据库确认。
-- `syfo-webdev-static`：仅维护已存在的历史 static Hosted App。
-- `syfo-webdev-fullstack`：仅维护已存在的历史 fullstack Hosted App。
+- `syfo-webdev`：新建与维护 `web-unified` 网站的统一入口，负责区分平台访问范围、Syfo OAuth 身份与 App 内业务权限，并通过按需 Reference 维护已存在的历史 static/fullstack Hosted App；新建时只接受显式 `site+none` 或 `app+tidb`。
 
-后两者是 legacy 兼容入口，不再用于新建。所有新增 Syfo 网站必须走 `syfo-webdev`；如果用户尚未确认
-本地 HTML vs Syfo 托管，或现有仓库类型不明确，先询问确认，不得猜测。Syfo 托管默认不启用数据库；
-只有功能需要持久化且用户尚未授权时，才询问一次 provider-neutral 的云数据库确认。
+历史 static/fullstack 只保留在 `syfo-webdev/references/legacy-app-maintenance.md` 和 `syfo-webdev/legacy/` 资源中，不再作为独立 Skill 发布。所有新增 Syfo 网站/App 必须走 `syfo-webdev`；如果用户尚未确认
+本地 HTML vs Syfo 托管、`site+none` vs `app+tidb`，或现有仓库类型不明确，先询问确认，不得猜测。
 已存在的旧 static/fullstack App 继续走原目录和原流程，不会被 `syfo-webdev` 自动迁移、启用数据库或部署。
-本仓库是这三个 Skill 的唯一源码真源。`syfo-daemon` 的发布流水线从本仓库最新的
+本仓库是该 Skill 的唯一源码真源。`syfo-daemon` 的发布流水线从本仓库最新的
 GitHub Release 下载经过 checksum 校验的压缩包，并把该版本嵌入 daemon 二进制。
 
 ## 本地安装
 
 ```bash
-ln -s "$PWD/syfo-webdev-static" ~/.codex/skills/syfo-webdev-static
-ln -s "$PWD/syfo-webdev-fullstack" ~/.codex/skills/syfo-webdev-fullstack
 ln -s "$PWD/syfo-webdev" ~/.codex/skills/syfo-webdev
 ```
 
@@ -70,7 +65,7 @@ npm run test:fullstack-template-canary -- \
 - `manifest.json`
 - `checksums.txt`
 
-压缩包顶层固定包含 `syfo-webdev/`、`syfo-webdev-static/` 和 `syfo-webdev-fullstack/`。release
+压缩包顶层固定只包含 `syfo-webdev/`；历史 static/fullstack 维护资源位于该目录的 `legacy/` 子目录。release
 manifest 同时声明 daemon-owned `.syfo-managed.json` marker 合同；marker 由 daemon 安装时写入，
 不得预置在压缩包中。daemon 构建只接受
 checksum 匹配且目录结构完整的 Release。
