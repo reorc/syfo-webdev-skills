@@ -3,8 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const unified = await readFile(new URL('./syfo-webdev/SKILL.md', import.meta.url), 'utf8');
-const staticSkill = await readFile(new URL('./syfo-webdev-static/SKILL.md', import.meta.url), 'utf8');
-const fullstackSkill = await readFile(new URL('./syfo-webdev-fullstack/SKILL.md', import.meta.url), 'utf8');
+const legacy = await readFile(new URL('./syfo-webdev/references/legacy-app-maintenance.md', import.meta.url), 'utf8');
 
 test('unified create contract accepts only frozen pairs', () => {
   assert.match(unified, /--template unified --preset site --from-template --clone <dir>/);
@@ -23,18 +22,15 @@ test('unified create contract accepts only frozen pairs', () => {
   assert.match(unified, /Never pass `--confirm-tidb` for `preset=site` or without informed explicit cloud-database consent/);
 });
 
-test('legacy aliases preserve flow and require explicit upgrade consent', () => {
-  for (const source of [staticSkill, fullstackSkill]) {
-    assert.match(source, /legacy compatibility/i);
-    assert.match(source, /Preserve the old/);
-    assert.match(source, /separate explicit human authorization|separate human consent/);
-  }
+test('bundled legacy reference preserves flow and requires explicit upgrade consent', () => {
+  assert.match(legacy, /rare legacy maintenance inside `syfo-webdev`/);
+  assert.match(legacy, /Keep the existing directory, template, runtime, database requirement, and deployment flow/);
+  assert.match(legacy, /separate explicit human decision/);
   assert.match(unified, /Detection is read-only\. A classification result is not migration consent/);
   assert.match(unified, /Never infer `none -> tidb`/);
   assert.match(unified, /Create and maintain Syfo-hosted websites/i);
-  assert.match(unified, /compatibility aliases for historical Apps only/);
-  assert.match(staticSkill, /Do not use for any new website or App/);
-  assert.match(fullstackSkill, /Do not use for any new website or App/);
+  assert.match(unified, /read `references\/legacy-app-maintenance\.md`/);
+  assert.match(legacy, /Route all new Syfo website creation through the unified workflow/);
 });
 
 test('existing unified site database enable uses one consent and preserves lifecycle boundaries', () => {
@@ -101,8 +97,8 @@ test('trigger matrix covers unified, legacy, ambiguous, and no-consent database 
   const cases = [
     [/unified site/, true],
     [/unified app preset/, true],
-    [/旧 web-static App/, false],
-    [/旧 web-fullstack App/, false],
+    [/旧 web-static App/, true],
+    [/旧 web-fullstack App/, true],
     [/markers 冲突/, true],
     [/还没授权迁移或启用 TiDB/, true],
     [/^我想做一个网站。$/, true],

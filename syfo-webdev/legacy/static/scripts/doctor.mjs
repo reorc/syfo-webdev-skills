@@ -332,7 +332,7 @@ if (!existsSync(packagePath)) {
     if (!packageJson.scripts?.[script]) add("warning", `missing-${script}-script`, "package.json", `No ${script} script was found.`);
   }
   for (const dependency of ["mysql2", "better-sqlite3", "sqlite3", "pg", "@prisma/client", "drizzle-orm", "sequelize", "typeorm"]) {
-    if (dependencies[dependency]) add("warning", "database-dependency", "package.json", `${dependency} suggests this may require syfo-webdev-fullstack.`);
+    if (dependencies[dependency]) add("warning", "database-dependency", "package.json", `${dependency} suggests this may require the syfo-webdev legacy fullstack maintenance branch.`);
   }
 }
 
@@ -410,8 +410,8 @@ const sourceFiles = [join(root, "app"), join(root, "src"), join(root, "pages")]
   .flatMap((directory) => walk(directory))
   .filter((path) => /\.[cm]?[jt]sx?$/.test(path));
 const patterns = [
-  ["error", "request-api", /from\s*["']next\/headers["']|\b(?:cookies|headers|draftMode)\s*\(/, "Request-time Next.js APIs require syfo-webdev-fullstack."],
-  ["error", "server-action", /["']use server["']/, "Server Actions require syfo-webdev-fullstack."],
+  ["error", "request-api", /from\s*["']next\/headers["']|\b(?:cookies|headers|draftMode)\s*\(/, "Request-time Next.js APIs require the syfo-webdev legacy fullstack maintenance branch."],
+  ["error", "server-action", /["']use server["']/, "Server Actions require the syfo-webdev legacy fullstack maintenance branch."],
   ["warning", "revalidate", /export\s+const\s+revalidate\b/, "Confirm ISR is not expected from a static deployment."],
   ["warning", "runtime-declaration", /export\s+const\s+runtime\b/, "Review explicit runtime declarations for static-export necessity."],
   ["warning", "public-secret", /NEXT_PUBLIC_[A-Z0-9_]*(?:SECRET|TOKEN|PRIVATE|PASSWORD|KEY)/, "Browser-exposed environment variables are public."],
@@ -425,7 +425,7 @@ for (const file of sourceFiles) {
 }
 
 for (const path of ["middleware.ts", "middleware.js", "src/middleware.ts", "src/middleware.js", "proxy.ts", "proxy.js", "src/proxy.ts", "src/proxy.js"]) {
-  if (existsSync(join(root, path))) add("error", "request-middleware", path, "Request middleware or proxy behavior requires syfo-webdev-fullstack.");
+  if (existsSync(join(root, path))) add("error", "request-middleware", path, "Request middleware or proxy behavior requires the syfo-webdev legacy fullstack maintenance branch.");
 }
 
 const combinedSource = sourceFiles.map((file) => read(file)).join("\n");

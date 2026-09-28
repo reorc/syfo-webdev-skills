@@ -8,7 +8,9 @@ The accepted application contract is `syfo.yaml` version 1 unless the repository
 - Keep every path relative to `appDir` and contained within it.
 - Use one matching dependency lock file and a frozen install command.
 - For npm Apps, pin an exact `packageManager: npm@10.x.y`, generate `package-lock.json` with that
-  version, and pass a no-script dry-run `npm ci` with the same version before validation or deploy.
+  version, and pass
+  `npx --yes npm@<package.json packageManager version> ci --ignore-scripts --dry-run`
+  before validation or deploy.
 - For Next.js 16, declare `engines.node: ">=20.9.0"` or a newer compatible minimum and verify the
   local and Syfo Builder Node versions satisfy it.
 - Declare deterministic install, build, run, health, migration, environment-name, and routing behavior.

@@ -14,8 +14,6 @@ LC_ALL=C git -C "${ROOT}" archive \
   --format=tar \
   HEAD \
   syfo-webdev \
-  syfo-webdev-static \
-  syfo-webdev-fullstack \
   | gzip -n -9 > "${DIST}/${ARCHIVE}"
 
 cat > "${DIST}/manifest.json" <<EOF
@@ -30,9 +28,7 @@ cat > "${DIST}/manifest.json" <<EOF
     "schemaVersion": 1
   },
   "skills": [
-    "syfo-webdev",
-    "syfo-webdev-static",
-    "syfo-webdev-fullstack"
+    "syfo-webdev"
   ]
 }
 EOF

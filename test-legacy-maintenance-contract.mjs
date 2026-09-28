@@ -1,52 +1,51 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import test from 'node:test';
 
-const skills = [
-  [
-    'static',
-    await readFile(new URL('./syfo-webdev-static/SKILL.md', import.meta.url), 'utf8'),
-    await readFile(new URL('./syfo-webdev-static/evals/evals.json', import.meta.url), 'utf8'),
-  ],
-  [
-    'fullstack',
-    await readFile(new URL('./syfo-webdev-fullstack/SKILL.md', import.meta.url), 'utf8'),
-    await readFile(new URL('./syfo-webdev-fullstack/evals/evals.json', import.meta.url), 'utf8'),
-  ],
-];
+const skill = await readFile(new URL('./syfo-webdev/SKILL.md', import.meta.url), 'utf8');
+const legacy = await readFile(new URL('./syfo-webdev/references/legacy-app-maintenance.md', import.meta.url), 'utf8');
 
-test('legacy Skill bodies are maintenance-only', () => {
-  for (const [name, source] of skills) {
-    assert.match(source, /existing historical App binding/);
-    assert.match(source, /Hard stop: this Skill must never run `syfo app init`/);
-    assert.match(source, /Never create a replacement App/);
-    assert.match(source, /syfo app bind <app-id>/);
-    assert.match(source, /syfo app clone <app-id> --clone <dir>/);
-    assert.match(source, /\.git\/syfo-hosted-app\.json/);
-    assert.match(source, /Route new creation to `syfo-webdev`/);
-    assert.doesNotMatch(source, new RegExp(`syfo app init[^\n]*--template ${name}`));
-    for (const line of source.split('\n').filter((value) => /syfo app init/i.test(value))) {
-      assert.match(line, /does not|do not|must not|never|refus|rather than/i);
-    }
-    assert.doesNotMatch(source, /brand-new|new Syfo Hosted App|new official-template Apps/i);
-    assert.doesNotMatch(source, /Produce a .* application|Before initialization/i);
-    assert.doesNotMatch(source, /For an existing local Git project.*platform creates/s);
+test('legacy maintenance is disclosed from the unified Skill', () => {
+  assert.match(skill, /read `references\/legacy-app-maintenance\.md` before editing, validation, or deployment/);
+  assert.match(skill, /positively identified historical static\/fullstack repositories follow the bundled legacy maintenance reference/);
+  assert.match(skill, /static branch of `references\/legacy-app-maintenance\.md`/);
+  assert.match(skill, /fullstack branch of `references\/legacy-app-maintenance\.md`/);
+});
+
+test('legacy reference is maintenance-only and preserves authoritative identity', () => {
+  assert.match(legacy, /positively identified existing historical Syfo static or fullstack App/);
+  assert.match(legacy, /Verify the existing historical App binding/);
+  assert.match(legacy, /Hard stop: historical maintenance must never run `syfo app init`/);
+  assert.match(legacy, /create a replacement App/);
+  assert.match(legacy, /syfo app bind <app-id>/);
+  assert.match(legacy, /syfo app clone <app-id> --clone <dir>/);
+  assert.match(legacy, /\.git\/syfo-hosted-app\.json/);
+  assert.match(legacy, /Existing App identity and canonical repository identity must agree/);
+  assert.match(legacy, /Route all new Syfo website creation through the unified workflow/);
+  assert.match(legacy, /never call `syfo app access set`/);
+});
+
+test('legacy static and fullstack resources remain bundled', async () => {
+  for (const path of [
+    './syfo-webdev/legacy/static/scripts/doctor.mjs',
+    './syfo-webdev/legacy/static/scripts/smoke-static.mjs',
+    './syfo-webdev/legacy/static/templates/project-static-server.mjs',
+    './syfo-webdev/legacy/fullstack/scripts/doctor.mjs',
+    './syfo-webdev/legacy/fullstack/scripts/smoke-server.mjs',
+    './syfo-webdev/legacy/fullstack/templates/syfo.nextjs-fullstack.yaml',
+  ]) {
+    await access(new URL(path, import.meta.url), constants.R_OK);
   }
 });
 
-test('legacy eval expectations never prescribe legacy App creation', () => {
-  for (const [name, , evalSource] of skills) {
-    const { evals } = JSON.parse(evalSource);
-    const expectations = evals.flatMap((evaluation) => [
-      evaluation.expected_output,
-      ...evaluation.expectations,
-    ]).join('\n');
-
-    for (const line of expectations.split('\n').filter((value) => /syfo app init/i.test(value))) {
-      assert.match(line, /does not|do not|must not|never|refus|rather than/i);
-    }
-    assert.doesNotMatch(expectations, new RegExp(`--template ${name}`));
-    assert.doesNotMatch(expectations, /new official-template App|official-template default/i);
-    assert.doesNotMatch(expectations, /(?:static|fullstack) skill initializes/i);
-  }
+test('legacy maintenance keeps migration and deployment consent separate', () => {
+  assert.match(legacy, /migration proposal, not permission to migrate/);
+  assert.match(legacy, /separate explicit human decision/);
+  assert.match(legacy, /independent database\/deployment authorization/);
+  assert.match(legacy, /`build_only`/);
+  assert.match(legacy, /`deploy_ready`/);
+  assert.match(legacy, /`deploy_authorized`/);
+  assert.match(legacy, /actual deployment always requires human confirmation/);
+  assert.match(legacy, /Do not append raw CLI JSON or an internal audit object by default/);
 });

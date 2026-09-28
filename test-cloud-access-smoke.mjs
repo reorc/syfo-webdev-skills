@@ -6,8 +6,8 @@ import { join } from 'node:path';
 import test from 'node:test';
 
 const root = process.cwd();
-const staticScript = join(root, 'syfo-webdev-static', 'scripts', 'smoke-cloud-access.mjs');
-const fullstackScript = join(root, 'syfo-webdev-fullstack', 'scripts', 'smoke-cloud-access.mjs');
+const staticScript = join(root, 'syfo-webdev', 'legacy', 'static', 'scripts', 'smoke-cloud-access.mjs');
+const fullstackScript = join(root, 'syfo-webdev', 'legacy', 'fullstack', 'scripts', 'smoke-cloud-access.mjs');
 
 function run(script, args, env = {}) {
   return new Promise((resolve, reject) => {

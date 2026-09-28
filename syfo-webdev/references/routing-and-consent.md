@@ -3,8 +3,8 @@
 ## Deterministic routing
 
 - `template.id: web-unified` → `syfo-webdev`.
-- Legacy static markers → `syfo-webdev-static`.
-- Legacy fullstack markers → `syfo-webdev-fullstack`.
+- Legacy static markers → the static branch of `legacy-app-maintenance.md`.
+- Legacy fullstack markers → the fullstack branch of `legacy-app-maintenance.md`.
 - Missing/conflicting markers → stop as ambiguous.
 
 ## Independent consent gates
@@ -14,10 +14,10 @@ The following are separate decisions and none implies another:
 1. Modify application code.
 2. Migrate a legacy App to unified.
 3. Enable a cloud database (currently the internal `none -> tidb` transition only).
-4. Prepare or execute deployment.
+4. Execute deployment through human card confirmation.
 5. Change access policy (human UI only).
 
-Detection and feature requirements never satisfy these gates.
+Detection and feature requirements never satisfy these gates. Once Syfo-hosted delivery is selected and the website is ready, the Agent may prepare its deploy card without a separate conversational deploy request. Respect explicit local-only, no-deploy, or no-card constraints; preparing a card does not confirm it.
 
 ## User-facing terminology
 
@@ -37,6 +37,6 @@ The only in-place database transition is an existing unified `site/none` App bec
 3. Run `syfo app database enable [app-id] --confirm-tidb`. The flag records consent and is not a second prompt.
 4. Require `enabled|already_enabled`, then re-read status and verify the internal unified `app/tidb` state plus an active database binding.
 5. Modify the same repository for cloud-database usage, set `database.required: true`, add migrations/data access/tests, and validate against the currently allocated provider.
-6. Deploy only after separate explicit authorization.
+6. Prepare the deploy card when the hosted-website delivery is ready and no explicit constraint excludes it. Deploy only after human card confirmation.
 
 The enable operation changes Core/database state only. It does not modify source, validate, deploy, change live version, domain, or access. Never use it for legacy Apps or as a substitute for migration consent.
