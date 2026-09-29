@@ -23,7 +23,7 @@ test('legacy reference is maintenance-only and preserves authoritative identity'
   assert.match(legacy, /\.git\/syfo-hosted-app\.json/);
   assert.match(legacy, /Existing App identity and canonical repository identity must agree/);
   assert.match(legacy, /Route all new Syfo website creation through the unified workflow/);
-  assert.match(legacy, /never call `syfo app access set`/);
+  assert.match(legacy, /App Owner's Agent may use `syfo app access set` only for a level/);
 });
 
 test('legacy static and fullstack resources remain bundled', async () => {

@@ -25,8 +25,9 @@ Recommend the level from the product mode:
 - Public information website: use `public`.
 
 For an existing website, read the current policy and preserve it unless the human explicitly asks to
-change it. Access changes are a separate human-owned action in the management UI; code work, OAuth,
-database enablement, and deployment never authorize a policy change.
+change it. An explicit human visitor-audience request can authorize the App Owner's Agent to use
+`syfo app access set` under `references/deployment-lifecycle.md`; code work, OAuth, database
+enablement, and deployment never authorize a policy change.
 
 ## Layer 2: Syfo OAuth identity
 
