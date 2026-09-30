@@ -11,7 +11,8 @@ The Hosted App platform gate controls who may open the whole website through its
 | `public` | Anyone may open the website without signing in. | Public information sites and external products with anonymous pages. |
 | `authenticated` | Any signed-in Syfo user, including users outside the owning organization. | Syfo-wide products where every visitor must have a Syfo account. |
 | `org` | Any active member of the owning organization. | Internal tools for the whole organization. |
-| `org_members` | Only selected active members of the owning organization. | Restricted internal tools for a named subset. |
+| `selected_users` | Only named Syfo accounts, inside or outside the owning organization. | Restricted tools for a confirmed list of people. |
+| `owner_only` | Only the App Owner; stored as a server-derived one-person `org_members` policy. | Private site for the Owner. |
 
 This is one whole-website gate, not a page or business-record permission system. It does not add a
 “Sign in with Syfo” button, create an App-local user, or decide which records and actions the user may
@@ -19,14 +20,18 @@ access after entry.
 
 Recommend the level from the product mode:
 
-- Internal tool: default to `org`; use `org_members` only for a named subset.
+- Internal tool: default to `org`; use `selected_users` for a confirmed named subset, or `owner_only` for just the Owner.
 - External product: use `public` when anonymous acquisition or public pages exist; use
   `authenticated` only when every visitor must already be a signed-in Syfo user.
 - Public information website: use `public`.
 
 For an existing website, read the current policy and preserve it unless the human explicitly asks to
-change it. Access changes are a separate human-owned action in the management UI; code work, OAuth,
-database enablement, and deployment never authorize a policy change.
+change it. An explicit human visitor-audience request can authorize the App Owner's Agent to use
+`syfo app access set` under `references/deployment-lifecycle.md`; code work, OAuth, database
+enablement, and deployment never authorize a policy change.
+Existing `org_members` policies remain readable for compatibility. Do not treat that legacy
+organization-only allowlist as the new cross-organization `selected_users` entry; never rewrite it
+without an explicit human audience decision.
 
 ## Layer 2: Syfo OAuth identity
 
@@ -34,7 +39,7 @@ Use Syfo OAuth only when application code must identify the acting user—for ex
 per-user ownership, App roles, preferences, or audit attribution.
 
 - `public` may still use Syfo OAuth on account-only routes while public pages remain anonymous.
-- `authenticated`, `org`, and `org_members` may require platform sign-in to enter, but App code still
+- `authenticated`, `org`, `selected_users`, and `owner_only` may require platform sign-in to enter, but App code still
   needs its own OAuth flow when it needs an App-local user identity.
 - A pure public information website normally needs no OAuth.
 
@@ -65,7 +70,7 @@ Record this before coding and include it in handoff:
 
 ```text
 product_mode: internal_tool | external_product | public_information
-platform_access: public | authenticated | org | org_members
+platform_access: public | authenticated | org | selected_users | owner_only
 platform_access_reason: <why this whole-website gate fits>
 access_change_authorized: yes | no | not_needed
 syfo_oauth: required | not_required
@@ -78,7 +83,7 @@ protected_routes: <server routes/actions and their required checks>
 Examples:
 
 - Internal operations dashboard: `org` + Syfo OAuth + App roles such as admin/operator.
-- Restricted finance tool: `org_members` + Syfo OAuth + App role and record-scope checks.
+- Restricted finance tool: `selected_users` + Syfo OAuth + App role and record-scope checks.
 - External member product with public landing pages: `public` + Syfo OAuth on account routes +
   subscription and data-ownership checks.
 - Public campaign site: `public` + no OAuth + no user ACL.

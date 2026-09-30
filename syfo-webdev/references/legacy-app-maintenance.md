@@ -31,7 +31,9 @@ Keep the existing directory, template, runtime, database requirement, and deploy
 - Static remains database-free and request-independent. If the requested behavior needs server APIs, application authentication, secrets, persistence, request-time rendering, middleware, or server actions, stop and ask for separate migration authorization.
 - Fullstack continues to use its allocated App database and migration history. Verify the canonical binding without exposing connection values; do not provision or silently switch databases.
 - Static-to-fullstack or legacy-to-unified migration requires a separate explicit human decision, a migration plan, and independent database/deployment authorization.
-- Keep access policy human-owned; read it with `syfo app status --json` and never call `syfo app access set`.
+- Preserve access policy unless the human explicitly requests a visitor audience. Read it with
+  `syfo app status --json`; the App Owner's Agent may use `syfo app access set` only for a level
+  supported by this legacy runtime, following `references/deployment-lifecycle.md`.
 
 ## Select the maintenance branch
 

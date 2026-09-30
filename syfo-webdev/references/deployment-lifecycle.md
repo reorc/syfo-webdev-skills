@@ -12,7 +12,7 @@ from another.
 | `awaiting_confirmation` | Deploy/action-card identifiers and intended commit recorded | Wait for human confirmation and Hosted App notifications |
 | `building` / `publishing` | A pushed deployment notification reports a non-terminal state | Wait for the pushed terminal result; do not poll or register a watch |
 | `failed` | Structured failure stage/code is available | Follow the failure branch below |
-| `active` | Intended commit is the live version | Read access policy, then run production acceptance |
+| `active` | Intended commit is the live version | Re-read access policy, then run production acceptance |
 
 ## Preparing and replacing deploy cards
 
@@ -66,11 +66,31 @@ embedded credentials, ports, redirects, or manually written link cards.
 
 ## Access policy ownership
 
-- App initialization assigns the platform default access policy. The Agent must not change it.
-- Read the current policy from `syfo app status --json` at deployment acceptance time.
-- If the current policy does not match the user's requirement, stop and ask a human to update it in
-  the Hosted App management UI. Re-read status after the human change before continuing.
-- Never call or suggest `syfo app access set`; access policy is a human-owned security boundary.
+- App initialization assigns the platform default access policy; do not infer a change from initialization or deployment.
+- Read the current policy from `syfo app status --json` before preparing deployment and again at
+  production acceptance. For a newly created App whose default is broader than the explicitly
+  requested audience, never deploy first and restrict later: even a brief public window is a leak.
+- If the human explicitly requested an audience in their own words, and the current policy differs,
+  the App Owner's Agent may run `syfo app access set <app-id> <level> --json` after the App has been
+  claimed. Use `public` for anyone, `authenticated` for all signed-in Syfo users, `org` for all
+  organization members, and `owner_only` for only the App Owner (`org_members` with a server-derived
+  one-person allowlist). For specific Syfo users inside or outside the organization, use
+  `selected_users` with repeated `--selected-user-email <email>` for the *complete*, non-empty
+  replacement list. Confirm each address with the human; never guess or silently omit recipients.
+  The CLI must confirm `selectedUsersApplied: true` from the backend, and `syfo app status --json`
+  must report the persisted level before claiming success. The legacy `org_members` policy is
+  readable but cannot be newly written through this Agent command. Do not silently broaden access
+  or enable Basic Auth. Runtime capability may reject a level (legacy static sites, for example,
+  only support `public`); stop rather than substituting a broader level.
+- If the audience is merely inferred from product classification, ask the human before changing it.
+  If the server denies the mutation, do not retry with another Agent or widen the audience: explain
+  that the App Owner must claim/grant developer access or change the policy in the management UI.
+  Re-read `syfo app status --json` after a successful write; report the actual persisted level.
+- If the App is unclaimed and the requested audience is narrower than its default, prepare a
+  `syfo app claim` card and wait for the human to confirm ownership, then apply and verify access
+  before preparing the deploy card. If ownership cannot be established or the runtime rejects the
+  private level, stop; do not deploy under the broader default. For an already-live App, explain
+  whether a requested widening would expose its current content before proceeding.
 - Run only the acceptance checks possible with credentials explicitly supplied by the human. Do not
   request, retrieve, rotate, print, or persist Basic Auth credentials.
 
@@ -80,7 +100,9 @@ embedded credentials, ports, redirects, or manually written link cards.
 - Do not run `syfo app claim` as a routine prerequisite. A first deploy confirmation may claim the
   App for the confirming human.
 - Use `syfo app claim` only when the user explicitly wants ownership established before deployment,
-  or when the CLI returns a specific ownership-required result.
+  when an explicitly requested narrower access policy requires a claimed Owner before safe first
+  publication, or when the CLI returns a specific ownership-required result. The human still
+  confirms the claim card; preparing it never makes the Agent an Owner.
 - The Agent prepares the deploy confirmation card; a human owner/admin commits the paid mutation.
 - `--target` is required when preparing the confirmation card. Use the complete current task/message
   reply target supplied by the runtime; do not omit it, shorten it, or invent a channel identifier.

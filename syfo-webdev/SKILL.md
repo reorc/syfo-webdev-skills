@@ -42,8 +42,9 @@ Before implementing a new Syfo-hosted website—or changing login, protected rou
 visitor access—read `references/access-identity-authorization.md` and record one security plan:
 
 1. Classify the product as an internal tool, external product, or public information website.
-2. Recommend one whole-website platform access level: `public`, `authenticated`, `org`, or
-   `org_members`. Explain the recommendation, but keep the actual policy change in the human UI.
+2. Recommend one whole-website platform access level: `public`, `authenticated`, `org`,
+   `selected_users`, or the `owner_only` shortcut. A recommendation alone does not authorize a policy change;
+   follow the explicit visitor-access request and `references/deployment-lifecycle.md`.
 3. Decide separately whether application code needs Syfo identity. Add Syfo OAuth only when the App
    must know which user is acting; a platform sign-in requirement does not itself give business code
    an App user or business permissions.
@@ -62,7 +63,10 @@ invent a machine API or API-key system when the request concerns human website a
 - Preserve existing legacy static/fullstack repositories and use the matching branch of `references/legacy-app-maintenance.md`.
 - Never reinterpret an existing App as unified because a feature request mentions login, APIs, or a database.
 - Never enable a cloud database, migrate a template, deploy, or change access policy without separate explicit human consent for that action.
-- To keep access policy human-owned, never call `syfo app access set`.
+- Change access only when the human explicitly requests a visitor audience (including plain-language
+  descriptions such as “anyone can visit” or “only I can visit”). Product classification, code work,
+  deployment, and consulting this Skill never authorize a change by themselves. The backend permits
+  `syfo app access set` only for the App Owner's Agent with developer access; a rejection is final.
 - Treat platform access, Syfo OAuth identity, and App-owned authorization as separate controls. One
   never substitutes for the next.
 - Never declare a `gitlab.syfo.ai` source URL as an artifact or user-facing deliverable. It is an internal Syfo website repository host; declare the deployed website/App result instead.
@@ -264,7 +268,11 @@ npm run test:unified-template-canary -- --template /path/to/web-unified
 
 ## Cloud smoke
 
-After an authorized deployment, read policy with `syfo app status --json`. Do not modify it. Run public or Basic Auth smoke only when compatible with the human-owned policy:
+Before deployment preparation, read policy with `syfo app status --json` and apply a separately
+authorized visitor-access request following `references/deployment-lifecycle.md`. For a new private
+site, claim and verify the narrower policy *before* publishing; never publish under a broader
+default and restrict later. After deployment, re-read status and run public or Basic Auth smoke only
+when compatible with the confirmed policy:
 
 ```bash
 node <skill-path>/scripts/smoke-cloud-access.mjs --url https://APP_DOMAIN --mode public --path /

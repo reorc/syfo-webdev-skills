@@ -15,7 +15,7 @@ The following are separate decisions and none implies another:
 2. Migrate a legacy App to unified.
 3. Enable a cloud database (currently the internal `none -> tidb` transition only).
 4. Execute deployment through human card confirmation.
-5. Change access policy (human UI only).
+5. Change access policy only for an explicit human visitor-audience request, via the App Owner's Agent and server-enforced `syfo app access set`; otherwise preserve it.
 
 Detection and feature requirements never satisfy these gates. Once Syfo-hosted delivery is selected and the website is ready, the Agent may prepare its deploy card without a separate conversational deploy request. Respect explicit local-only, no-deploy, or no-card constraints; preparing a card does not confirm it.
 
