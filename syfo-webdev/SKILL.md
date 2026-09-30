@@ -43,7 +43,7 @@ visitor access—read `references/access-identity-authorization.md` and record o
 
 1. Classify the product as an internal tool, external product, or public information website.
 2. Recommend one whole-website platform access level: `public`, `authenticated`, `org`,
-   `org_members`, or `selected_users`. A recommendation alone does not authorize a policy change;
+   `selected_users`, or the `owner_only` shortcut. A recommendation alone does not authorize a policy change;
    follow the explicit visitor-access request and `references/deployment-lifecycle.md`.
 3. Decide separately whether application code needs Syfo identity. Add Syfo OAuth only when the App
    must know which user is acting; a platform sign-in requirement does not itself give business code

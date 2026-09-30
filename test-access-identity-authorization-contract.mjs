@@ -33,7 +33,7 @@ test('unified Skill requires a three-layer security plan before implementation',
   assert.match(skill, /App Owner's Agent with developer access; a rejection is final/);
   assert.match(skill, /references\/access-identity-authorization\.md/);
   assert.match(skill, /internal tool, external product, or public information website/);
-  assert.match(skill, /`public`, `authenticated`, `org`,\s+`org_members`, or `selected_users`/s);
+  assert.match(skill, /`public`, `authenticated`, `org`,\s+`selected_users`, or the `owner_only` shortcut/s);
   assert.match(skill, /Add Syfo OAuth only when the App\s+must know which user is acting/s);
   assert.match(skill, /Enforce it in server\s+routes and mutations/s);
   assert.match(skill, /Do not\s+invent a machine API or API-key system/s);
@@ -43,8 +43,11 @@ test('access reference defines exact platform semantics and product-mode default
   assert.match(reference, /`public` \| Anyone may open the website without signing in/);
   assert.match(reference, /`authenticated` \| Any signed-in Syfo user, including users outside/);
   assert.match(reference, /`org` \| Any active member of the owning organization/);
-  assert.match(reference, /`org_members` \| Only selected active members of the owning organization/);
-  assert.match(reference, /Internal tool: default to `org`; use `org_members` only for a named subset/);
+  assert.match(reference, /`selected_users` \| Only named Syfo accounts, inside or outside/);
+  assert.match(reference, /`owner_only` \| Only the App Owner/);
+  assert.match(reference, /Internal tool: default to `org`; use `selected_users` for a confirmed named subset/);
+  assert.match(reference, /Existing `org_members` policies remain readable for compatibility/);
+  assert.match(skill, /explicitly requests a visitor audience/);
   assert.match(reference, /External product: use `public` when anonymous acquisition or public pages exist/);
   assert.match(reference, /explicit human visitor-audience request can authorize the App Owner's Agent/);
 });
