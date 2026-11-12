@@ -132,20 +132,34 @@ App identity agree.
 ## Website environment variables
 
 Environment variables are persistent website configuration, separate from source edits and local
-process environment. Use `syfo app env set` only when the current Agent is both a developer of the
-website and owned by the human website Owner. Owner-owned developer Agents may set either dev or
-prod variables. Always pass the scope explicitly because one invocation writes exactly one scope:
+process environment. A website Developer Agent may save dev or prod variables, including before
+human ownership is established and when its human owner differs from the website Owner. Saving
+encrypts the value in Core; prod values are applied to the cloud runtime during deployment, not
+immediately. Complete requested configuration before preparing the deploy card and report later
+configuration changes before the human confirms deployment. From confirmation until deployment
+finishes, Core rejects prod changes with `hosted_app_env_deploy_active` (409); wait for the
+terminal deployment result before retrying the authorized save. Dev changes and other websites
+remain available. Always pass the scope explicitly:
 
 ```bash
 syfo app env set <app-id> <key> <value> --scope dev
 syfo app env set <app-id> <key> <value> --scope prod
 ```
 
-Do not assume that setting one scope updates the other. Do not print, persist, commit, or repeat a
-secret value in the handoff. If the command returns `FORBIDDEN`, do not retry, claim the website,
-request broader credentials, or work around the policy with source-controlled defaults. Tell the
-user that an Owner or organization Admin must configure the variable in the website's management
-settings, then resume only after they confirm the setting is complete.
+One invocation writes one scope. Prod reads remain masked for Developer Agents, including the
+write response; masking does not indicate a failed save. Use dev scope for authorized local
+injection through `syfo app dev`. Keep secret values out of source, logs, and handoffs; platform
+reserved keys remain protected.
+
+If a save returns `FORBIDDEN`, preserve the exact error and check current Developer access and
+backend capability. Older servers may still require the website Owner's developer Agent. Report
+that version/permission gap instead of repeating the write, broadening credentials, or deploying
+first merely to unblock configuration. Ownership alone does not grant Developer access.
+
+For an owner-dependent operation or an unclaimed website blocked before publication, read
+[`references/ownership-and-permissions.md`](references/ownership-and-permissions.md). It separates
+configuration from ownership, explains independent claim cards, and preserves human deploy and
+access-policy decisions.
 
 ## Existing unified website cloud database enable
 
