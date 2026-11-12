@@ -96,6 +96,10 @@ embedded credentials, ports, redirects, or manually written link cards.
 
 ## Ownership and deploy authority
 
+For configuration, membership, data writes, or another owner-dependent operation, first use the
+operation-specific table in [ownership and permissions](ownership-and-permissions.md). Saving env
+does not require a claim or a preliminary deployment.
+
 - `owner=null` after `syfo app init` is a valid unclaimed draft, not an initialization failure.
 - Do not run `syfo app claim` as a routine prerequisite. A first deploy confirmation may claim the
   App for the confirming human.

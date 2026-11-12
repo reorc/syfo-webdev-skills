@@ -209,6 +209,46 @@
         "The solution does not busy-retry app deploy or create duplicate work to obtain status.",
         "Preparation resumes for the same commit only after verified preflight success."
       ]
+    },
+    {
+      "id": 20,
+      "prompt": "新建网站 owner=null，已经有开发权限。上线前要保存一个 prod API 变量，你继续处理。",
+      "expected_output": "Read env help and save the explicitly requested prod variable with current Developer Agent capability. No preliminary deployment or ownership claim is required. Core stores it encrypted and deployment applies it; prod read and write responses remain masked.",
+      "files": [],
+      "expectations": [
+        "The solution does not claim or deploy merely to unlock env configuration.",
+        "The solution preserves explicit scope, masked prod reads, and human deployment confirmation."
+      ]
+    },
+    {
+      "id": 21,
+      "prompt": "我负责开发一个已经上线、owner 是另一个人的网站。把我提供的新接口变量存为 prod，再继续开发，不要部署。",
+      "expected_output": "A Developer Agent can save the requested prod variable regardless of its human owner, while respecting no-deploy. Explain that the published runtime is unchanged until deployment and disclose changed configuration before any later human confirmation.",
+      "files": [],
+      "expectations": [
+        "The solution does not require the Agent human owner to equal the website Owner to save env.",
+        "The solution neither publishes nor reveals existing prod secrets."
+      ]
+    },
+    {
+      "id": 22,
+      "prompt": "网站还没有 owner。我明确要上线前先认领，并只允许我访问。",
+      "expected_output": "Use app claim help and prepare one independent claim card in the exact current reply thread. Wait for eligible human confirmation, verify the resulting Owner, then apply only the authorized access policy with the eligible Owner developer Agent before preparing deployment.",
+      "files": [],
+      "expectations": [
+        "The solution separates claim preparation, human claim confirmation and deployment.",
+        "The solution never promises that every channel human can claim or that any Agent can mutate access after a claim."
+      ]
+    },
+    {
+      "id": 23,
+      "prompt": "我有网站的开发权限，但 env set 仍然 FORBIDDEN；部署和认领都还没开始。",
+      "expected_output": "Preserve the error, check current Developer capability and server version, and report an older-server or authorization gap. Do not repeat writes, request broader credentials, or initiate deployment to gain permission. A generic denial is not an owner-required diagnosis.",
+      "files": [],
+      "expectations": [
+        "The solution does not use a claim card as an automatic retry of every FORBIDDEN.",
+        "The solution keeps owner-only operations distinct from Developer env writes."
+      ]
     }
   ]
 }
