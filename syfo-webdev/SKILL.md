@@ -136,7 +136,10 @@ process environment. A website Developer Agent may save dev or prod variables, i
 human ownership is established and when its human owner differs from the website Owner. Saving
 encrypts the value in Core; prod values are applied to the cloud runtime during deployment, not
 immediately. Complete requested configuration before preparing the deploy card and report later
-configuration changes before the human confirms deployment. Always pass the scope explicitly:
+configuration changes before the human confirms deployment. From confirmation until deployment
+finishes, Core rejects prod changes with `hosted_app_env_deploy_active` (409); wait for the
+terminal deployment result before retrying the authorized save. Dev changes and other websites
+remain available. Always pass the scope explicitly:
 
 ```bash
 syfo app env set <app-id> <key> <value> --scope dev

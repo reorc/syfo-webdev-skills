@@ -7,7 +7,7 @@ status; a generic denial does not prove that claiming will fix the operation.
 | Operation | Developer Agent / ownership requirement | Next action |
 | --- | --- | --- |
 | Source clone/bind/push, local dev, validation | Current Developer access; a human website Owner is not a prerequisite | Use the managed binding/Git path; resolve missing Developer access with an authorized human |
-| Save dev/prod env | Current Developer Agent; no matching website Owner required | Save only the requested scope; Core encrypts it, and deployment applies prod values to the cloud |
+| Save dev/prod env | Current Developer Agent; no matching website Owner required | Save only the requested scope; Core encrypts it; prod changes wait while that website has a confirmed, unfinished deploy |
 | Read prod env values | Human website Owner; Developer responses remain masked | Use authorized dev-scope injection for local work; do not request prod plaintext to verify a write |
 | Enable a cloud database | Developer capability plus explicit human database consent | Follow the database enable branch; database consent does not authorize deployment |
 | Prepare deployment | Developer capability; owner may still be null | Validate and push first, then prepare one card for the intended commit |
@@ -48,6 +48,17 @@ Core's current variables and sends them to the cloud configuration. Save the req
 before preparing deployment, and disclose changes made after preparation to the confirming human;
 an immutable source commit alone does not pin all environment settings. Do not use a deployment
 as a way to obtain ownership or as a test that a variable was saved.
+
+Once a deployment is confirmed, Core freezes prod writes for that website until the deployment
+reaches a terminal result, including build/provider waits and automatic retries that are active.
+On `hosted_app_env_deploy_active` (409), preserve the requested change, wait for that deployment
+to finish, then retry only the authorized save. Do not switch to dev as a substitute for the
+requested prod change, bypass the guard, or prepare another deploy to unlock it. Dev writes and
+other websites remain independent. On `hosted_app_env_guard_unavailable` (503), report the
+missing server migration; do not assume the configuration was saved.
+
+Release order is database guard migration, Core API rollout, then Skill distribution. Old Core
+replicas are protected by the database too, but may return a generic error for this conflict.
 
 If an older server rejects Developer env writes, report the exact command/error and missing
 capability. The existing human Owner/Admin management path remains available; use an independent

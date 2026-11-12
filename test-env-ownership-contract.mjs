@@ -23,5 +23,14 @@ test('owner-dependent actions route to explicit human claim and keep separate au
   assert.match(source, /an immutable source commit alone does not pin all environment settings/);
   assert.match(source, /independent claim cards are separate action-card records/);
   const evals = JSON.parse(await read('syfo-webdev/evals/evals.json')).evals;
-  for (const id of [20, 21, 22, 23]) assert.ok(evals.some((entry) => entry.id === id));
+  for (const id of [20, 21, 22, 23, 24]) assert.ok(evals.some((entry) => entry.id === id));
+});
+
+test('confirmed deploy conflicts wait without blocking other websites', async () => {
+  const source = await read('syfo-webdev/references/ownership-and-permissions.md');
+  assert.match(source, /hosted_app_env_deploy_active.*409/);
+  assert.match(source, /other websites remain independent/);
+  assert.match(source, /Do not switch to dev as a substitute/);
+  assert.match(source, /database guard migration, Core API rollout, then Skill distribution/);
+  assert.match(source, /hosted_app_env_guard_unavailable.*503/);
 });

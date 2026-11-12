@@ -249,6 +249,16 @@
         "The solution does not use a claim card as an automatic retry of every FORBIDDEN.",
         "The solution keeps owner-only operations distinct from Developer env writes."
       ]
+    },
+    {
+      "id": 24,
+      "prompt": "A 网站刚确认部署，还在构建。我现在要改 A 的 prod env，保存返回 hosted_app_env_deploy_active。B 网站也要配置和部署，继续处理。",
+      "expected_output": "Preserve the requested A prod change and wait for its terminal deploy result before retrying that authorized save. Continue independently authorized B configuration and deployment preparation; A does not freeze B. Dev remains available but cannot substitute for the requested prod change.",
+      "files": [],
+      "expectations": [
+        "The solution does not bypass the guard, change scope, or start another deployment to unlock A.",
+        "The solution never reports a rejected save as successful and keeps B human deployment confirmation."
+      ]
     }
   ]
 }
